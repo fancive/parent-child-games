@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>小熊超市</title>
+    <style>
+        :root {
+            --bg-warm: #FFF8E1;
+            --bg-cream: #FFFDE7;
+            --brown-dark: #3E2723;
+            --brown-medium: #5D4037;
+            --brown-light: #8D6E63;
+            --bear-brown: #A1887F;
+            --shelf-bg: #EFEBE9;
+            --gold: #FFC107;
+            --gold-dark: #FF8F00;
+            --green: #66BB6A;
+            --green-dark: #43A047;
+            --red: #EF5350;
+            --red-dark: #E53935;
+            --blue: #42A5F5;
+            --blue-dark: #1E88E5;
+            --orange: #FFA726;
+            --pink: #F48FB1;
+            --purple: #CE93D8;
+            --white: #FFFFFF;
+            --shadow: rgba(0,0,0,0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+            background: var(--bg-warm);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--brown-dark);
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        /* ===== SCREENS ===== */
+        .screen { display: none; min-height: 100vh; }
+        .screen.active { display: flex; flex-direction: column; }
+
+        /* ===== WELCOME SCREEN ===== */
+        #welcome {
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #FFE0B2 0%, #FFF8E1 50%, #FFECB3 100%);
+            text-align: center;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .welcome-bear {
+            font-size: 120px;
+            animation: bearBounce 2s ease-in-out infinite;
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.15));
+        }
+
+        @keyframes bearBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .welcome-title {
+            font-size: 42px;
+            font-weight: 900;
+            color: var(--brown-dark);
+            text-shadow: 2px 2px 0 var(--gold);
+            letter-spacing: 4px;
+        }
+
+        .welcome-subtitle {
+            font-size: 18px;
+            color: var(--brown-medium);
+            margin-top: -8px;
+        }
+
+        .welcome-features {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 500px;
+        }
+
+        .feature-tag {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 15px;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, var(--gold), var(--orange));
+            border: none;
+            color: var(--white);
+            font-size: 28px;
+            font-weight: 800;
+            padding: 18px 56px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(255,152,0,0.4);
+            transition: all 0.2s;
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+
+        .btn-start:active {
+            transform: scale(0.95);
+            box-shadow: 0 3px 10px rgba(255,152,0,0.4);
+        }
+
+        /* ===== GAME SCREEN ===== */
+        #game {
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .game-header {
+            background: linear-gradient(135deg, var(--brown-medium), var(--brown-dark));
+            color: var(--white);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .store-name {
+            font-size: 22px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 16px;
+            font-size: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(255,255,255,0.15);
+            padding: 4px 12px;
+            border-radius: 16px;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .game-main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ===== INVENTORY PANEL ===== */
+        .inventory-panel {
+            width: 280px;
+            background: var(--shelf-bg);
+            border-right: 3px solid #D7CCC8;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .inventory-title {
+            padding: 10px 14px;
+            font-size: 16px;
+            font-weight: 700;
+            background: #D7CCC8;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .inventory-grid {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            align-content: start;
+        }
+
+        .toy-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 10px 8px;
+            text-align: center;
+            box-shadow: 0 2px 6px var(--shadow);
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .toy-card.out-of-stock {
+            opacity: 0.4;
+            filter: grayscale(0.5);
+        }
+
+        .toy-card.highlight {
+            border: 3px solid var(--gold);
+            box-shadow: 0 0 12px rgba(255,193,7,0.4);
+        }
+
+        .toy-emoji { font-size: 32px; }
+
+        .toy-name {
+            font-size: 12px;
+            font-weight: 600;
+            margin: 4px 0 2px;
+            color: var(--brown-dark);
+        }
+
+        .toy-price {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--gold-dark);
+        }
+
+        .toy-stock {
+            font-size: 11px;
+            color: var(--brown-light);
+            margin-top: 2px;
+        }
+
+        .stock-dots {
+            display: flex;
+            justify-content: center;
+            gap: 3px;
+            margin-top: 3px;
+        }
+
+        .stock-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+        }
+
+        .stock-dot.empty { background: #E0E0E0; }
+
+        .sold-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--red);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+
+        /* ===== INTERACTION PANEL ===== */
+        .interaction-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(180deg, #FFF8E1 0%, #FFFDE7 100%);
+            overflow: hidden;
+        }
+
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-msg {
+            display: flex;
+            gap: 10px;
+            animation: msgAppear 0.4s ease-out;
+            max-width: 85%;
+        }
+
+        .chat-msg.customer { align-self: flex-start; }
+        .chat-msg.bear { align-self: flex-end; flex-direction: row-reverse; }
+        .chat-msg.system { align-self: center; }
+
+        @keyframes msgAppear {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-avatar {
+            font-size: 36px;
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-bubble {
+            padding: 10px 16px;
+            border-radius: 16px;
+            font-size: 16px;
+            line-height: 1.5;
+            box-shadow: 0 2px 6px var(--shadow);
+        }
+
+        .customer .chat-bubble {
+            background: var(--white);
+            border-bottom-left-radius: 4px;
+        }
+
+        .bear .chat-bubble {
+            background: #E8F5E9;
+            border-bottom-right-radius: 4px;
+        }
+
+        .system .chat-bubble {
+            background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+            border-radius: 20px;
+            font-size: 14px;
+            padding: 8px 20px;
+            font-weight: 600;
+        }
+
+        /* ===== TOY DISPLAY CARD ===== */
+        .toy-display {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 4px 12px var(--shadow);
+            margin: 4px 0;
+            animation: cardPop 0.3s ease-out;
+            align-self: center;
+            min-width: 200px;
+        }
+
+        @keyframes cardPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .toy-display .toy-emoji { font-size: 56px; }
+        .toy-display .toy-name { font-size: 18px; margin: 6px 0; }
+        .toy-display .toy-price { font-size: 20px; }
+        .toy-display .toy-stock { font-size: 14px; }
+
+        /* ===== ACTION AREA ===== */
+        .action-area {
+            padding: 12px 16px;
+            background: var(--white);
+            border-top: 2px solid #F5F5F5;
+            flex-shrink: 0;
+        }
+
+        .price-setter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .price-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: none;
+            font-size: 28px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+
+        .price-btn:active { transform: scale(0.9); }
+
+        .price-btn.minus {
+            background: linear-gradient(135deg, #FFCDD2, var(--red));
+            color: white;
+        }
+
+        .price-btn.plus {
+            background: linear-gradient(135deg, #C8E6C9, var(--green));
+            color: white;
+        }
+
+        .price-display {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--gold-dark);
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .price-display small {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .price-hint {
+            text-align: center;
+            font-size: 13px;
+            color: var(--brown-light);
+            margin-bottom: 8px;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .action-btn {
+            border: none;
+            padding: 14px 24px;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-btn:active { transform: scale(0.96); }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--gold), var(--orange));
+            color: white;
+            box-shadow: 0 3px 10px rgba(255,152,0,0.3);
+        }
+
+        .action-btn.accept {
+            background: linear-gradient(135deg, var(--green), var(--green-dark));
+            color: white;
+            box-shadow: 0 3px 10px rgba(76,175,80,0.3);
+        }
+
+        .action-btn.reject {
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            color: white;
+            box-shadow: 0 3px 10px rgba(244,67,54,0.3);
+        }
+
+        .action-btn.counter {
+            background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+            color: white;
+            box-shadow: 0 3px 10px rgba(33,150,243,0.3);
+        }
+
+        .action-btn.secondary {
+            background: #F5F5F5;
+            color: var(--brown-medium);
+        }
+
+        .action-btn.next {
+            background: linear-gradient(135deg, var(--purple), #AB47BC);
+            color: white;
+            box-shadow: 0 3px 10px rgba(171,71,188,0.3);
+        }
+
+        .counter-options {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .counter-option {
+            flex: 1;
+            min-width: 80px;
+            border: none;
+            padding: 12px 8px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+            color: var(--blue-dark);
+            transition: all 0.15s;
+        }
+
+        .counter-option:active { transform: scale(0.95); }
+
+        /* ===== DEAL CELEBRATION ===== */
+        .deal-celebration {
+            text-align: center;
+            padding: 20px;
+            animation: celebrate 0.5s ease-out;
+        }
+
+        @keyframes celebrate {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .deal-emoji { font-size: 72px; }
+        .deal-text { font-size: 24px; font-weight: 800; margin: 10px 0; }
+        .deal-amount {
+            font-size: 36px;
+            font-weight: 900;
+            color: var(--gold-dark);
+        }
+
+        /* ===== CONFETTI ===== */
+        .confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            top: -10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            animation: confettiFall linear forwards;
+        }
+
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* ===== COIN ANIMATION ===== */
+        .coin-fly {
+            position: fixed;
+            font-size: 32px;
+            z-index: 99;
+            pointer-events: none;
+            animation: coinFlyUp 1s ease-out forwards;
+        }
+
+        @keyframes coinFlyUp {
+            0% { opacity: 1; transform: scale(1); }
+            50% { transform: scale(1.3) translateY(-50px); }
+            100% { opacity: 0; transform: scale(0.5) translateY(-120px); }
+        }
+
+        /* ===== CUSTOMER ENTER/EXIT ===== */
+        .customer-enter { animation: slideInRight 0.5s ease-out; }
+        .customer-exit { animation: slideOutLeft 0.5s ease-out; }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOutLeft {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(-100px); opacity: 0; }
+        }
+
+        /* ===== SUMMARY SCREEN ===== */
+        #summary {
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #E8F5E9 0%, #FFF8E1 50%, #FFECB3 100%);
+            text-align: center;
+            padding: 20px;
+            gap: 16px;
+        }
+
+        .summary-title {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--brown-dark);
+        }
+
+        .summary-bear { font-size: 80px; }
+
+        .summary-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            max-width: 500px;
+        }
+
+        .summary-stat {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 16px 24px;
+            box-shadow: 0 4px 12px var(--shadow);
+            min-width: 140px;
+        }
+
+        .summary-stat-value {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--gold-dark);
+        }
+
+        .summary-stat-label {
+            font-size: 14px;
+            color: var(--brown-light);
+            margin-top: 4px;
+        }
+
+        .stars {
+            font-size: 40px;
+            letter-spacing: 8px;
+            margin: 8px 0;
+        }
+
+        .star-label {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--brown-medium);
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, var(--green), var(--green-dark));
+            border: none;
+            color: white;
+            font-size: 22px;
+            font-weight: 800;
+            padding: 16px 48px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(76,175,80,0.3);
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        .btn-restart:active { transform: scale(0.95); }
+
+        /* ===== RESTOCK MODAL ===== */
+        .restock-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .restock-modal {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .restock-modal h3 {
+            font-size: 22px;
+            margin-bottom: 16px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .inventory-panel { display: none; }
+
+            .game-header {
+                padding: 8px 12px;
+            }
+
+            .store-name { font-size: 18px; }
+            .header-stats { gap: 8px; font-size: 13px; }
+
+            .stat-item { padding: 3px 8px; }
+
+            .welcome-bear { font-size: 80px; }
+            .welcome-title { font-size: 32px; }
+
+            .price-display { font-size: 40px; }
+            .price-btn { width: 48px; height: 48px; font-size: 24px; }
+
+            .action-btn { padding: 12px 20px; font-size: 16px; }
+        }
+
+        @media (max-width: 480px) {
+            .welcome-title { font-size: 26px; letter-spacing: 2px; }
+            .btn-start { font-size: 22px; padding: 14px 40px; }
+        }
+
+        /* ===== MOBILE INVENTORY BAR ===== */
+        .mobile-inventory-bar {
+            display: none;
+            overflow-x: auto;
+            background: var(--shelf-bg);
+            border-bottom: 2px solid #D7CCC8;
+            padding: 6px 8px;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-inventory-bar { display: flex; }
+        }
+
+        .mobile-toy-chip {
+            flex-shrink: 0;
+            background: var(--white);
+            border-radius: 10px;
+            padding: 4px 10px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 1px 4px var(--shadow);
+        }
+
+        .mobile-toy-chip.out-of-stock { opacity: 0.35; }
+        .mobile-toy-chip.highlight {
+            border: 2px solid var(--gold);
+            background: #FFF8E1;
+        }
+
+        .mobile-toy-chip .chip-emoji { font-size: 18px; }
+        .mobile-toy-chip .chip-stock {
+            font-size: 11px;
+            color: var(--brown-light);
+        }
+
+        /* idle prompt */
+        .idle-prompt {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .idle-bear { font-size: 64px; animation: bearBounce 2s ease-in-out infinite; }
+        .idle-text { font-size: 18px; color: var(--brown-light); }
+
+        /* scrollbar */
+        .inventory-grid::-webkit-scrollbar,
+        .chat-area::-webkit-scrollbar { width: 6px; }
+        .inventory-grid::-webkit-scrollbar-thumb,
+        .chat-area::-webkit-scrollbar-thumb {
+            background: #D7CCC8;
+            border-radius: 3px;
+        }
+
+        .no-deal-face { font-size: 64px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<div id="welcome" class="screen active">
+    <div class="welcome-bear">🐻</div>
+    <div class="welcome-title">小熊超市</div>
+    <div class="welcome-subtitle">欢迎来到最可爱的玩具超市！</div>
+    <div class="welcome-features">
+        <div class="feature-tag">🧸 30种玩具</div>
+        <div class="feature-tag">🐰 可爱顾客</div>
+        <div class="feature-tag">💰 讨价还价</div>
+        <div class="feature-tag">🌟 赚取金币</div>
+    </div>
+    <button class="btn-start" onclick="startGame()">开始营业！</button>
+</div>
+
+<div id="game" class="screen">
+    <div class="game-header">
+        <div class="store-name">🐻 小熊超市</div>
+        <div class="header-stats">
+            <div class="stat-item">💰 <span class="stat-value" id="hdr-money">0</span>元</div>
+            <div class="stat-item">👥 <span class="stat-value" id="hdr-customers">0</span></div>
+            <div class="stat-item">📦 <span class="stat-value" id="hdr-day">第1天</span></div>
+        </div>
+    </div>
+
+    <div class="mobile-inventory-bar" id="mobile-inventory"></div>
+
+    <div class="game-main">
+        <div class="inventory-panel">
+            <div class="inventory-title">📦 货架</div>
+            <div class="inventory-grid" id="inventory-grid"></div>
+        </div>
+
+        <div class="interaction-panel">
+            <div class="chat-area" id="chat-area"></div>
+            <div class="action-area" id="action-area"></div>
+        </div>
+    </div>
+</div>
+
+<div id="summary" class="screen">
+    <div class="summary-bear">🐻</div>
+    <div class="summary-title">今日营业结束！</div>
+    <div class="stars" id="summary-stars"></div>
+    <div class="star-label" id="summary-star-label"></div>
+    <div class="summary-stats" id="summary-stats"></div>
+    <button class="btn-restart" onclick="startNewDay()">明天继续营业！</button>
+    <button class="btn-restart" style="background:linear-gradient(135deg,var(--blue),var(--blue-dark));margin-top:0" onclick="backToWelcome()">回到首页</button>
+</div>
+
+<div class="confetti-container" id="confetti"></div>
+
+<script>
+// ==================== GAME DATA ====================
+const TOYS = [
+    { id: 1,  emoji: '🧸', name: '泰迪熊',       price: 15, stock: 3,  maxStock: 3  },
+    { id: 2,  emoji: '🚗', name: '小汽车',       price: 8,  stock: 5,  maxStock: 5  },
+    { id: 3,  emoji: '🎨', name: '蜡笔套装',     price: 6,  stock: 4,  maxStock: 4  },
+    { id: 4,  emoji: '🪁', name: '风筝',         price: 10, stock: 3,  maxStock: 3  },
+    { id: 5,  emoji: '🧱', name: '积木套装',     price: 12, stock: 4,  maxStock: 4  },
+    { id: 6,  emoji: '🎸', name: '小吉他',       price: 20, stock: 2,  maxStock: 2  },
+    { id: 7,  emoji: '🦕', name: '恐龙玩具',     price: 18, stock: 3,  maxStock: 3  },
+    { id: 8,  emoji: '🎈', name: '气球套装',     price: 5,  stock: 6,  maxStock: 6  },
+    { id: 9,  emoji: '🧩', name: '拼图游戏',     price: 9,  stock: 4,  maxStock: 4  },
+    { id: 10, emoji: '🎭', name: '动物面具',     price: 7,  stock: 5,  maxStock: 5  },
+    { id: 11, emoji: '🪀', name: '溜溜球',       price: 4,  stock: 8,  maxStock: 8  },
+    { id: 12, emoji: '🎯', name: '飞镖玩具',     price: 16, stock: 2,  maxStock: 2  },
+    { id: 13, emoji: '🪆', name: '俄罗斯套娃',   price: 14, stock: 3,  maxStock: 3  },
+    { id: 14, emoji: '🎵', name: '音乐盒',       price: 25, stock: 2,  maxStock: 2  },
+    { id: 15, emoji: '🧲', name: '磁力片',       price: 22, stock: 3,  maxStock: 3  },
+    { id: 16, emoji: '🎺', name: '小喇叭',       price: 8,  stock: 5,  maxStock: 5  },
+    { id: 17, emoji: '🐼', name: '熊猫玩偶',     price: 13, stock: 3,  maxStock: 3  },
+    { id: 18, emoji: '🦁', name: '狮子玩偶',     price: 13, stock: 3,  maxStock: 3  },
+    { id: 19, emoji: '🌈', name: '彩虹弹簧',     price: 6,  stock: 6,  maxStock: 6  },
+    { id: 20, emoji: '🎪', name: '魔术道具',     price: 15, stock: 3,  maxStock: 3  },
+    { id: 21, emoji: '🔭', name: '望远镜',       price: 19, stock: 2,  maxStock: 2  },
+    { id: 22, emoji: '🖍️', name: '水彩颜料',     price: 11, stock: 4,  maxStock: 4  },
+    { id: 23, emoji: '📚', name: '故事绘本',     price: 7,  stock: 6,  maxStock: 6  },
+    { id: 24, emoji: '🪅', name: '沙锤乐器',     price: 5,  stock: 7,  maxStock: 7  },
+    { id: 25, emoji: '🎀', name: '发饰套装',     price: 3,  stock: 10, maxStock: 10 },
+    { id: 26, emoji: '🏀', name: '小篮球',       price: 10, stock: 4,  maxStock: 4  },
+    { id: 27, emoji: '🎲', name: '桌游棋盘',     price: 16, stock: 3,  maxStock: 3  },
+    { id: 28, emoji: '🦋', name: '蝴蝶标本',     price: 12, stock: 3,  maxStock: 3  },
+    { id: 29, emoji: '🌻', name: '向日葵种子',   price: 2,  stock: 12, maxStock: 12 },
+    { id: 30, emoji: '🐰', name: '兔子玩偶',     price: 11, stock: 4,  maxStock: 4  },
+];
+
+const CUSTOMERS = [
+    { emoji: '🐰', name: '小兔贝贝',   personality: 'gentle'  },
+    { emoji: '🐱', name: '小猫喵喵',   personality: 'clever'  },
+    { emoji: '🐶', name: '小狗旺旺',   personality: 'generous' },
+    { emoji: '🐸', name: '青蛙呱呱',   personality: 'hesitant' },
+    { emoji: '🦊', name: '狐狸聪聪',   personality: 'shrewd'  },
+    { emoji: '🐧', name: '企鹅冰冰',   personality: 'shy'     },
+    { emoji: '🐨', name: '考拉慢慢',   personality: 'gentle'  },
+    { emoji: '🐭', name: '老鼠吱吱',   personality: 'thrifty' },
+    { emoji: '🐹', name: '仓鼠圆圆',   personality: 'generous' },
+    { emoji: '🦄', name: '独角兽亮亮', personality: 'rich'    },
+    { emoji: '🐯', name: '老虎威威',   personality: 'generous' },
+    { emoji: '🐮', name: '小牛哞哞',   personality: 'gentle'  },
+    { emoji: '🐷', name: '小猪噜噜',   personality: 'hesitant' },
+    { emoji: '🐑', name: '小羊咩咩',   personality: 'shy'     },
+    { emoji: '🦉', name: '猫头鹰圆圆', personality: 'clever'  },
+];
+
+const BUDGET_RANGES = {
+    rich:     { min: 1.0,  max: 1.4  },
+    generous: { min: 0.85, max: 1.15 },
+    gentle:   { min: 0.7,  max: 1.0  },
+    clever:   { min: 0.6,  max: 0.95 },
+    hesitant: { min: 0.55, max: 0.85 },
+    shy:      { min: 0.6,  max: 0.9  },
+    shrewd:   { min: 0.45, max: 0.75 },
+    thrifty:  { min: 0.4,  max: 0.7  },
+};
+
+const GREETINGS = [
+    '你好呀！',
+    '嗨！小熊售货员！',
+    '你好你好！',
+    '小熊你好！',
+    '哈喽！',
+];
+
+const WANT_PHRASES = [
+    (name) => `我想买一个${name}！`,
+    (name) => `我好想要那个${name}！`,
+    (name) => `请问${name}多少钱呀？`,
+    (name) => `我可以看看那个${name}吗？`,
+    (name) => `哇，${name}好棒！我想买！`,
+];
+
+const AFFORDABLE_PHRASES = [
+    '好的！给你钱！',
+    '太好了！我买了！',
+    '谢谢你！',
+    '好的好的！',
+    '耶！我要这个！',
+];
+
+const CANT_AFFORD_PHRASES = [
+    (n) => `可是...我只有${n}元，可以便宜一点吗？`,
+    (n) => `啊...我的零花钱只有${n}元呢...`,
+    (n) => `${n}元够不够呀？我只有这么多...`,
+    (n) => `我数数...我只有${n}元，能卖给我吗？`,
+];
+
+const ACCEPT_PHRASES = [
+    '太好了！谢谢你！',
+    '耶！我好开心！',
+    '谢谢小熊售货员！',
+    '你真好！',
+    '好棒！拿到啦！',
+];
+
+const LEAVE_PHRASES = [
+    '好吧...那我下次再来...',
+    '呜呜...那我攒够钱再来...',
+    '好的...我再想想...',
+    '那我去别的地方看看吧...',
+];
+
+const COUNTER_RESPONSE = [
+    (n) => `嗯...那我最多能给${n}元了！`,
+    (n) => `我再翻翻口袋...最多${n}元！`,
+    (n) => `${n}元行不行？这是我全部的钱了！`,
+];
+
+// ==================== GAME STATE ====================
+let state = {
+    screen: 'welcome',
+    phase: 'idle',
+    totalEarnings: 0,
+    todayEarnings: 0,
+    customersServed: 0,
+    todayCustomers: 0,
+    maxCustomersPerDay: 8,
+    dayNumber: 1,
+    currentCustomer: null,
+    currentToy: null,
+    myPrice: 0,
+    customerBudget: 0,
+    customerOffer: 0,
+    round: 0,
+    maxRounds: 3,
+    inventory: JSON.parse(JSON.stringify(TOYS)),
+    itemsSoldToday: 0,
+    recentCustomerIndices: [],
+};
+
+// ==================== UTILITY ====================
+function rand(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function pick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function clamp(val, min, max) {
+    return Math.max(min, Math.min(max, val));
+}
+
+function scrollChatToBottom() {
+    const chat = document.getElementById('chat-area');
+    if (chat) setTimeout(() => chat.scrollTop = chat.scrollHeight, 50);
+}
+
+// ==================== RENDERING ====================
+function renderInventory() {
+    const grid = document.getElementById('inventory-grid');
+    const mobile = document.getElementById('mobile-inventory');
+    if (!grid) return;
+
+    grid.innerHTML = state.inventory.map(toy => {
+        const isOut = toy.stock <= 0;
+        const isHighlight = state.currentToy && state.currentToy.id === toy.id;
+        const dots = [];
+        const maxDots = Math.min(toy.maxStock, 8);
+        for (let i = 0; i < maxDots; i++) {
+            dots.push(`<div class="stock-dot ${i < toy.stock ? '' : 'empty'}"></div>`);
+        }
+        return `
+            <div class="toy-card ${isOut ? 'out-of-stock' : ''} ${isHighlight ? 'highlight' : ''}">
+                <div class="toy-emoji">${toy.emoji}</div>
+                <div class="toy-name">${toy.name}</div>
+                <div class="toy-price">${toy.price}元</div>
+                <div class="toy-stock">库存: ${toy.stock}个</div>
+                <div class="stock-dots">${dots.join('')}</div>
+                ${isOut ? '<div class="sold-badge">售罄</div>' : ''}
+            </div>
+        `;
+    }).join('');
+
+    mobile.innerHTML = state.inventory.map(toy => {
+        const isOut = toy.stock <= 0;
+        const isHighlight = state.currentToy && state.currentToy.id === toy.id;
+        return `
+            <div class="mobile-toy-chip ${isOut ? 'out-of-stock' : ''} ${isHighlight ? 'highlight' : ''}">
+                <span class="chip-emoji">${toy.emoji}</span>
+                <span class="chip-stock">${toy.stock}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderHeader() {
+    document.getElementById('hdr-money').textContent = state.totalEarnings;
+    document.getElementById('hdr-customers').textContent = state.customersServed;
+    document.getElementById('hdr-day').textContent = `第${state.dayNumber}天`;
+}
+
+function addChatMessage(from, text, extra = '') {
+    const chat = document.getElementById('chat-area');
+    const avatar = from === 'customer' ? state.currentCustomer.emoji :
+                   from === 'bear' ? '🐻' : '';
+    const className = from;
+    const html = `
+        <div class="chat-msg ${className}">
+            ${avatar ? `<div class="chat-avatar">${avatar}</div>` : ''}
+            <div class="chat-bubble">${text}${extra}</div>
+        </div>
+    `;
+    chat.insertAdjacentHTML('beforeend', html);
+    scrollChatToBottom();
+}
+
+function addToyDisplay(toy) {
+    const chat = document.getElementById('chat-area');
+    const dots = [];
+    const maxDots = Math.min(toy.maxStock, 8);
+    for (let i = 0; i < maxDots; i++) {
+        dots.push(`<div class="stock-dot ${i < toy.stock ? '' : 'empty'}"></div>`);
+    }
+    const html = `
+        <div class="toy-display">
+            <div class="toy-emoji">${toy.emoji}</div>
+            <div class="toy-name">${toy.name}</div>
+            <div class="toy-price">标价：${toy.price}元</div>
+            <div class="toy-stock">库存还有 ${toy.stock} 个</div>
+            <div class="stock-dots">${dots.join('')}</div>
+        </div>
+    `;
+    chat.insertAdjacentHTML('beforeend', html);
+    scrollChatToBottom();
+}
+
+function renderActions(html) {
+    document.getElementById('action-area').innerHTML = html;
+}
+
+function clearChat() {
+    document.getElementById('chat-area').innerHTML = '';
+}
+
+// ==================== SCREEN MANAGEMENT ====================
+function showScreen(name) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(name).classList.add('active');
+    state.screen = name;
+}
+
+// ==================== GAME LOGIC ====================
+function startGame() {
+    state.totalEarnings = 0;
+    state.todayEarnings = 0;
+    state.customersServed = 0;
+    state.todayCustomers = 0;
+    state.dayNumber = 1;
+    state.itemsSoldToday = 0;
+    state.inventory = JSON.parse(JSON.stringify(TOYS));
+    state.recentCustomerIndices = [];
+
+    showScreen('game');
+    renderHeader();
+    renderInventory();
+    clearChat();
+    showIdleState();
+}
+
+function showIdleState() {
+    state.phase = 'idle';
+    state.currentCustomer = null;
+    state.currentToy = null;
+    renderInventory();
+
+    const inStock = state.inventory.filter(t => t.stock > 0);
+    if (inStock.length === 0) {
+        endDay();
+        return;
+    }
+
+    if (state.todayCustomers >= state.maxCustomersPerDay) {
+        endDay();
+        return;
+    }
+
+    const chat = document.getElementById('chat-area');
+    chat.innerHTML = `
+        <div class="idle-prompt">
+            <div class="idle-bear">🐻</div>
+            <div class="idle-text">等待下一位顾客...</div>
+        </div>
+    `;
+
+    renderActions(`
+        <button class="action-btn next" onclick="nextCustomer()">
+            🔔 迎接下一位顾客！
+        </button>
+        <button class="action-btn secondary" style="margin-top:6px" onclick="endDay()">
+            🌙 今天打烊
+        </button>
+    `);
+}
+
+function nextCustomer() {
+    clearChat();
+    state.todayCustomers++;
+    state.round = 0;
+
+    // Pick a customer (avoid recent repeats)
+    let ci;
+    do {
+        ci = Math.floor(Math.random() * CUSTOMERS.length);
+    } while (state.recentCustomerIndices.includes(ci) && CUSTOMERS.length > 3);
+    state.recentCustomerIndices.push(ci);
+    if (state.recentCustomerIndices.length > 4) state.recentCustomerIndices.shift();
+
+    state.currentCustomer = { ...CUSTOMERS[ci] };
+
+    // Pick a random in-stock toy
+    const inStock = state.inventory.filter(t => t.stock > 0);
+    if (inStock.length === 0) {
+        endDay();
+        return;
+    }
+    state.currentToy = inStock[Math.floor(Math.random() * inStock.length)];
+
+    // Calculate customer budget
+    const range = BUDGET_RANGES[state.currentCustomer.personality];
+    const ratio = range.min + Math.random() * (range.max - range.min);
+    state.customerBudget = Math.max(1, Math.round(state.currentToy.price * ratio));
+
+    state.phase = 'greeting';
+    renderInventory();
+
+    // Show greeting
+    const greeting = pick(GREETINGS);
+    const want = pick(WANT_PHRASES)(state.currentToy.name);
+    addChatMessage('customer', greeting);
+
+    setTimeout(() => {
+        addChatMessage('customer', want);
+        setTimeout(() => {
+            addToyDisplay(state.currentToy);
+            setTimeout(() => {
+                addChatMessage('system', '给这位顾客报个价吧！');
+                showPriceSetter();
+            }, 300);
+        }, 400);
+    }, 500);
+}
+
+function showPriceSetter() {
+    state.phase = 'pricing';
+    state.myPrice = state.currentToy.price;
+
+    function renderPriceUI() {
+        renderActions(`
+            <div class="price-hint">
+                标价 ${state.currentToy.price}元 · 库存 ${state.currentToy.stock}个
+                ${state.currentToy.stock <= 2 ? ' · <span style="color:var(--red)">快卖完啦！</span>' : ''}
+            </div>
+            <div class="price-setter">
+                <button class="price-btn minus" onclick="adjustPrice(-1)">−</button>
+                <div class="price-display">${state.myPrice}<small>元</small></div>
+                <button class="price-btn plus" onclick="adjustPrice(1)">+</button>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn primary" onclick="confirmPrice()">
+                    💬 就卖 ${state.myPrice} 元！
+                </button>
+            </div>
+        `);
+    }
+
+    renderPriceUI();
+
+    window.adjustPrice = function(delta) {
+        state.myPrice = clamp(state.myPrice + delta, 1, 99);
+        renderPriceUI();
+    };
+}
+
+function confirmPrice() {
+    state.phase = 'response';
+    addChatMessage('bear', `这个${state.currentToy.name}卖${state.myPrice}元！`);
+    renderActions('');
+
+    setTimeout(() => {
+        if (state.customerBudget >= state.myPrice) {
+            // Customer can afford it!
+            addChatMessage('customer', pick(AFFORDABLE_PHRASES));
+            setTimeout(() => completeDeal(state.myPrice), 600);
+        } else {
+            // Customer can't afford
+            state.customerOffer = state.customerBudget;
+            const phrase = pick(CANT_AFFORD_PHRASES)(state.customerBudget);
+            addChatMessage('customer', phrase);
+            setTimeout(() => showNegotiationOptions(), 500);
+        }
+    }, 600);
+}
+
+function showNegotiationOptions() {
+    state.phase = 'negotiating';
+    state.round++;
+
+    if (state.round > state.maxRounds) {
+        customerLeaves();
+        return;
+    }
+
+    // Generate counter-offer options
+    const diff = state.myPrice - state.customerOffer;
+    let counterOptions = [];
+    if (diff >= 3) {
+        const step = Math.max(1, Math.floor(diff / 3));
+        for (let p = state.customerOffer + step; p < state.myPrice; p += step) {
+            counterOptions.push(p);
+        }
+        if (counterOptions.length > 3) counterOptions = counterOptions.slice(0, 3);
+    } else if (diff === 2) {
+        counterOptions = [state.customerOffer + 1];
+    }
+
+    let counterHtml = '';
+    if (counterOptions.length > 0) {
+        counterHtml = `
+            <div style="font-size:14px;color:var(--brown-light);margin-top:4px;margin-bottom:4px;text-align:center">或者便宜一点？</div>
+            <div class="counter-options">
+                ${counterOptions.map(p => `
+                    <button class="counter-option" onclick="makeCounterOffer(${p})">
+                        ${p}元
+                    </button>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    renderActions(`
+        <div class="action-buttons">
+            <button class="action-btn accept" onclick="acceptOffer()">
+                😊 好吧，${state.customerOffer}元卖给你！
+            </button>
+            <button class="action-btn reject" onclick="rejectOffer()">
+                😤 不行，太少了！
+            </button>
+            ${counterHtml}
+        </div>
+    `);
+}
+
+function acceptOffer() {
+    addChatMessage('bear', `好吧，${state.customerOffer}元卖给你！`);
+    setTimeout(() => {
+        addChatMessage('customer', pick(ACCEPT_PHRASES));
+        setTimeout(() => completeDeal(state.customerOffer), 500);
+    }, 400);
+}
+
+function rejectOffer() {
+    addChatMessage('bear', '不行哦，太少了！');
+    setTimeout(() => {
+        if (state.round >= state.maxRounds) {
+            addChatMessage('customer', pick(LEAVE_PHRASES));
+            setTimeout(() => customerLeaves(), 600);
+        } else {
+            // Customer may raise offer slightly
+            const raise = rand(1, Math.max(1, Math.floor((state.myPrice - state.customerOffer) * 0.3)));
+            const newOffer = Math.min(state.customerBudget, state.customerOffer + raise);
+
+            if (newOffer > state.customerOffer) {
+                state.customerOffer = newOffer;
+                const phrase = pick(COUNTER_RESPONSE)(newOffer);
+                addChatMessage('customer', phrase);
+                setTimeout(() => showNegotiationOptions(), 400);
+            } else {
+                addChatMessage('customer', pick(LEAVE_PHRASES));
+                setTimeout(() => customerLeaves(), 600);
+            }
+        }
+    }, 500);
+}
+
+function makeCounterOffer(price) {
+    state.myPrice = price;
+    addChatMessage('bear', `那${price}元行不行？`);
+    renderActions('');
+
+    setTimeout(() => {
+        if (price <= state.customerBudget) {
+            addChatMessage('customer', pick(ACCEPT_PHRASES));
+            setTimeout(() => completeDeal(price), 500);
+        } else {
+            // Customer tries to meet halfway
+            const newOffer = Math.min(state.customerBudget, state.customerOffer + rand(1, Math.max(1, price - state.customerOffer - 1)));
+            if (newOffer > state.customerOffer) {
+                state.customerOffer = newOffer;
+            }
+            const phrase = pick(COUNTER_RESPONSE)(state.customerOffer);
+            addChatMessage('customer', phrase);
+            setTimeout(() => showNegotiationOptions(), 400);
+        }
+    }, 600);
+}
+
+function completeDeal(finalPrice) {
+    state.phase = 'deal';
+    state.totalEarnings += finalPrice;
+    state.todayEarnings += finalPrice;
+    state.customersServed++;
+    state.itemsSoldToday++;
+
+    // Decrease stock
+    const toy = state.inventory.find(t => t.id === state.currentToy.id);
+    if (toy) toy.stock--;
+
+    renderHeader();
+    renderInventory();
+
+    // Show celebration
+    const chat = document.getElementById('chat-area');
+    chat.insertAdjacentHTML('beforeend', `
+        <div class="deal-celebration">
+            <div class="deal-emoji">🎉</div>
+            <div class="deal-text">成交！</div>
+            <div class="deal-amount">+${finalPrice}元</div>
+        </div>
+    `);
+    scrollChatToBottom();
+
+    showConfetti();
+    showCoinAnimation(finalPrice);
+
+    renderActions(`
+        <button class="action-btn next" onclick="showIdleState()">
+            👋 下一位顾客
+        </button>
+    `);
+}
+
+function customerLeaves() {
+    state.phase = 'nodeal';
+
+    const chat = document.getElementById('chat-area');
+    chat.insertAdjacentHTML('beforeend', `
+        <div style="text-align:center;padding:16px;animation:msgAppear 0.4s ease-out">
+            <div class="no-deal-face">😢</div>
+            <div style="font-size:16px;color:var(--brown-light)">顾客走了...没关系，下一位会更好！</div>
+        </div>
+    `);
+    scrollChatToBottom();
+
+    renderActions(`
+        <button class="action-btn next" onclick="showIdleState()">
+            💪 下一位顾客
+        </button>
+    `);
+}
+
+function endDay() {
+    showScreen('summary');
+
+    // Calculate stars
+    let stars = 0;
+    if (state.todayEarnings >= 30) stars = 1;
+    if (state.todayEarnings >= 60) stars = 2;
+    if (state.todayEarnings >= 100) stars = 3;
+    if (state.todayEarnings >= 150) stars = 4;
+    if (state.todayEarnings >= 200) stars = 5;
+
+    const starLabels = ['继续加油哦！', '不错不错！', '很棒！', '太厉害了！', '超级售货员！', '传说级售货员！'];
+
+    document.getElementById('summary-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(5 - stars);
+    document.getElementById('summary-star-label').textContent = starLabels[stars];
+
+    document.getElementById('summary-stats').innerHTML = `
+        <div class="summary-stat">
+            <div class="summary-stat-value">${state.todayEarnings}元</div>
+            <div class="summary-stat-label">今日收入</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-value">${state.totalEarnings}元</div>
+            <div class="summary-stat-label">总收入</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-value">${state.itemsSoldToday}件</div>
+            <div class="summary-stat-label">今日售出</div>
+        </div>
+        <div class="summary-stat">
+            <div class="summary-stat-value">${state.todayCustomers}位</div>
+            <div class="summary-stat-label">接待顾客</div>
+        </div>
+    `;
+
+    if (stars >= 3) showConfetti();
+}
+
+function startNewDay() {
+    state.dayNumber++;
+    state.todayEarnings = 0;
+    state.todayCustomers = 0;
+    state.itemsSoldToday = 0;
+    state.recentCustomerIndices = [];
+
+    // Restock: add 1-2 to each toy's stock (up to max)
+    state.inventory.forEach(toy => {
+        const add = rand(1, 2);
+        toy.stock = Math.min(toy.maxStock, toy.stock + add);
+    });
+
+    showScreen('game');
+    renderHeader();
+    renderInventory();
+    clearChat();
+    showIdleState();
+}
+
+function backToWelcome() {
+    showScreen('welcome');
+}
+
+// ==================== ANIMATIONS ====================
+function showConfetti() {
+    const container = document.getElementById('confetti');
+    container.innerHTML = '';
+    const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181', '#AA96DA', '#FCBAD3', '#A8D8EA'];
+
+    for (let i = 0; i < 50; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+        piece.style.animationDelay = Math.random() * 0.5 + 's';
+        piece.style.width = (8 + Math.random() * 8) + 'px';
+        piece.style.height = (8 + Math.random() * 8) + 'px';
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        container.appendChild(piece);
+    }
+
+    setTimeout(() => container.innerHTML = '', 4000);
+}
+
+function showCoinAnimation(amount) {
+    const coins = Math.min(amount, 8);
+    for (let i = 0; i < coins; i++) {
+        setTimeout(() => {
+            const coin = document.createElement('div');
+            coin.className = 'coin-fly';
+            coin.textContent = '🪙';
+            coin.style.left = (40 + Math.random() * 20) + '%';
+            coin.style.top = (50 + Math.random() * 20) + '%';
+            document.body.appendChild(coin);
+            setTimeout(() => coin.remove(), 1000);
+        }, i * 100);
+    }
+}
+</script>
+</body>
+</html>

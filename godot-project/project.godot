@@ -1,0 +1,60 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
+[application]
+
+config/name="亲子游戏"
+config/description="适合 3-6 岁小朋友的亲子互动游戏合集"
+config/version="1.0.0"
+run/main_scene="res://src/shared/splash_screen.tscn"
+config/features=PackedStringArray("4.6", "Mobile")
+config/icon="res://assets/icon.svg"
+
+[autoload]
+
+GameManager="*res://src/autoload/game_manager.gd"
+AudioManager="*res://src/autoload/audio_manager.gd"
+SceneTransition="*res://src/autoload/scene_transition.gd"
+
+[display]
+
+window/size/viewport_width=2880
+window/size/viewport_height=1800
+window/stretch/mode="canvas_items"
+
+[gui]
+
+theme/custom="res://assets/theme/main_theme.tres"
+theme/custom_font="res://assets/fonts/default_font.tres"
+
+[input]
+
+touch={
+"deadzone": 0.5,
+"events": []
+}
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[internationalization]
+
+locale/default="zh_CN"
+
+[rendering]
+
+renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true
+environment/defaults/default_clear_color=Color(0.96, 0.96, 0.94, 1)

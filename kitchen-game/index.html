@@ -3,1706 +3,511 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>小厨师做饭</title>
+<title>小厨师做饭 - 超市</title>
+<link rel="stylesheet" href="shared.css">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
 body {
-  font-family: -apple-system, 'Helvetica Rounded', 'Arial Rounded MT Bold', Arial, sans-serif;
-  min-height: 100vh;
-  overflow: hidden;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* ===== PHASE INDICATOR ===== */
-.phase-bar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 48px;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  z-index: 50;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.phase-dot {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  background: #e8e8e8;
-  color: #999;
-  transition: all 0.4s;
-}
-.phase-dot.active {
-  background: #ff9800;
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(255,152,0,0.4);
-}
-.phase-dot.done {
-  background: #66bb6a;
-  color: #fff;
-}
-.phase-connector {
-  width: 20px;
-  height: 2px;
-  background: #ddd;
-  border-radius: 1px;
-}
-
-/* ===== SCREENS ===== */
-.screen {
-  display: none;
-  width: 100%;
-  height: 100vh;
-}
-.screen.active {
-  display: flex;
-  flex-direction: column;
-}
-
-/* ===== STAGE 1: SUPERMARKET ===== */
-#screen-shop {
   background: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 100%);
-  padding-top: 56px;
 }
+.page { padding-top: 56px; }
 
+/* ===== HEADER ===== */
 .shop-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 16px;
+  display: flex; align-items: center;
+  justify-content: space-between; padding: 8px 16px;
 }
+.shop-title { font-size: 1.2rem; font-weight: 700; color: #1565c0; }
 
+/* Wallet */
 .wallet {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  display: flex; align-items: center; gap: 6px;
   background: linear-gradient(135deg, #fff9c4, #fff176);
-  padding: 6px 16px;
-  border-radius: 24px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #f57f17;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 6px 16px; border-radius: 24px;
+  font-size: 1.1rem; font-weight: 700; color: #f57f17;
+  box-shadow: var(--shadow-sm); transition: transform 0.3s;
 }
 .wallet .coin { font-size: 1.3rem; }
-.wallet.shake {
-  animation: wallet-shake 0.4s ease;
-}
+.wallet.shake { animation: wallet-shake 0.4s ease; }
+.wallet.pulse { animation: wallet-pulse 0.3s ease; }
 @keyframes wallet-shake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-6px); }
-  40% { transform: translateX(6px); }
-  60% { transform: translateX(-4px); }
-  80% { transform: translateX(4px); }
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); } 40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); } 80% { transform: translateX(4px); }
+}
+@keyframes wallet-pulse {
+  0% { transform: scale(1); } 50% { transform: scale(1.08); } 100% { transform: scale(1); }
 }
 
-.shop-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #1565c0;
+/* Recipe book button */
+.recipe-book-btn {
+  display: flex; align-items: center; gap: 4px;
+  background: linear-gradient(135deg, #ffe0b2, #ffcc80);
+  padding: 8px 14px; border-radius: 24px;
+  font-size: 0.9rem; font-weight: 700; color: #e65100;
+  border: none; cursor: pointer; min-height: var(--touch-min);
+  box-shadow: var(--shadow-sm);
 }
+.recipe-book-btn:active { transform: scale(0.95); }
 
+/* ===== SHELVES ===== */
 .shelves {
-  flex: 1;
-  overflow-y: auto;
+  flex: 1; overflow-y: auto;
   padding: 0 12px 12px;
   -webkit-overflow-scrolling: touch;
 }
-
-.shelf-section {
-  margin-bottom: 12px;
-}
-
+.shelf-section { margin-bottom: 12px; }
 .shelf-label {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #5d4037;
-  padding: 4px 10px;
-  background: rgba(255,255,255,0.6);
-  border-radius: 12px;
-  display: inline-block;
-  margin-bottom: 6px;
+  font-size: 0.85rem; font-weight: 700; color: var(--c-brown);
+  padding: 4px 10px; background: rgba(255,255,255,0.6);
+  border-radius: 12px; display: inline-block; margin-bottom: 6px;
 }
-
 .shelf-items {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 10px;
 }
 
+/* Shop item */
 .shop-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: 14px 6px 10px;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 4px;
+  padding: 12px 6px 10px;
   background: rgba(255,255,255,0.85);
-  border-radius: 14px;
-  cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  position: relative;
+  border-radius: 14px; cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  position: relative; overflow: hidden;
+  min-height: var(--touch-min);
+  /* stagger entrance */
+  opacity: 0; transform: translateY(16px) scale(0.95);
+  transition: opacity 0.35s ease, transform 0.35s ease;
 }
-.shop-item:hover { transform: scale(1.05); }
-.shop-item:active { transform: scale(0.95); }
-.shop-item .item-emoji { font-size: 3rem; line-height: 1; }
-.shop-item .item-name { font-size: 0.85rem; color: #555; font-weight: 600; }
+.shop-item.entered { opacity: 1; transform: none; }
+.shop-item:active { transform: scale(0.92) !important; }
+.shop-item .item-emoji { font-size: 2.8rem; line-height: 1; transition: transform 0.3s; }
+.shop-item .item-name { font-size: 0.8rem; color: #555; font-weight: 600; }
 .shop-item .item-price {
-  font-size: 0.7rem;
-  color: #e65100;
-  font-weight: 700;
-  background: #fff3e0;
-  padding: 1px 8px;
-  border-radius: 10px;
+  font-size: 0.7rem; color: #e65100; font-weight: 700;
+  background: #fff3e0; padding: 1px 8px; border-radius: 10px;
 }
-.shop-item.bought {
-  opacity: 0.4;
-  pointer-events: none;
-}
-.shop-item.cant-afford {
-  animation: item-shake 0.3s ease;
-}
+.shop-item.bought { opacity: 0.35; pointer-events: none; }
+.shop-item.bought .item-emoji { transform: scale(0.8); }
+.shop-item.cant-afford { animation: item-shake 0.3s ease; }
 @keyframes item-shake {
-  0%, 100% { transform: translateX(0) rotate(0); }
+  0%,100% { transform: translateX(0) rotate(0); }
   25% { transform: translateX(-3px) rotate(-2deg); }
   75% { transform: translateX(3px) rotate(2deg); }
 }
 
-/* Shopping cart */
+/* Ripple */
+.ripple {
+  position: absolute; border-radius: 50%;
+  background: rgba(255,152,0,0.3);
+  transform: scale(0); pointer-events: none;
+  animation: ripple-out 0.5s ease-out forwards;
+}
+@keyframes ripple-out { to { transform: scale(4); opacity: 0; } }
+
+/* Flying clone */
+.flying-item {
+  position: fixed; font-size: 2.5rem;
+  z-index: 999; pointer-events: none;
+  will-change: transform, left, top;
+}
+
+/* ===== CART ===== */
 .cart-area {
-  background: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.92);
   border-top: 2px solid #e0e0e0;
-  padding: 8px 12px;
-  min-height: 100px;
+  padding: 8px 12px; min-height: 100px;
 }
-
+.cart-area.bounce { animation: cart-bounce 0.35s var(--ease-bounce); }
+@keyframes cart-bounce {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.03) translateY(-2px); }
+  100% { transform: scale(1); }
+}
 .cart-label {
-  font-size: 0.8rem;
-  color: #888;
-  margin-bottom: 4px;
-  font-weight: 600;
+  font-size: 0.8rem; color: #888; margin-bottom: 4px;
+  font-weight: 600; display: flex; align-items: center; gap: 6px;
 }
-
+.cart-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 20px; border-radius: 10px;
+  background: var(--c-orange); color: #fff;
+  font-size: 0.7rem; font-weight: 700; padding: 0 4px;
+}
+.cart-count.pop { animation: add-pop 0.3s var(--ease-bounce); }
 .cart-items {
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  padding: 4px 0;
-  min-height: 54px;
-  align-items: center;
+  display: flex; gap: 6px; overflow-x: auto;
+  padding: 4px 0; min-height: 54px; align-items: center;
+  -webkit-overflow-scrolling: touch;
 }
 .cart-items:empty::after {
-  content: '购物车是空的，点击上面的食材购买吧！';
-  color: #bbb;
-  font-size: 0.8rem;
+  content: '购物车是空的，点击食材购买吧！';
+  color: #bbb; font-size: 0.8rem;
+  animation: gentle-pulse 2s ease-in-out infinite;
 }
+@keyframes gentle-pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
 
 .cart-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  padding: 4px 8px;
-  background: #fff;
-  border-radius: 12px;
-  cursor: pointer;
-  flex-shrink: 0;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 1px;
+  padding: 4px 8px; background: #fff; border-radius: 12px;
+  cursor: pointer; flex-shrink: 0;
   box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-  transition: transform 0.15s;
-  position: relative;
+  position: relative; min-height: var(--touch-min);
+  justify-content: center;
 }
-.cart-item:hover { transform: scale(1.1); }
-.cart-item:active { transform: scale(0.9); }
+.cart-item:active { transform: scale(0.85); }
 .cart-item .ci-emoji { font-size: 1.5rem; }
 .cart-item .ci-name { font-size: 0.6rem; color: #888; }
 .cart-item::after {
-  content: '✕';
-  position: absolute;
-  top: -4px; right: -4px;
-  width: 16px; height: 16px;
-  background: #ef5350;
-  color: #fff;
-  font-size: 0.55rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
+  content: '✕'; position: absolute; top: -4px; right: -4px;
+  width: 16px; height: 16px; background: var(--c-red); color: #fff;
+  font-size: 0.55rem; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-weight: 700;
 }
+.cart-item.entering { animation: cart-pop-in 0.4s var(--ease-bounce) forwards; }
+@keyframes cart-pop-in {
+  0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+.cart-item.removing { animation: cart-poof 0.3s ease-out forwards; pointer-events: none; }
+@keyframes cart-poof {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.15) rotate(5deg); opacity: 0.5; }
+  100% { transform: scale(0); opacity: 0; }
+}
+.cart-actions { display: flex; justify-content: flex-end; margin-top: 6px; }
 
-.cart-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 6px;
-}
-
-.btn {
-  padding: 10px 24px;
-  border: none;
-  border-radius: 50px;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-}
-.btn:hover { transform: translateY(-1px); }
-.btn:active { transform: translateY(0); }
-.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-.btn-go-home {
-  background: linear-gradient(135deg, #66bb6a, #43a047);
-  color: #fff;
-}
-.btn-primary {
-  background: linear-gradient(135deg, #ff9800, #f57c00);
-  color: #fff;
-}
-.btn-secondary {
-  background: linear-gradient(135deg, #78909c, #546e7a);
-  color: #fff;
-}
-.btn-cook {
-  background: linear-gradient(135deg, #ff5722, #e64a19);
-  color: #fff;
-}
-
-/* ===== STAGE 2: BIKE RIDE ===== */
-#screen-bike {
-  background: linear-gradient(180deg, #81d4fa 0%, #b3e5fc 40%, #e1f5fe 100%);
-  overflow: hidden;
-  position: relative;
-  justify-content: flex-end;
-}
-
-.parallax-layer {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  overflow: hidden;
-}
-
-/* Sky / clouds */
-.sky-layer {
-  top: 48px;
-  height: 35%;
-}
-.cloud {
-  position: absolute;
-  font-size: 2.5rem;
-  opacity: 0.7;
-  will-change: transform;
-}
-
-/* Buildings layer */
-.building-layer {
-  bottom: 25%;
-  height: 40%;
-  display: flex;
-  align-items: flex-end;
-}
-.building-strip {
-  display: flex;
-  align-items: flex-end;
-  gap: 0;
-  position: absolute;
-  bottom: 0;
-  will-change: transform;
-  white-space: nowrap;
-}
-.building-obj {
-  font-size: 3rem;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-/* Road layer */
-.road-layer {
-  bottom: 0;
-  height: 25%;
-  background: linear-gradient(180deg, #8d6e63 0%, #6d4c41 20%, #5d4037 100%);
-}
-.road-strip {
-  position: absolute;
-  bottom: 40%;
-  height: 4px;
-  display: flex;
-  gap: 30px;
-  will-change: transform;
-}
-.road-dash {
-  width: 40px;
-  height: 4px;
-  background: #fff;
-  border-radius: 2px;
-  opacity: 0.5;
-  flex-shrink: 0;
-}
-.lamppost {
-  position: absolute;
-  bottom: 55%;
-  font-size: 1.8rem;
-  will-change: transform;
-}
-
-/* Biker */
-.biker {
-  position: absolute;
-  bottom: 26%;
-  left: 30%;
-  font-size: 3rem;
-  z-index: 10;
-  will-change: transform;
-}
-.biker-body {
-  animation: biker-bounce 0.35s ease-in-out infinite alternate;
-}
-@keyframes biker-bounce {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-4px); }
-}
-.shopping-bag {
-  position: absolute;
-  top: -10px;
-  right: -15px;
-  font-size: 1.2rem;
-  animation: bag-swing 0.5s ease-in-out infinite alternate;
-}
-@keyframes bag-swing {
-  0% { transform: rotate(-8deg); }
-  100% { transform: rotate(8deg); }
-}
-
-/* Start/End markers */
-.marker {
-  position: absolute;
-  bottom: 26%;
-  font-size: 1.5rem;
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  will-change: transform;
-}
-.marker .marker-label {
-  font-size: 0.7rem;
-  background: rgba(255,255,255,0.9);
-  padding: 2px 8px;
-  border-radius: 8px;
-  font-weight: 700;
-  color: #333;
-  white-space: nowrap;
-}
-
-/* ===== STAGE 3: KITCHEN ===== */
-#screen-kitchen {
-  background: linear-gradient(180deg, #fff8e1 0%, #ffecb3 100%);
-  padding-top: 56px;
-}
-
-/* 3a: Recipe selection */
-.recipe-selection {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.recipe-title {
-  text-align: center;
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #e65100;
-  margin-bottom: 4px;
-}
-
-.recipe-cards {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.recipe-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 14px 10px;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s;
-  border: 3px solid transparent;
-}
-.recipe-card:hover { transform: scale(1.03); }
-.recipe-card:active { transform: scale(0.97); }
-.recipe-card.available {
-  border-color: #66bb6a;
-}
-.recipe-card.unavailable {
-  opacity: 0.5;
-  cursor: not-allowed;
-  filter: grayscale(0.4);
-}
-.recipe-card .rc-emoji { font-size: 3.5rem; }
-.recipe-card .rc-name {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #333;
-  margin: 4px 0;
-}
-.recipe-card .rc-ingredients {
-  font-size: 0.7rem;
-  color: #888;
-  line-height: 1.4;
-}
-.recipe-card .rc-missing {
-  font-size: 0.7rem;
-  color: #ef5350;
-  margin-top: 4px;
-  font-weight: 600;
-}
-
-/* 3b: Cooking area */
-.cooking-area {
-  flex: 1;
-  display: none;
-  flex-direction: column;
-  padding: 8px 12px;
-  gap: 8px;
-}
-.cooking-area.active { display: flex; }
-
-.cooking-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.cooking-dish-name {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #e65100;
-}
-
-.cooking-hint {
-  text-align: center;
-  font-size: 0.85rem;
-  color: #f57c00;
-  font-weight: 600;
-  min-height: 24px;
-  padding: 4px;
-}
-
-.cooking-main {
-  flex: 1;
-  display: flex;
-  gap: 10px;
-  min-height: 0;
-}
-
-/* Ingredient sidebar */
-.ing-sidebar {
-  width: 90px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  overflow-y: auto;
-}
-
-.ing-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 8px 4px;
-  background: rgba(255,255,255,0.8);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: transform 0.15s, opacity 0.3s;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-}
-.ing-item:hover { transform: scale(1.08); }
-.ing-item:active { transform: scale(0.92); }
-.ing-item .ii-emoji { font-size: 1.8rem; }
-.ing-item .ii-name { font-size: 0.6rem; color: #777; font-weight: 600; }
-.ing-item.required {
-  border: 2px dashed #ff9800;
-}
-.ing-item.optional {
-  border: 2px solid #e0e0e0;
-}
-.ing-item.added {
-  opacity: 0.3;
-  pointer-events: none;
-}
-
-/* Cooking pot area */
-.pot-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.pot-container {
-  position: relative;
-  width: 200px;
-  height: 200px;
-}
-
-.pot {
-  width: 200px;
-  height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 8rem;
-  position: relative;
-}
-
-.pot-ingredients {
-  position: absolute;
-  top: 20%;
-  left: 15%;
-  right: 15%;
-  bottom: 30%;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-}
-.pot-ing {
-  font-size: 1.4rem;
-  animation: pot-plop 0.3s ease-out;
-}
-@keyframes pot-plop {
-  0% { transform: scale(0) translateY(-20px); opacity: 0; }
-  60% { transform: scale(1.2) translateY(0); }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-.cook-btn-area {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  padding: 8px;
-}
-
-/* 3c: Cooking animation overlay */
-.cooking-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.75);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 100;
-  gap: 20px;
-}
-.cooking-overlay.active { display: flex; }
-
-.cooking-pot-anim {
-  font-size: 6rem;
-  position: relative;
-}
-.cooking-pot-anim .steam {
-  position: absolute;
-  top: -30px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 8px;
-}
-.steam-puff {
-  font-size: 1.5rem;
-  animation: steam-rise 1s ease-in-out infinite;
-  opacity: 0.7;
-}
-.steam-puff:nth-child(2) { animation-delay: 0.3s; }
-.steam-puff:nth-child(3) { animation-delay: 0.6s; }
-@keyframes steam-rise {
-  0% { transform: translateY(0) scale(0.8); opacity: 0.4; }
-  50% { transform: translateY(-15px) scale(1.2); opacity: 0.8; }
-  100% { transform: translateY(-30px) scale(0.6); opacity: 0; }
-}
-
-.cooking-text {
-  color: #fff;
-  font-size: 1.3rem;
-  font-weight: 700;
-}
-
-/* Celebration overlay */
-.celebration-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.7);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 200;
-}
-.celebration-overlay.active { display: flex; }
-
-.celeb-card {
-  background: linear-gradient(135deg, #fff9c4, #fff176);
-  border-radius: 24px;
-  padding: 24px 32px;
-  text-align: center;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-  animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  max-width: 360px;
-  width: 90%;
-}
-@keyframes bounce-in {
-  0% { transform: scale(0); }
-  100% { transform: scale(1); }
-}
-
-.celeb-card .dish-result { font-size: 4rem; margin-bottom: 8px; }
-.celeb-card h2 { font-size: 1.4rem; color: #e65100; margin-bottom: 4px; }
-.celeb-card p { font-size: 0.95rem; color: #795548; margin-bottom: 10px; }
-.celeb-card .stars {
-  font-size: 2rem;
-  margin-bottom: 12px;
-  animation: star-dance 1s ease-in-out infinite alternate;
-}
-@keyframes star-dance {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.1); }
-}
-.celeb-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* Confetti */
-.confetti {
-  position: fixed;
-  z-index: 250;
-  pointer-events: none;
-}
-@keyframes confetti-fall {
-  0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-}
-
-/* ===== ANIMATIONS ===== */
-@keyframes fade-in {
-  0% { opacity: 0; transform: translateY(10px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-.fade-in {
-  animation: fade-in 0.4s ease-out;
-}
-
-/* Add to cart pop */
-@keyframes add-pop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.3); }
-  100% { transform: scale(1); }
-}
-.add-pop {
-  animation: add-pop 0.25s ease;
-}
-
-/* ===== RECIPE BOOK OVERLAY (in supermarket) ===== */
-.recipe-book-btn {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: linear-gradient(135deg, #ffe0b2, #ffcc80);
-  padding: 6px 14px;
-  border-radius: 24px;
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: #e65100;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  transition: transform 0.15s;
-}
-.recipe-book-btn:hover { transform: scale(1.05); }
-.recipe-book-btn:active { transform: scale(0.95); }
-
-.recipe-book-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 300;
-}
-.recipe-book-overlay.active { display: flex; }
-
+/* ===== RECIPE BOOK OVERLAY ===== */
 .recipe-book {
   background: linear-gradient(135deg, #fff8e1, #ffecb3);
-  border-radius: 20px;
-  width: 92%;
-  max-width: 500px;
-  max-height: 85vh;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-  animation: bounce-in 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  border-radius: 20px; width: 92%; max-width: 500px; max-height: 85vh;
+  display: flex; flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  animation: bounce-in 0.35s var(--ease-overshoot);
   overflow: hidden;
 }
-
 .rb-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 16px;
-  border-bottom: 2px solid rgba(0,0,0,0.08);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-bottom: 2px solid rgba(0,0,0,0.08);
 }
-.rb-header h2 {
-  font-size: 1.15rem;
-  color: #e65100;
-}
+.rb-header h2 { font-size: 1.15rem; color: #e65100; }
 .rb-close {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  border: none;
-  background: #ef5350;
-  color: #fff;
-  font-size: 1.1rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.15s;
+  width: 36px; height: 36px; border-radius: 50%; border: none;
+  background: var(--c-red); color: #fff;
+  font-size: 1.1rem; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
 }
-.rb-close:hover { transform: scale(1.1); }
-
+.rb-close:active { transform: scale(0.9); }
 .rb-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  flex: 1; overflow-y: auto; padding: 10px;
+  display: flex; flex-direction: column; gap: 10px;
   -webkit-overflow-scrolling: touch;
 }
-
 .rb-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 10px 12px;
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
+  background: #fff; border-radius: 14px; padding: 10px 12px;
+  display: flex; gap: 10px; align-items: flex-start;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
-.rb-card-emoji {
-  font-size: 3rem;
-  flex-shrink: 0;
-  line-height: 1;
-}
+.rb-card-emoji { font-size: 2.8rem; flex-shrink: 0; line-height: 1; }
 .rb-card-info { flex: 1; min-width: 0; }
-.rb-card-name {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 4px;
-}
+.rb-card-name { font-size: 1rem; font-weight: 700; color: #333; margin-bottom: 4px; }
 .rb-card-row {
-  font-size: 0.85rem;
-  color: #777;
-  line-height: 1.6;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px 6px;
-  align-items: center;
+  font-size: 0.8rem; color: #777; line-height: 1.6;
+  display: flex; flex-wrap: wrap; gap: 2px 6px; align-items: center;
 }
-.rb-card-row .label {
-  font-weight: 700;
-  color: #999;
-  flex-shrink: 0;
-}
-.rb-ing {
-  display: inline-flex;
-  align-items: center;
-  gap: 1px;
-  white-space: nowrap;
-}
-.rb-ing.has { color: #43a047; }
+.rb-card-row .label { font-weight: 700; color: var(--c-text-muted); flex-shrink: 0; }
+.rb-ing { display: inline-flex; align-items: center; gap: 1px; white-space: nowrap; }
+.rb-ing.has { color: var(--c-green-dark); }
 .rb-ing.missing { color: #bbb; }
-.rb-card-cost {
-  font-size: 0.8rem;
-  color: #f57c00;
-  font-weight: 600;
-  margin-top: 2px;
-}
-.rb-card.can-make {
-  border-left: 4px solid #66bb6a;
-}
+.rb-card-cost { font-size: 0.75rem; color: var(--c-orange-dark); font-weight: 600; margin-top: 2px; }
+.rb-card.can-make { border-left: 4px solid var(--c-green); }
 </style>
 </head>
 <body>
 
-<!-- Phase indicator bar -->
 <div class="phase-bar">
-  <div class="phase-dot active" id="pd1">🛒 超市</div>
+  <div class="phase-dot active">🛒 超市</div>
   <div class="phase-connector"></div>
-  <div class="phase-dot" id="pd2">🚲 回家</div>
+  <div class="phase-dot">🚲 回家</div>
   <div class="phase-connector"></div>
-  <div class="phase-dot" id="pd3">🍳 做饭</div>
+  <div class="phase-dot">🍳 做饭</div>
 </div>
 
-<!-- ===== SCREEN 1: SUPERMARKET ===== -->
-<div class="screen active" id="screen-shop">
+<div class="page">
   <div class="shop-header">
     <div class="shop-title">🏪 超市</div>
-    <button class="recipe-book-btn" onclick="openRecipeBook()">📖 食谱</button>
+    <button class="recipe-book-btn" id="btn-recipe">📖 食谱</button>
     <div class="wallet" id="wallet">
       <span class="coin">🪙</span>
       <span id="wallet-amount">20</span> 元
     </div>
   </div>
   <div class="shelves" id="shelves"></div>
-  <div class="cart-area">
-    <div class="cart-label">🛒 购物车</div>
+  <div class="cart-area" id="cart-area">
+    <div class="cart-label">🛒 购物车 <span class="cart-count" id="cart-count" style="display:none">0</span></div>
     <div class="cart-items" id="cart-items"></div>
     <div class="cart-actions">
-      <button class="btn btn-go-home" id="btn-go-home" disabled onclick="goHome()">🏠 回家做饭！</button>
+      <button class="btn btn-go-home" id="btn-go-home" disabled>🏠 回家做饭！</button>
     </div>
   </div>
 </div>
 
-<!-- ===== SCREEN 2: BIKE RIDE ===== -->
-<div class="screen" id="screen-bike">
-  <div class="sky-layer parallax-layer" id="sky-layer"></div>
-  <div class="building-layer parallax-layer">
-    <div class="building-strip" id="building-strip"></div>
-  </div>
-  <div class="road-layer parallax-layer">
-    <div class="road-strip" id="road-strip"></div>
-  </div>
-  <div class="marker" id="marker-start" style="left: -60px;">
-    <span>🏪</span>
-    <span class="marker-label">超市</span>
-  </div>
-  <div class="marker" id="marker-end" style="right: -60px;">
-    <span>🏠</span>
-    <span class="marker-label">我的家</span>
-  </div>
-  <div class="biker" id="biker">
-    <div class="biker-body">🚲</div>
-    <div class="shopping-bag">🛍️</div>
-  </div>
-</div>
-
-<!-- ===== SCREEN 3: KITCHEN ===== -->
-<div class="screen" id="screen-kitchen">
-  <!-- 3a: Recipe selection -->
-  <div class="recipe-selection" id="recipe-selection">
-    <div class="recipe-title">📖 选一道菜来做吧！</div>
-    <div class="recipe-cards" id="recipe-cards"></div>
-    <div style="text-align:center;padding:8px;">
-      <button class="btn btn-secondary" onclick="backToShop()">🛒 回超市买更多</button>
-    </div>
-  </div>
-
-  <!-- 3b: Cooking area -->
-  <div class="cooking-area" id="cooking-area">
-    <div class="cooking-header">
-      <button class="btn btn-secondary" style="padding:6px 14px;font-size:0.8rem;" onclick="backToRecipes()">← 换菜</button>
-      <div class="cooking-dish-name" id="cooking-dish-name"></div>
-      <div style="width:60px"></div>
-    </div>
-    <div class="cooking-hint" id="cooking-hint"></div>
-    <div class="cooking-main">
-      <div class="ing-sidebar" id="ing-sidebar"></div>
-      <div class="pot-area">
-        <div class="pot-container">
-          <div class="pot" id="cooking-pot"></div>
-          <div class="pot-ingredients" id="pot-ingredients"></div>
-        </div>
-      </div>
-    </div>
-    <div class="cook-btn-area">
-      <button class="btn btn-cook" id="btn-start-cook" disabled onclick="startCooking()">🔥 开火烹饪！</button>
-    </div>
-  </div>
-</div>
-
-<!-- Recipe book overlay (in supermarket) -->
-<div class="recipe-book-overlay" id="recipe-book-overlay">
+<!-- Recipe book overlay -->
+<div class="overlay-backdrop" id="recipe-book-overlay">
   <div class="recipe-book">
     <div class="rb-header">
       <h2>📖 食谱大全</h2>
-      <button class="rb-close" onclick="closeRecipeBook()">✕</button>
+      <button class="rb-close" id="btn-rb-close">✕</button>
     </div>
     <div class="rb-list" id="rb-list"></div>
   </div>
 </div>
 
-<!-- Cooking animation overlay -->
-<div class="cooking-overlay" id="cooking-overlay">
-  <div class="cooking-pot-anim">
-    <span id="cook-anim-pot"></span>
-    <div class="steam">
-      <span class="steam-puff">💨</span>
-      <span class="steam-puff">💨</span>
-      <span class="steam-puff">💨</span>
-    </div>
-  </div>
-  <div class="cooking-text" id="cooking-overlay-text">烹饪中...</div>
-</div>
-
-<!-- Celebration overlay -->
-<div class="celebration-overlay" id="celebration-overlay">
-  <div class="celeb-card">
-    <div class="dish-result" id="celeb-dish"></div>
-    <h2 id="celeb-title">太棒了！</h2>
-    <p id="celeb-msg"></p>
-    <div class="stars" id="celeb-stars"></div>
-    <div class="celeb-buttons">
-      <button class="btn btn-primary" id="btn-cook-again" onclick="cookAgain()">🍳 再做一道！</button>
-      <button class="btn btn-secondary" onclick="restartGame()">🛒 重新购物！</button>
-    </div>
-  </div>
-</div>
-
+<script src="shared.js"></script>
 <script>
-// ===== GAME DATA =====
-const ALL_INGREDIENTS = [
-  { id: 'tomato',   emoji: '🍅', name: '番茄',   price: 2, category: '蔬菜' },
-  { id: 'carrot',   emoji: '🥕', name: '胡萝卜', price: 1, category: '蔬菜' },
-  { id: 'pepper',   emoji: '🫑', name: '青椒',   price: 1, category: '蔬菜' },
-  { id: 'cabbage',  emoji: '🥬', name: '白菜',   price: 1, category: '蔬菜' },
-  { id: 'corn',     emoji: '🌽', name: '玉米',   price: 2, category: '蔬菜' },
-  { id: 'mushroom', emoji: '🍄', name: '蘑菇',   price: 2, category: '蔬菜' },
-  { id: 'egg',      emoji: '🥚', name: '鸡蛋',   price: 2, category: '蛋奶' },
-  { id: 'cheese',   emoji: '🧀', name: '芝士',   price: 3, category: '蛋奶' },
-  { id: 'beef',     emoji: '🥩', name: '牛肉',   price: 5, category: '肉类' },
-  { id: 'chicken',  emoji: '🍗', name: '鸡腿',   price: 4, category: '肉类' },
-  { id: 'shrimp',   emoji: '🦐', name: '虾仁',   price: 5, category: '肉类' },
-  { id: 'bacon',    emoji: '🥓', name: '培根',   price: 3, category: '肉类' },
-  { id: 'rice',     emoji: '🍚', name: '米饭',   price: 2, category: '主食' },
-  { id: 'noodle',   emoji: '🍜', name: '面条',   price: 2, category: '主食' },
-  { id: 'butter',   emoji: '🧈', name: '黄油',   price: 3, category: '调料' },
-];
-
-const RECIPES = [
-  {
-    id: 'pizza',
-    emoji: '🍕',
-    name: '美味披萨',
-    pot: '🍕',
-    required: ['tomato', 'cheese'],
-    optional: ['bacon', 'mushroom', 'pepper'],
-    cookMessages: ['揉面团...', '涂番茄酱...', '撒芝士...', '放进烤箱...', '好香啊！'],
-  },
-  {
-    id: 'friedrice',
-    emoji: '🍳',
-    name: '蛋炒饭',
-    pot: '🍳',
-    required: ['rice', 'egg'],
-    optional: ['carrot', 'corn', 'shrimp'],
-    cookMessages: ['热油锅...', '炒鸡蛋...', '加米饭翻炒...', '加点调料...', '出锅啦！'],
-  },
-  {
-    id: 'pasta',
-    emoji: '🍝',
-    name: '番茄肉酱面',
-    pot: '🍲',
-    required: ['noodle', 'tomato', 'beef'],
-    optional: ['mushroom', 'pepper'],
-    cookMessages: ['煮面条...', '炒肉酱...', '加番茄...', '搅拌均匀...', '真香！'],
-  },
-  {
-    id: 'salad',
-    emoji: '🥗',
-    name: '缤纷沙拉',
-    pot: '🥣',
-    required: ['tomato', 'carrot', 'corn'],
-    optional: ['egg', 'shrimp'],
-    cookMessages: ['洗蔬菜...', '切番茄...', '拌一拌...', '加沙拉酱...', '清爽！'],
-  },
-  {
-    id: 'tomatoegg',
-    emoji: '🥘',
-    name: '番茄炒蛋',
-    pot: '🍳',
-    required: ['tomato', 'egg'],
-    optional: ['pepper', 'mushroom'],
-    cookMessages: ['打鸡蛋...', '热油锅...', '炒番茄...', '翻炒均匀...', '好吃！'],
-  },
-  {
-    id: 'burger',
-    emoji: '🍔',
-    name: '芝士汉堡',
-    pot: '🍔',
-    required: ['beef', 'cheese'],
-    optional: ['tomato', 'bacon', 'cabbage'],
-    cookMessages: ['煎牛肉饼...', '翻一面...', '放芝士...', '夹面包里...', '汉堡好了！'],
-  },
-  {
-    id: 'soup',
-    emoji: '🍲',
-    name: '蔬菜浓汤',
-    pot: '🍲',
-    required: ['cabbage', 'carrot', 'tomato'],
-    optional: ['mushroom', 'corn', 'egg'],
-    cookMessages: ['烧开水...', '切蔬菜...', '放进锅里...', '小火慢炖...', '汤好了！'],
-  },
-  {
-    id: 'butterchicken',
-    emoji: '🍗',
-    name: '黄油烤鸡腿',
-    pot: '🍗',
-    required: ['chicken', 'butter'],
-    optional: ['mushroom', 'pepper', 'corn'],
-    cookMessages: ['腌鸡腿...', '涂黄油...', '放进烤箱...', '滋滋冒油...', '烤好了！'],
-  },
-  {
-    id: 'cheesyrice',
-    emoji: '🧀',
-    name: '芝士焗饭',
-    pot: '🍚',
-    required: ['rice', 'cheese', 'butter'],
-    optional: ['bacon', 'corn', 'mushroom'],
-    cookMessages: ['炒米饭...', '加黄油...', '铺芝士...', '放进烤箱...', '焗饭好了！'],
-  },
-  {
-    id: 'shrimnoodle',
-    emoji: '🦐',
-    name: '鲜虾拌面',
-    pot: '🍜',
-    required: ['noodle', 'shrimp', 'egg'],
-    optional: ['pepper', 'carrot'],
-    cookMessages: ['煮面条...', '炒虾仁...', '煎鸡蛋...', '拌在一起...', '真鲜！'],
-  },
-];
-
-// ===== GAME STATE =====
 let money = 20;
-let cart = []; // array of ingredient ids
-let currentPhase = 'shop'; // shop, bike, kitchen
-let selectedRecipe = null;
-let potIngredients = []; // ids of ingredients added to pot
-let usedIngredients = new Set(); // track ingredients consumed across multiple dishes
+let cart = [];
 
-// Audio
-let audioCtx;
-function getAudio() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  return audioCtx;
-}
-
-function playSound(type) {
-  try {
-    const ctx = getAudio();
-    if (type === 'buy') {
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
-      osc.connect(g); g.connect(ctx.destination);
-      osc.frequency.setValueAtTime(800, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.08);
-      g.gain.setValueAtTime(0.2, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
-      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.12);
-    } else if (type === 'return') {
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
-      osc.connect(g); g.connect(ctx.destination);
-      osc.frequency.setValueAtTime(600, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.12);
-      g.gain.setValueAtTime(0.2, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
-      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.12);
-    } else if (type === 'error') {
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
-      osc.connect(g); g.connect(ctx.destination);
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(200, ctx.currentTime);
-      g.gain.setValueAtTime(0.15, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.2);
-    } else if (type === 'plop') {
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
-      osc.connect(g); g.connect(ctx.destination);
-      osc.frequency.setValueAtTime(500, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(250, ctx.currentTime + 0.1);
-      g.gain.setValueAtTime(0.25, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
-      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.15);
-    } else if (type === 'sizzle') {
-      const bufSize = ctx.sampleRate * 0.3;
-      const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
-      const data = buf.getChannelData(0);
-      for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * 0.1 * (1 - i / bufSize);
-      const src = ctx.createBufferSource();
-      src.buffer = buf;
-      const g = ctx.createGain();
-      src.connect(g); g.connect(ctx.destination);
-      g.gain.setValueAtTime(0.15, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-      src.start(ctx.currentTime);
-    } else if (type === 'fanfare') {
-      [0, 0.12, 0.24, 0.4].forEach((t, i) => {
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.frequency.value = [523, 659, 784, 1047][i];
-        g.gain.setValueAtTime(0.18, ctx.currentTime + t);
-        g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + t + 0.25);
-        o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + 0.25);
-      });
-    } else if (type === 'bell') {
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
-      osc.connect(g); g.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(1200, ctx.currentTime);
-      g.gain.setValueAtTime(0.2, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-      osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.4);
-    }
-  } catch(e) {}
-}
-
-// ===== PHASE MANAGEMENT =====
-function setPhase(phase) {
-  currentPhase = phase;
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const pd1 = document.getElementById('pd1');
-  const pd2 = document.getElementById('pd2');
-  const pd3 = document.getElementById('pd3');
-
-  if (phase === 'shop') {
-    document.getElementById('screen-shop').classList.add('active');
-    pd1.className = 'phase-dot active';
-    pd2.className = 'phase-dot';
-    pd3.className = 'phase-dot';
-  } else if (phase === 'bike') {
-    document.getElementById('screen-bike').classList.add('active');
-    pd1.className = 'phase-dot done';
-    pd2.className = 'phase-dot active';
-    pd3.className = 'phase-dot';
-  } else if (phase === 'kitchen') {
-    document.getElementById('screen-kitchen').classList.add('active');
-    pd1.className = 'phase-dot done';
-    pd2.className = 'phase-dot done';
-    pd3.className = 'phase-dot active';
+// ===== INIT =====
+(function init() {
+  if (localStorage.getItem('kitchen-back-to-shop')) {
+    const state = loadGameState();
+    money = state.money;
+    cart = state.cart;
+    localStorage.removeItem('kitchen-back-to-shop');
   }
-}
+  document.getElementById('wallet-amount').textContent = money;
+  buildShelves();
+  syncCartDOM();
+  updateCartBadge();
+  updateGoHomeBtn();
 
-// ===== STAGE 1: SUPERMARKET =====
-function initShop() {
+  // Event delegation
+  document.getElementById('btn-go-home').addEventListener('click', goHome);
+  document.getElementById('btn-recipe').addEventListener('click', openRecipeBook);
+  document.getElementById('btn-rb-close').addEventListener('click', closeRecipeBook);
+  document.getElementById('recipe-book-overlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeRecipeBook();
+  });
+})();
+
+// ===== SHELVES =====
+function buildShelves() {
   const shelves = document.getElementById('shelves');
-  shelves.innerHTML = '';
+  const frag = document.createDocumentFragment();
   const categories = {};
   ALL_INGREDIENTS.forEach(ing => {
-    if (!categories[ing.category]) categories[ing.category] = [];
-    categories[ing.category].push(ing);
+    (categories[ing.category] ||= []).push(ing);
   });
+  const catEmojis = { '蔬菜':'🥦', '蛋奶':'🥛', '肉类':'🥩', '主食':'🍚', '调料':'🧂' };
 
-  const catEmojis = { '蔬菜': '🥦', '蛋奶': '🥛', '肉类': '🥩', '主食': '🍚', '调料': '🧂' };
-
-  Object.entries(categories).forEach(([cat, items]) => {
+  let idx = 0;
+  for (const [cat, items] of Object.entries(categories)) {
     const section = document.createElement('div');
     section.className = 'shelf-section';
-    section.innerHTML = `<div class="shelf-label">${catEmojis[cat] || ''} ${cat}</div>`;
-
+    section.innerHTML = `<div class="shelf-label">${catEmojis[cat]||''} ${cat}</div>`;
     const grid = document.createElement('div');
     grid.className = 'shelf-items';
 
-    items.forEach(ing => {
+    for (const ing of items) {
       const el = document.createElement('div');
-      el.className = 'shop-item';
-      el.id = 'shop-' + ing.id;
+      el.className = 'shop-item' + (cart.includes(ing.id) ? ' bought entered' : '');
+      el.dataset.id = ing.id;
       el.innerHTML = `
         <span class="item-emoji">${ing.emoji}</span>
         <span class="item-name">${ing.name}</span>
-        <span class="item-price">${ing.price}元</span>
-      `;
-      el.addEventListener('click', () => buyItem(ing));
+        <span class="item-price">${ing.price}元</span>`;
+      el.addEventListener('click', onShopItemClick);
+      // Stagger entrance
+      const d = idx * 40;
+      if (!cart.includes(ing.id)) {
+        setTimeout(() => el.classList.add('entered'), d + 80);
+      }
       grid.appendChild(el);
-    });
-
+      idx++;
+    }
     section.appendChild(grid);
-    shelves.appendChild(section);
-  });
-
-  updateShopUI();
+    frag.appendChild(section);
+  }
+  shelves.appendChild(frag);
 }
 
-function buyItem(ing) {
-  if (cart.includes(ing.id)) return;
+// Debounced buy
+const onShopItemClick = debounceClick(function (e) {
+  const el = this;
+  const id = el.dataset.id;
+  const ing = getIngredient(id);
+  if (!ing || cart.includes(id)) return;
+
   if (money < ing.price) {
     playSound('error');
-    const wallet = document.getElementById('wallet');
-    wallet.classList.add('shake');
-    setTimeout(() => wallet.classList.remove('shake'), 400);
-    const el = document.getElementById('shop-' + ing.id);
-    if (el) {
-      el.classList.add('cant-afford');
-      setTimeout(() => el.classList.remove('cant-afford'), 300);
-    }
+    flashClass('wallet', 'shake', 400);
+    el.classList.add('cant-afford');
+    setTimeout(() => el.classList.remove('cant-afford'), 300);
     return;
   }
+
   money -= ing.price;
-  cart.push(ing.id);
+  cart.push(id);
   playSound('buy');
-  updateShopUI();
-}
-
-function returnItem(ingId) {
-  const idx = cart.indexOf(ingId);
-  if (idx === -1) return;
-  const ing = ALL_INGREDIENTS.find(i => i.id === ingId);
-  money += ing.price;
-  cart.splice(idx, 1);
-  playSound('return');
-  updateShopUI();
-}
-
-function updateShopUI() {
   document.getElementById('wallet-amount').textContent = money;
+  flashClass('wallet', 'pulse', 300);
 
-  // Update bought state
-  ALL_INGREDIENTS.forEach(ing => {
-    const el = document.getElementById('shop-' + ing.id);
-    if (el) {
-      el.classList.toggle('bought', cart.includes(ing.id));
-    }
-  });
+  // Ripple
+  spawnRipple(el, e);
 
-  // Update cart
-  const cartEl = document.getElementById('cart-items');
-  cartEl.innerHTML = '';
+  // Fly to cart
+  flyToCart(ing, el);
+
+  // Mark bought
+  el.classList.add('bought');
+  updateGoHomeBtn();
+}, 200);
+
+function spawnRipple(el, e) {
+  const rect = el.getBoundingClientRect();
+  const x = (e.clientX || rect.left + rect.width / 2) - rect.left;
+  const y = (e.clientY || rect.top + rect.height / 2) - rect.top;
+  const r = document.createElement('span');
+  r.className = 'ripple';
+  r.style.cssText = `left:${x}px;top:${y}px;width:40px;height:40px;margin:-20px 0 0 -20px;`;
+  el.appendChild(r);
+  setTimeout(() => r.remove(), 500);
+}
+
+function flyToCart(ing, fromEl) {
+  const fromRect = fromEl.getBoundingClientRect();
+  const cartRect = document.getElementById('cart-area').getBoundingClientRect();
+  const clone = document.createElement('div');
+  clone.className = 'flying-item';
+  clone.textContent = ing.emoji;
+  const sx = fromRect.left + fromRect.width / 2 - 20;
+  const sy = fromRect.top;
+  const tx = cartRect.left + cartRect.width / 2 - 20;
+  const ty = cartRect.top + 10;
+  clone.style.left = sx + 'px';
+  clone.style.top = sy + 'px';
+  document.body.appendChild(clone);
+
+  const dur = 400;
+  const start = performance.now();
+  (function tick(now) {
+    const p = Math.min((now - start) / dur, 1);
+    const ease = 1 - (1 - p) ** 3;
+    clone.style.left = (sx + (tx - sx) * ease) + 'px';
+    clone.style.top = (sy + (ty - sy) * ease - 70 * Math.sin(p * Math.PI)) + 'px';
+    clone.style.transform = `scale(${1 - p * 0.5}) rotate(${p * 360}deg)`;
+    clone.style.opacity = 1 - p * 0.3;
+    if (p < 1) return requestAnimationFrame(tick);
+    clone.remove();
+    appendCartItem(ing.id);
+    flashClass('cart-area', 'bounce', 350);
+  })(performance.now());
+}
+
+// ===== CART =====
+function appendCartItem(id) {
+  const ing = getIngredient(id);
+  const el = document.createElement('div');
+  el.className = 'cart-item entering';
+  el.dataset.id = id;
+  el.innerHTML = `<span class="ci-emoji">${ing.emoji}</span><span class="ci-name">${ing.name}</span>`;
+  el.addEventListener('click', onCartItemClick);
+  document.getElementById('cart-items').appendChild(el);
+  setTimeout(() => el.classList.remove('entering'), 400);
+  updateCartBadge();
+}
+
+const onCartItemClick = debounceClick(function () {
+  const el = this;
+  const id = el.dataset.id;
+  const idx = cart.indexOf(id);
+  if (idx === -1) return;
+
+  playSound('return');
+  el.classList.add('removing');
+  setTimeout(() => {
+    el.remove();
+    const ing = getIngredient(id);
+    cart.splice(idx, 1);
+    money += ing.price;
+    document.getElementById('wallet-amount').textContent = money;
+    flashClass('wallet', 'pulse', 300);
+    // Un-gray shop item
+    const shopEl = document.querySelector(`.shop-item[data-id="${id}"]`);
+    if (shopEl) shopEl.classList.remove('bought');
+    updateCartBadge();
+    updateGoHomeBtn();
+  }, 300);
+}, 350);
+
+function syncCartDOM() {
+  const container = document.getElementById('cart-items');
+  container.innerHTML = '';
   cart.forEach(id => {
-    const ing = ALL_INGREDIENTS.find(i => i.id === id);
+    const ing = getIngredient(id);
     const el = document.createElement('div');
-    el.className = 'cart-item fade-in';
+    el.className = 'cart-item';
+    el.dataset.id = id;
     el.innerHTML = `<span class="ci-emoji">${ing.emoji}</span><span class="ci-name">${ing.name}</span>`;
-    el.addEventListener('click', () => returnItem(id));
-    cartEl.appendChild(el);
+    el.addEventListener('click', onCartItemClick);
+    container.appendChild(el);
   });
+}
 
-  // Go home button
+function updateCartBadge() {
+  const badge = document.getElementById('cart-count');
+  if (cart.length > 0) {
+    badge.style.display = '';
+    badge.textContent = cart.length;
+    badge.classList.remove('pop');
+    void badge.offsetWidth;
+    badge.classList.add('pop');
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function updateGoHomeBtn() {
   document.getElementById('btn-go-home').disabled = cart.length === 0;
 }
 
-// ===== STAGE 2: BIKE RIDE =====
+// ===== NAVIGATE =====
 function goHome() {
   if (cart.length === 0) return;
-  setPhase('bike');
+  saveGameState(money, cart);
   playSound('bell');
-  startBikeRide();
+  navigateTo('ride.html');
 }
 
-function startBikeRide() {
-  // Generate clouds
-  const skyLayer = document.getElementById('sky-layer');
-  skyLayer.innerHTML = '';
-  const cloudEmojis = ['☁️', '⛅', '🌤️'];
-  for (let i = 0; i < 8; i++) {
-    const c = document.createElement('div');
-    c.className = 'cloud';
-    c.textContent = cloudEmojis[i % cloudEmojis.length];
-    c.style.top = (10 + Math.random() * 60) + '%';
-    c.style.left = (Math.random() * 200) + '%';
-    c.style.fontSize = (1.5 + Math.random() * 2) + 'rem';
-    skyLayer.appendChild(c);
-  }
-
-  // Generate buildings
-  const buildingStrip = document.getElementById('building-strip');
-  buildingStrip.innerHTML = '';
-  const buildingEmojis = ['🏠', '🏡', '🏢', '🌳', '🌲', '🏪', '🏫', '🌳', '🏠', '🌲', '🏬', '🌳', '🏡', '🏠', '🌲', '🏢', '🌳', '🏠', '🏡', '🌳'];
-  buildingEmojis.forEach(b => {
-    const el = document.createElement('span');
-    el.className = 'building-obj';
-    el.textContent = b;
-    buildingStrip.appendChild(el);
-  });
-
-  // Generate road dashes
-  const roadStrip = document.getElementById('road-strip');
-  roadStrip.innerHTML = '';
-  for (let i = 0; i < 40; i++) {
-    const d = document.createElement('div');
-    d.className = 'road-dash';
-    roadStrip.appendChild(d);
-  }
-
-  // Animate
-  const duration = 5500;
-  const startTime = performance.now();
-  const vw = window.innerWidth;
-
-  const markerStart = document.getElementById('marker-start');
-  const markerEnd = document.getElementById('marker-end');
-  markerStart.style.left = vw * 0.7 + 'px';
-  markerEnd.style.left = vw * 2 + 'px';
-
-  function animFrame(now) {
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    // ease in-out
-    const ease = progress < 0.5
-      ? 2 * progress * progress
-      : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-
-    // Clouds move slowly
-    const cloudOffset = ease * vw * 0.4;
-    skyLayer.querySelectorAll('.cloud').forEach(c => {
-      const initLeft = parseFloat(c.style.left);
-      c.style.transform = `translateX(${-cloudOffset}px)`;
-    });
-
-    // Buildings move medium
-    const buildingOffset = ease * vw * 1.5;
-    buildingStrip.style.transform = `translateX(${-buildingOffset}px)`;
-
-    // Road dashes move fast
-    const roadOffset = ease * vw * 2.5;
-    roadStrip.style.transform = `translateX(${-roadOffset}px)`;
-
-    // Markers
-    const startX = vw * 0.7 - ease * vw * 1.5;
-    markerStart.style.left = startX + 'px';
-    const endX = vw * 2 - ease * vw * 1.8;
-    markerEnd.style.left = endX + 'px';
-
-    if (progress < 1) {
-      requestAnimationFrame(animFrame);
-    } else {
-      // Arrive home
-      setTimeout(() => {
-        setPhase('kitchen');
-        showRecipeSelection();
-      }, 400);
-    }
-  }
-
-  requestAnimationFrame(animFrame);
-}
-
-// ===== STAGE 3: KITCHEN =====
-function getAvailableIngredients() {
-  return cart.filter(id => !usedIngredients.has(id));
-}
-
-function showRecipeSelection() {
-  const container = document.getElementById('recipe-cards');
-  const recipeSelection = document.getElementById('recipe-selection');
-  const cookingArea = document.getElementById('cooking-area');
-
-  recipeSelection.style.display = '';
-  cookingArea.classList.remove('active');
-  container.innerHTML = '';
-
-  const available = getAvailableIngredients();
-
-  RECIPES.forEach(recipe => {
-    const hasAllRequired = recipe.required.every(id => available.includes(id));
-    const missingRequired = recipe.required.filter(id => !available.includes(id));
-
-    const card = document.createElement('div');
-    card.className = 'recipe-card ' + (hasAllRequired ? 'available' : 'unavailable');
-
-    const requiredHTML = recipe.required.map(id => {
-      const ing = ALL_INGREDIENTS.find(i => i.id === id);
-      const has = available.includes(id);
-      return `<span style="opacity:${has ? 1 : 0.4}">${has ? '' : '❌'}${ing.emoji}${ing.name}</span>`;
-    }).join(' ');
-
-    const optionalHTML = recipe.optional.map(id => {
-      const ing = ALL_INGREDIENTS.find(i => i.id === id);
-      const has = available.includes(id);
-      return `<span style="opacity:${has ? 1 : 0.4}">${ing.emoji}</span>`;
-    }).join('');
-
-    card.innerHTML = `
-      <div class="rc-emoji">${recipe.emoji}</div>
-      <div class="rc-name">${recipe.name}</div>
-      <div class="rc-ingredients">必要: ${requiredHTML}</div>
-      <div class="rc-ingredients">可选: ${optionalHTML}</div>
-      ${!hasAllRequired ? `<div class="rc-missing">缺少: ${missingRequired.map(id => ALL_INGREDIENTS.find(i => i.id === id).name).join('、')}</div>` : ''}
-    `;
-
-    if (hasAllRequired) {
-      card.addEventListener('click', () => selectRecipe(recipe));
-    }
-    container.appendChild(card);
-  });
-}
-
-function selectRecipe(recipe) {
-  selectedRecipe = recipe;
-  potIngredients = [];
-  playSound('bell');
-  showCookingArea();
-}
-
-function showCookingArea() {
-  const recipeSelection = document.getElementById('recipe-selection');
-  const cookingArea = document.getElementById('cooking-area');
-
-  recipeSelection.style.display = 'none';
-  cookingArea.classList.add('active');
-
-  document.getElementById('cooking-dish-name').textContent = selectedRecipe.emoji + ' ' + selectedRecipe.name;
-  document.getElementById('cooking-pot').textContent = selectedRecipe.pot;
-  document.getElementById('pot-ingredients').innerHTML = '';
-
-  const available = getAvailableIngredients();
-
-  // Build ingredient sidebar
-  const sidebar = document.getElementById('ing-sidebar');
-  sidebar.innerHTML = '';
-
-  // Required first
-  selectedRecipe.required.forEach(id => {
-    const ing = ALL_INGREDIENTS.find(i => i.id === id);
-    const el = document.createElement('div');
-    el.className = 'ing-item required';
-    el.id = 'cook-ing-' + id;
-    el.innerHTML = `<span class="ii-emoji">${ing.emoji}</span><span class="ii-name">${ing.name}</span>`;
-    el.addEventListener('click', () => addToPot(id));
-    sidebar.appendChild(el);
-  });
-
-  // Optional (only if in cart)
-  selectedRecipe.optional.forEach(id => {
-    if (!available.includes(id)) return;
-    const ing = ALL_INGREDIENTS.find(i => i.id === id);
-    const el = document.createElement('div');
-    el.className = 'ing-item optional';
-    el.id = 'cook-ing-' + id;
-    el.innerHTML = `<span class="ii-emoji">${ing.emoji}</span><span class="ii-name">${ing.name}</span>`;
-    el.addEventListener('click', () => addToPot(id));
-    sidebar.appendChild(el);
-  });
-
-  updateCookingUI();
-}
-
-function addToPot(ingId) {
-  if (potIngredients.includes(ingId)) return;
-
-  // Check if all required before this optional are added
-  const allRequiredAdded = selectedRecipe.required.every(id => potIngredients.includes(id));
-  const isRequired = selectedRecipe.required.includes(ingId);
-
-  // If it's required, check order hint
-  if (isRequired) {
-    const nextRequired = selectedRecipe.required.find(id => !potIngredients.includes(id));
-    if (nextRequired !== ingId) {
-      // Show hint about order
-      updateHint(`先把 ${ALL_INGREDIENTS.find(i => i.id === nextRequired).emoji} ${ALL_INGREDIENTS.find(i => i.id === nextRequired).name} 放进去！`);
-      return;
-    }
-  }
-
-  // Optional ingredients can only be added after all required
-  if (!isRequired && !allRequiredAdded) {
-    updateHint('先把必要食材放进去！');
-    return;
-  }
-
-  potIngredients.push(ingId);
-  playSound('plop');
-  setTimeout(() => playSound('sizzle'), 150);
-
-  // Visual: add to pot
-  const ing = ALL_INGREDIENTS.find(i => i.id === ingId);
-  const potDiv = document.getElementById('pot-ingredients');
-  const el = document.createElement('span');
-  el.className = 'pot-ing';
-  el.textContent = ing.emoji;
-  potDiv.appendChild(el);
-
-  // Mark as added
-  const sideEl = document.getElementById('cook-ing-' + ingId);
-  if (sideEl) sideEl.classList.add('added');
-
-  updateCookingUI();
-}
-
-function updateHint(text) {
-  const hint = document.getElementById('cooking-hint');
-  hint.textContent = text;
-}
-
-function updateCookingUI() {
-  const allRequiredAdded = selectedRecipe.required.every(id => potIngredients.includes(id));
-
-  // Hint
-  if (!allRequiredAdded) {
-    const nextRequired = selectedRecipe.required.find(id => !potIngredients.includes(id));
-    if (nextRequired) {
-      const ing = ALL_INGREDIENTS.find(i => i.id === nextRequired);
-      updateHint(`👈 把 ${ing.emoji} ${ing.name} 放进锅里！`);
-    }
-  } else {
-    const available = getAvailableIngredients();
-    const optionalAvailable = selectedRecipe.optional.filter(id =>
-      available.includes(id) && !potIngredients.includes(id)
-    );
-    if (optionalAvailable.length > 0) {
-      updateHint('✨ 还可以加更多食材，或者直接开火！');
-    } else {
-      updateHint('👍 食材都放好了，开火吧！');
-    }
-  }
-
-  // Cook button
-  document.getElementById('btn-start-cook').disabled = !allRequiredAdded;
-}
-
-function startCooking() {
-  if (!selectedRecipe) return;
-  const allRequiredAdded = selectedRecipe.required.every(id => potIngredients.includes(id));
-  if (!allRequiredAdded) return;
-
-  // Mark ingredients as used
-  potIngredients.forEach(id => usedIngredients.add(id));
-
-  // Show cooking overlay
-  const overlay = document.getElementById('cooking-overlay');
-  const textEl = document.getElementById('cooking-overlay-text');
-  const potEl = document.getElementById('cook-anim-pot');
-  potEl.textContent = selectedRecipe.pot;
-  overlay.classList.add('active');
-
-  const messages = selectedRecipe.cookMessages;
-  let idx = 0;
-  textEl.textContent = messages[0];
-
-  const interval = setInterval(() => {
-    idx++;
-    if (idx < messages.length) {
-      textEl.textContent = messages[idx];
-      playSound('sizzle');
-    }
-  }, 700);
-
-  setTimeout(() => {
-    clearInterval(interval);
-    overlay.classList.remove('active');
-    playSound('fanfare');
-    showCelebration();
-  }, 3800);
-}
-
-function showCelebration() {
-  const overlay = document.getElementById('celebration-overlay');
-  const dishEl = document.getElementById('celeb-dish');
-  const titleEl = document.getElementById('celeb-title');
-  const msgEl = document.getElementById('celeb-msg');
-  const starsEl = document.getElementById('celeb-stars');
-  const cookAgainBtn = document.getElementById('btn-cook-again');
-
-  dishEl.textContent = selectedRecipe.emoji;
-
-  const optionalUsed = potIngredients.filter(id =>
-    selectedRecipe.optional.includes(id)
-  ).length;
-
-  let starCount = 1;
-  if (optionalUsed >= 1) starCount = 2;
-  if (optionalUsed >= 2) starCount = 3;
-
-  const titles = ['不错哦！', '太棒了！', '完美大厨！'];
-  const msgs = [
-    `你做了一道${selectedRecipe.name}！`,
-    `好厉害！你的${selectedRecipe.name}真好看！`,
-    `哇！你是最棒的小厨师！${selectedRecipe.name}一定超级好吃！`,
-  ];
-
-  titleEl.textContent = titles[starCount - 1];
-  msgEl.textContent = msgs[starCount - 1];
-  starsEl.textContent = '⭐'.repeat(starCount) + '☆'.repeat(3 - starCount);
-
-  // Can cook again if there are remaining ingredients that match any recipe
-  const remaining = getAvailableIngredients();
-  const canCookMore = RECIPES.some(r => r.required.every(id => remaining.includes(id)));
-  cookAgainBtn.style.display = canCookMore ? '' : 'none';
-
-  overlay.classList.add('active');
-  spawnConfetti();
-}
-
-function cookAgain() {
-  document.getElementById('celebration-overlay').classList.remove('active');
-  selectedRecipe = null;
-  potIngredients = [];
-  showRecipeSelection();
-}
-
-function backToRecipes() {
-  selectedRecipe = null;
-  potIngredients = [];
-  showRecipeSelection();
-}
-
-function backToShop() {
-  // Reset game but keep cart contents and adjust money
-  usedIngredients.clear();
-  setPhase('shop');
-  // Re-init shop with current state
-  initShop();
-}
-
-function restartGame() {
-  document.getElementById('celebration-overlay').classList.remove('active');
-  money = 20;
-  cart = [];
-  usedIngredients.clear();
-  selectedRecipe = null;
-  potIngredients = [];
-  setPhase('shop');
-  initShop();
-}
-
-function spawnConfetti() {
-  const colors = ['#ff5722', '#ff9800', '#ffeb3b', '#4caf50', '#2196f3', '#9c27b0', '#e91e63'];
-  for (let i = 0; i < 50; i++) {
-    const c = document.createElement('div');
-    c.className = 'confetti';
-    c.style.left = Math.random() * 100 + 'vw';
-    c.style.top = '-10px';
-    c.style.background = colors[Math.floor(Math.random() * colors.length)];
-    c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-    c.style.width = (6 + Math.random() * 8) + 'px';
-    c.style.height = (6 + Math.random() * 8) + 'px';
-    c.style.animation = `confetti-fall ${1.5 + Math.random() * 2}s linear ${Math.random() * 0.5}s forwards`;
-    document.body.appendChild(c);
-    setTimeout(() => c.remove(), 4000);
-  }
-}
-
-// ===== RECIPE BOOK (in supermarket) =====
+// ===== RECIPE BOOK =====
 function openRecipeBook() {
-  renderRecipeBook();
+  const list = document.getElementById('rb-list');
+  list.innerHTML = '';
+  for (const recipe of RECIPES) {
+    const hasAll = recipe.required.every(id => cart.includes(id));
+    const cost = recipe.required.reduce((s, id) => s + getIngredient(id).price, 0);
+    const card = document.createElement('div');
+    card.className = 'rb-card' + (hasAll ? ' can-make' : '');
+    card.innerHTML = `
+      <div class="rb-card-emoji">${recipe.emoji}</div>
+      <div class="rb-card-info">
+        <div class="rb-card-name">${recipe.name}${hasAll ? ' ✅' : ''}</div>
+        <div class="rb-card-row"><span class="label">必要:</span>${recipe.required.map(id => {
+          const ing = getIngredient(id); const has = cart.includes(id);
+          return `<span class="rb-ing ${has ? 'has' : 'missing'}">${has ? '✅' : '⬜'}${ing.emoji}${ing.name}</span>`;
+        }).join('')}</div>
+        <div class="rb-card-row"><span class="label">可选:</span>${recipe.optional.map(id => {
+          const ing = getIngredient(id);
+          return `<span class="rb-ing ${cart.includes(id) ? 'has' : 'missing'}">${ing.emoji}</span>`;
+        }).join('')}</div>
+        <div class="rb-card-cost">必要食材共 ${cost} 元</div>
+      </div>`;
+    list.appendChild(card);
+  }
   document.getElementById('recipe-book-overlay').classList.add('active');
   playSound('bell');
 }
@@ -1711,51 +516,14 @@ function closeRecipeBook() {
   document.getElementById('recipe-book-overlay').classList.remove('active');
 }
 
-function renderRecipeBook() {
-  const list = document.getElementById('rb-list');
-  list.innerHTML = '';
-
-  RECIPES.forEach(recipe => {
-    const hasAllRequired = recipe.required.every(id => cart.includes(id));
-    const card = document.createElement('div');
-    card.className = 'rb-card' + (hasAllRequired ? ' can-make' : '');
-
-    const reqCost = recipe.required.reduce((sum, id) => {
-      return sum + ALL_INGREDIENTS.find(i => i.id === id).price;
-    }, 0);
-
-    const requiredHTML = recipe.required.map(id => {
-      const ing = ALL_INGREDIENTS.find(i => i.id === id);
-      const has = cart.includes(id);
-      return `<span class="rb-ing ${has ? 'has' : 'missing'}">${has ? '✅' : '⬜'}${ing.emoji}${ing.name}</span>`;
-    }).join('');
-
-    const optionalHTML = recipe.optional.map(id => {
-      const ing = ALL_INGREDIENTS.find(i => i.id === id);
-      const has = cart.includes(id);
-      return `<span class="rb-ing ${has ? 'has' : 'missing'}">${ing.emoji}</span>`;
-    }).join('');
-
-    card.innerHTML = `
-      <div class="rb-card-emoji">${recipe.emoji}</div>
-      <div class="rb-card-info">
-        <div class="rb-card-name">${recipe.name}${hasAllRequired ? ' ✅' : ''}</div>
-        <div class="rb-card-row"><span class="label">必要:</span>${requiredHTML}</div>
-        <div class="rb-card-row"><span class="label">可选:</span>${optionalHTML}</div>
-        <div class="rb-card-cost">必要食材共 ${reqCost} 元</div>
-      </div>
-    `;
-    list.appendChild(card);
-  });
+// ===== UTILS =====
+function flashClass(id, cls, ms) {
+  const el = document.getElementById(id);
+  el.classList.remove(cls);
+  void el.offsetWidth;
+  el.classList.add(cls);
+  setTimeout(() => el.classList.remove(cls), ms);
 }
-
-// Close recipe book when clicking backdrop
-document.getElementById('recipe-book-overlay').addEventListener('click', function(e) {
-  if (e.target === this) closeRecipeBook();
-});
-
-// ===== INIT =====
-initShop();
 </script>
 </body>
 </html>
