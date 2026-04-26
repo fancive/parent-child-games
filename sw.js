@@ -22,6 +22,7 @@ const ASSETS = [
   './bear-supermarket/data.js',
   './bear-supermarket/renderer.js',
   './bear-supermarket/game.js',
+  './offline.html',
 ];
 
 self.addEventListener('install', (e) => {
@@ -57,6 +58,11 @@ self.addEventListener('fetch', (e) => {
             return response;
           })
           .catch(() => cached);
+
+        // For navigation requests, show offline page if both cache and network fail
+        if (e.request.mode === 'navigate') {
+          return cached || fetchPromise.catch(() => cache.match('./offline.html'));
+        }
 
         return cached || fetchPromise;
       }),
