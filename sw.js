@@ -10,6 +10,7 @@ const ASSETS = [
   './kitchen-game/shared.js',
   './kitchen-game/shared.css',
   './bear-supermarket/index.html',
+  './bear-supermarket/styles.css',
 ];
 
 self.addEventListener('install', e => {
