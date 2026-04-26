@@ -36,15 +36,15 @@ function getIngredient(id) { return INGREDIENT_MAP[id]; }
 // ===== LOCALSTORAGE (with error handling) =====
 function saveGameState(money, cart) {
   try {
-    localStorage.setItem('kitchen-money', JSON.stringify(money));
-    localStorage.setItem('kitchen-cart', JSON.stringify(cart));
+    localStorage.setItem('pcg_kitchen-money', JSON.stringify(money));
+    localStorage.setItem('pcg_kitchen-cart', JSON.stringify(cart));
   } catch (e) { /* quota exceeded or private browsing */ }
 }
 
 function loadGameState() {
   try {
-    const money = JSON.parse(localStorage.getItem('kitchen-money') || '20');
-    const cart = JSON.parse(localStorage.getItem('kitchen-cart') || '[]');
+    const money = JSON.parse(localStorage.getItem('pcg_kitchen-money') || '20');
+    const cart = JSON.parse(localStorage.getItem('pcg_kitchen-cart') || '[]');
     if (typeof money !== 'number' || !Array.isArray(cart)) throw new Error();
     return { money, cart };
   } catch (e) {
@@ -54,9 +54,9 @@ function loadGameState() {
 }
 
 function clearGameState() {
-  localStorage.removeItem('kitchen-money');
-  localStorage.removeItem('kitchen-cart');
-  localStorage.removeItem('kitchen-back-to-shop');
+  localStorage.removeItem('pcg_kitchen-money');
+  localStorage.removeItem('pcg_kitchen-cart');
+  localStorage.removeItem('pcg_kitchen-back-to-shop');
 }
 
 // ===== DEBOUNCE =====

@@ -363,7 +363,7 @@ function available() { return cart.filter(id => !usedIngredients.has(id)); }
 
 // ===== EVENTS =====
 document.getElementById('btn-back-shop').addEventListener('click', () => {
-  localStorage.setItem('kitchen-back-to-shop', '1');
+  localStorage.setItem('pcg_kitchen-back-to-shop', '1');
   navigateTo('index.html');
 });
 document.getElementById('btn-change-dish').addEventListener('click', backToRecipes);
