@@ -19,7 +19,7 @@ let cart = [];
   document.getElementById('btn-go-home').addEventListener('click', goHome);
   document.getElementById('btn-recipe').addEventListener('click', openRecipeBook);
   document.getElementById('btn-rb-close').addEventListener('click', closeRecipeBook);
-  document.getElementById('recipe-book-overlay').addEventListener('click', e => {
+  document.getElementById('recipe-book-overlay').addEventListener('click', (e) => {
     if (e.target === e.currentTarget) closeRecipeBook();
   });
 })();
@@ -29,16 +29,16 @@ function buildShelves() {
   const shelves = document.getElementById('shelves');
   const frag = document.createDocumentFragment();
   const categories = {};
-  ALL_INGREDIENTS.forEach(ing => {
+  ALL_INGREDIENTS.forEach((ing) => {
     (categories[ing.category] ||= []).push(ing);
   });
-  const catEmojis = { '蔬菜':'🥦', '蛋奶':'🥛', '肉类':'🥩', '主食':'🍚', '调料':'🧂' };
+  const catEmojis = { 蔬菜: '🥦', 蛋奶: '🥛', 肉类: '🥩', 主食: '🍚', 调料: '🧂' };
 
   let idx = 0;
   for (const [cat, items] of Object.entries(categories)) {
     const section = document.createElement('div');
     section.className = 'shelf-section';
-    section.innerHTML = `<div class="shelf-label">${catEmojis[cat]||''} ${cat}</div>`;
+    section.innerHTML = `<div class="shelf-label">${catEmojis[cat] || ''} ${cat}</div>`;
     const grid = document.createElement('div');
     grid.className = 'shelf-items';
 
@@ -52,7 +52,7 @@ function buildShelves() {
         <span class="item-price">${ing.price}元</span>`;
       el.addEventListener('click', onShopItemClick);
       if (!cart.includes(ing.id)) {
-        el.style.animationDelay = (idx * 40 + 80) + 'ms';
+        el.style.animationDelay = idx * 40 + 80 + 'ms';
         el.classList.add('entering');
       }
       grid.appendChild(el);
@@ -126,8 +126,8 @@ function flyToCart(ing, fromEl) {
   (function tick(now) {
     const p = Math.min((now - start) / dur, 1);
     const ease = 1 - (1 - p) ** 3;
-    clone.style.left = (sx + (tx - sx) * ease) + 'px';
-    clone.style.top = (sy + (ty - sy) * ease - 70 * Math.sin(p * Math.PI)) + 'px';
+    clone.style.left = sx + (tx - sx) * ease + 'px';
+    clone.style.top = sy + (ty - sy) * ease - 70 * Math.sin(p * Math.PI) + 'px';
     clone.style.transform = `scale(${1 - p * 0.5}) rotate(${p * 360}deg)`;
     clone.style.opacity = 1 - p * 0.3;
     if (p < 1) return requestAnimationFrame(tick);
@@ -176,7 +176,7 @@ const onCartItemClick = debounceClick(function () {
 function syncCartDOM() {
   const container = document.getElementById('cart-items');
   container.innerHTML = '';
-  cart.forEach(id => {
+  cart.forEach((id) => {
     const ing = getIngredient(id);
     const el = document.createElement('div');
     el.className = 'cart-item';
@@ -217,7 +217,7 @@ function openRecipeBook() {
   const list = document.getElementById('rb-list');
   list.innerHTML = '';
   for (const recipe of RECIPES) {
-    const hasAll = recipe.required.every(id => cart.includes(id));
+    const hasAll = recipe.required.every((id) => cart.includes(id));
     const cost = recipe.required.reduce((s, id) => s + getIngredient(id).price, 0);
     const card = document.createElement('div');
     card.className = 'rb-card' + (hasAll ? ' can-make' : '');
@@ -225,14 +225,19 @@ function openRecipeBook() {
       <div class="rb-card-emoji">${recipe.emoji}</div>
       <div class="rb-card-info">
         <div class="rb-card-name">${recipe.name}${hasAll ? ' ✅' : ''}</div>
-        <div class="rb-card-row"><span class="label">必要:</span>${recipe.required.map(id => {
-          const ing = getIngredient(id); const has = cart.includes(id);
-          return `<span class="rb-ing ${has ? 'has' : 'missing'}">${has ? '✅' : '⬜'}${ing.emoji}${ing.name}</span>`;
-        }).join('')}</div>
-        <div class="rb-card-row"><span class="label">可选:</span>${recipe.optional.map(id => {
-          const ing = getIngredient(id);
-          return `<span class="rb-ing ${cart.includes(id) ? 'has' : 'missing'}">${ing.emoji}</span>`;
-        }).join('')}</div>
+        <div class="rb-card-row"><span class="label">必要:</span>${recipe.required
+          .map((id) => {
+            const ing = getIngredient(id);
+            const has = cart.includes(id);
+            return `<span class="rb-ing ${has ? 'has' : 'missing'}">${has ? '✅' : '⬜'}${ing.emoji}${ing.name}</span>`;
+          })
+          .join('')}</div>
+        <div class="rb-card-row"><span class="label">可选:</span>${recipe.optional
+          .map((id) => {
+            const ing = getIngredient(id);
+            return `<span class="rb-ing ${cart.includes(id) ? 'has' : 'missing'}">${ing.emoji}</span>`;
+          })
+          .join('')}</div>
         <div class="rb-card-cost">必要食材共 ${cost} 元</div>
       </div>`;
     list.appendChild(card);

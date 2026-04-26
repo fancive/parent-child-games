@@ -25,9 +25,15 @@ const sandbox = {
     let store = {};
     return {
       getItem: (k) => (k in store ? store[k] : null),
-      setItem: (k, v) => { store[k] = String(v); },
-      removeItem: (k) => { delete store[k]; },
-      clear: () => { store = {}; },
+      setItem: (k, v) => {
+        store[k] = String(v);
+      },
+      removeItem: (k) => {
+        delete store[k];
+      },
+      clear: () => {
+        store = {};
+      },
     };
   })(),
 };
@@ -38,17 +44,27 @@ vm.createContext(sandbox);
 // Load kitchen-game/shared.js
 const code = readFileSync(join(__dirname, '..', 'kitchen-game', 'shared.js'), 'utf-8');
 // Wrap in IIFE to capture const declarations onto sandbox
-vm.runInContext(code + `
+vm.runInContext(
+  code +
+    `
 ;(function(_s){
   _s.ALL_INGREDIENTS = ALL_INGREDIENTS;
   _s.RECIPES = RECIPES;
   _s.INGREDIENT_MAP = INGREDIENT_MAP;
 })(this);
-`, sandbox);
+`,
+  sandbox,
+);
 
 const {
-  ALL_INGREDIENTS, RECIPES, INGREDIENT_MAP, getIngredient,
-  saveGameState, loadGameState, clearGameState, navigateTo,
+  ALL_INGREDIENTS,
+  RECIPES,
+  INGREDIENT_MAP,
+  getIngredient,
+  saveGameState,
+  loadGameState,
+  clearGameState,
+  navigateTo,
 } = sandbox;
 
 describe('ALL_INGREDIENTS', () => {
@@ -78,7 +94,10 @@ describe('RECIPES', () => {
         assert.ok(INGREDIENT_MAP[id], `recipe ${recipe.id} references unknown ingredient '${id}'`);
       }
       for (const id of recipe.optional) {
-        assert.ok(INGREDIENT_MAP[id], `recipe ${recipe.id} references unknown optional ingredient '${id}'`);
+        assert.ok(
+          INGREDIENT_MAP[id],
+          `recipe ${recipe.id} references unknown optional ingredient '${id}'`,
+        );
       }
     }
   });

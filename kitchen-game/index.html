@@ -1,55 +1,71 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'">
-<title>小厨师做饭 - 超市</title>
-<link rel="stylesheet" href="shared.css">
-<link rel="stylesheet" href="shop.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'"
+    />
+    <title>小厨师做饭 - 超市</title>
+    <link rel="stylesheet" href="shared.css" />
+    <link rel="stylesheet" href="shop.css" />
+  </head>
+  <body>
+    <nav class="phase-bar" aria-label="游戏进度">
+      <div class="phase-dot active" aria-current="step">🛒 超市</div>
+      <div class="phase-connector" aria-hidden="true"></div>
+      <div class="phase-dot">🚲 回家</div>
+      <div class="phase-connector" aria-hidden="true"></div>
+      <div class="phase-dot">🍳 做饭</div>
+    </nav>
 
-<nav class="phase-bar" aria-label="游戏进度">
-  <div class="phase-dot active" aria-current="step">🛒 超市</div>
-  <div class="phase-connector" aria-hidden="true"></div>
-  <div class="phase-dot">🚲 回家</div>
-  <div class="phase-connector" aria-hidden="true"></div>
-  <div class="phase-dot">🍳 做饭</div>
-</nav>
+    <main class="page">
+      <header class="shop-header">
+        <h1 class="shop-title">🏪 超市</h1>
+        <button class="recipe-book-btn" id="btn-recipe" aria-label="打开食谱">📖 食谱</button>
+        <div class="wallet" id="wallet" role="status" aria-label="钱包余额">
+          <span class="coin" aria-hidden="true">🪙</span>
+          <span id="wallet-amount">20</span> 元
+        </div>
+      </header>
+      <section class="shelves" id="shelves" role="list" aria-label="商品货架"></section>
+      <section class="cart-area" id="cart-area" aria-label="购物车">
+        <div class="cart-label">
+          🛒 购物车
+          <span class="cart-count" id="cart-count" style="display: none" role="status">0</span>
+        </div>
+        <div class="cart-items" id="cart-items" role="list" aria-label="已选商品"></div>
+        <div class="cart-actions">
+          <button class="btn btn-go-home" id="btn-go-home" disabled aria-label="回家做饭">
+            🏠 回家做饭！
+          </button>
+        </div>
+      </section>
+    </main>
 
-<main class="page">
-  <header class="shop-header">
-    <h1 class="shop-title">🏪 超市</h1>
-    <button class="recipe-book-btn" id="btn-recipe" aria-label="打开食谱">📖 食谱</button>
-    <div class="wallet" id="wallet" role="status" aria-label="钱包余额">
-      <span class="coin" aria-hidden="true">🪙</span>
-      <span id="wallet-amount">20</span> 元
+    <!-- Recipe book overlay -->
+    <div
+      class="overlay-backdrop"
+      id="recipe-book-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="食谱大全"
+    >
+      <div class="recipe-book">
+        <div class="rb-header">
+          <h2>📖 食谱大全</h2>
+          <button class="rb-close" id="btn-rb-close" aria-label="关闭食谱">✕</button>
+        </div>
+        <div class="rb-list" id="rb-list" role="list" aria-label="食谱列表"></div>
+      </div>
     </div>
-  </header>
-  <section class="shelves" id="shelves" role="list" aria-label="商品货架"></section>
-  <section class="cart-area" id="cart-area" aria-label="购物车">
-    <div class="cart-label">🛒 购物车 <span class="cart-count" id="cart-count" style="display:none" role="status">0</span></div>
-    <div class="cart-items" id="cart-items" role="list" aria-label="已选商品"></div>
-    <div class="cart-actions">
-      <button class="btn btn-go-home" id="btn-go-home" disabled aria-label="回家做饭">🏠 回家做饭！</button>
-    </div>
-  </section>
-</main>
 
-<!-- Recipe book overlay -->
-<div class="overlay-backdrop" id="recipe-book-overlay" role="dialog" aria-modal="true" aria-label="食谱大全">
-  <div class="recipe-book">
-    <div class="rb-header">
-      <h2>📖 食谱大全</h2>
-      <button class="rb-close" id="btn-rb-close" aria-label="关闭食谱">✕</button>
-    </div>
-    <div class="rb-list" id="rb-list" role="list" aria-label="食谱列表"></div>
-  </div>
-</div>
-
-<script src="../shared/utils.js"></script>
-<script src="shared.js"></script>
-<script src="shop.js"></script>
-</body>
+    <script src="../shared/utils.js"></script>
+    <script src="shared.js"></script>
+    <script src="shop.js"></script>
+  </body>
 </html>

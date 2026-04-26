@@ -1,66 +1,92 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'"
+    />
     <title>小熊超市</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-
-<div id="welcome" class="screen active" role="region" aria-label="欢迎页面">
-    <div class="welcome-bear" aria-hidden="true">🐻</div>
-    <h1 class="welcome-title">小熊超市</h1>
-    <p class="welcome-subtitle">欢迎来到最可爱的玩具超市！</p>
-    <div class="welcome-features" aria-label="游戏特色">
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="welcome" class="screen active" role="region" aria-label="欢迎页面">
+      <div class="welcome-bear" aria-hidden="true">🐻</div>
+      <h1 class="welcome-title">小熊超市</h1>
+      <p class="welcome-subtitle">欢迎来到最可爱的玩具超市！</p>
+      <div class="welcome-features" aria-label="游戏特色">
         <div class="feature-tag">🧸 30种玩具</div>
         <div class="feature-tag">🐰 可爱顾客</div>
         <div class="feature-tag">💰 讨价还价</div>
         <div class="feature-tag">🌟 赚取金币</div>
+      </div>
+      <button class="btn-start" onclick="startGame()" aria-label="开始营业">开始营业！</button>
     </div>
-    <button class="btn-start" onclick="startGame()" aria-label="开始营业">开始营业！</button>
-</div>
 
-<div id="game" class="screen" role="region" aria-label="游戏界面">
-    <header class="game-header">
+    <div id="game" class="screen" role="region" aria-label="游戏界面">
+      <header class="game-header">
         <div class="store-name" aria-hidden="true">🐻 小熊超市</div>
         <div class="header-stats" aria-label="游戏状态">
-            <div class="stat-item" aria-label="金币">💰 <span class="stat-value" id="hdr-money">0</span>元</div>
-            <div class="stat-item" aria-label="已服务顾客">👥 <span class="stat-value" id="hdr-customers">0</span></div>
-            <div class="stat-item" aria-label="天数">📦 <span class="stat-value" id="hdr-day">第1天</span></div>
+          <div class="stat-item" aria-label="金币">
+            💰 <span class="stat-value" id="hdr-money">0</span>元
+          </div>
+          <div class="stat-item" aria-label="已服务顾客">
+            👥 <span class="stat-value" id="hdr-customers">0</span>
+          </div>
+          <div class="stat-item" aria-label="天数">
+            📦 <span class="stat-value" id="hdr-day">第1天</span>
+          </div>
         </div>
-    </header>
+      </header>
 
-    <nav class="mobile-inventory-bar" id="mobile-inventory" aria-label="移动端货架"></nav>
+      <nav class="mobile-inventory-bar" id="mobile-inventory" aria-label="移动端货架"></nav>
 
-    <main class="game-main">
+      <main class="game-main">
         <aside class="inventory-panel" aria-label="玩具货架">
-            <div class="inventory-title">📦 货架</div>
-            <div class="inventory-grid" id="inventory-grid" role="list" aria-label="玩具列表"></div>
+          <div class="inventory-title">📦 货架</div>
+          <div class="inventory-grid" id="inventory-grid" role="list" aria-label="玩具列表"></div>
         </aside>
 
         <section class="interaction-panel">
-            <div class="chat-area" id="chat-area" role="log" aria-label="对话区域" aria-live="polite"></div>
-            <div class="action-area" id="action-area" role="toolbar" aria-label="操作按钮"></div>
+          <div
+            class="chat-area"
+            id="chat-area"
+            role="log"
+            aria-label="对话区域"
+            aria-live="polite"
+          ></div>
+          <div class="action-area" id="action-area" role="toolbar" aria-label="操作按钮"></div>
         </section>
-    </main>
-</div>
+      </main>
+    </div>
 
-<div id="summary" class="screen" role="region" aria-label="营业总结">
-    <div class="summary-bear" aria-hidden="true">🐻</div>
-    <h2 class="summary-title">今日营业结束！</h2>
-    <div class="stars" id="summary-stars" aria-label="星级评价"></div>
-    <div class="star-label" id="summary-star-label"></div>
-    <div class="summary-stats" id="summary-stats" aria-label="营业统计"></div>
-    <button class="btn-restart" onclick="startNewDay()" aria-label="开始新一天营业">明天继续营业！</button>
-    <button class="btn-restart" style="background:linear-gradient(135deg,var(--blue),var(--blue-dark));margin-top:0" onclick="backToWelcome()" aria-label="返回首页">回到首页</button>
-</div>
+    <div id="summary" class="screen" role="region" aria-label="营业总结">
+      <div class="summary-bear" aria-hidden="true">🐻</div>
+      <h2 class="summary-title">今日营业结束！</h2>
+      <div class="stars" id="summary-stars" aria-label="星级评价"></div>
+      <div class="star-label" id="summary-star-label"></div>
+      <div class="summary-stats" id="summary-stats" aria-label="营业统计"></div>
+      <button class="btn-restart" onclick="startNewDay()" aria-label="开始新一天营业">
+        明天继续营业！
+      </button>
+      <button
+        class="btn-restart"
+        style="background: linear-gradient(135deg, var(--blue), var(--blue-dark)); margin-top: 0"
+        onclick="backToWelcome()"
+        aria-label="返回首页"
+      >
+        回到首页
+      </button>
+    </div>
 
-<div class="confetti-container" id="confetti" aria-hidden="true"></div>
+    <div class="confetti-container" id="confetti" aria-hidden="true"></div>
 
-<script src="../shared/utils.js"></script>
-<script src="data.js"></script>
-<script src="game.js"></script>
-</body>
+    <script src="../shared/utils.js"></script>
+    <script src="data.js"></script>
+    <script src="game.js"></script>
+  </body>
 </html>

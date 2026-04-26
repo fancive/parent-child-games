@@ -26,20 +26,30 @@ const sandbox = {
       textContent: '',
       style: { cssText: '' },
       children: [],
-      appendChild(c) { this.children.push(c); },
+      appendChild(c) {
+        this.children.push(c);
+      },
       remove() {},
     }),
     createDocumentFragment: () => ({
       children: [],
-      appendChild(c) { this.children.push(c); },
+      appendChild(c) {
+        this.children.push(c);
+      },
     }),
   },
   window: {},
   AudioContext: class {
-    constructor() { this.currentTime = 0; this.destination = {}; this.sampleRate = 44100; }
+    constructor() {
+      this.currentTime = 0;
+      this.destination = {};
+      this.sampleRate = 44100;
+    }
     createOscillator() {
       return {
-        connect() {}, start() {}, stop() {},
+        connect() {},
+        start() {},
+        stop() {},
         type: 'sine',
         frequency: { setValueAtTime() {}, exponentialRampToValueAtTime() {}, value: 0 },
       };
@@ -61,9 +71,15 @@ const sandbox = {
     let store = {};
     return {
       getItem: (k) => (k in store ? store[k] : null),
-      setItem: (k, v) => { store[k] = String(v); },
-      removeItem: (k) => { delete store[k]; },
-      clear: () => { store = {}; },
+      setItem: (k, v) => {
+        store[k] = String(v);
+      },
+      removeItem: (k) => {
+        delete store[k];
+      },
+      clear: () => {
+        store = {};
+      },
       _store: () => store,
     };
   })(),
@@ -79,7 +95,18 @@ const { playSound, vibrate, debounceClick, saveState, loadState, showConfetti } 
 
 describe('playSound', () => {
   test('does not throw for known sound types', () => {
-    for (const type of ['buy', 'return', 'error', 'splash', 'chop', 'plop', 'sizzle', 'fanfare', 'bell', 'ding']) {
+    for (const type of [
+      'buy',
+      'return',
+      'error',
+      'splash',
+      'chop',
+      'plop',
+      'sizzle',
+      'fanfare',
+      'bell',
+      'ding',
+    ]) {
       assert.doesNotThrow(() => playSound(type));
     }
   });
@@ -99,14 +126,18 @@ describe('vibrate', () => {
 describe('debounceClick', () => {
   test('calls function on first invocation', () => {
     let count = 0;
-    const fn = debounceClick(() => { count++; }, 50);
+    const fn = debounceClick(() => {
+      count++;
+    }, 50);
     fn();
     assert.equal(count, 1);
   });
 
   test('blocks rapid re-invocations', () => {
     let count = 0;
-    const fn = debounceClick(() => { count++; }, 50);
+    const fn = debounceClick(() => {
+      count++;
+    }, 50);
     fn();
     fn();
     fn();
@@ -146,9 +177,16 @@ describe('showConfetti', () => {
   test('appends children to container without throwing', () => {
     const children = [];
     const container = {
-      get children() { return children; },
-      removeChild(c) { const i = children.indexOf(c); if (i >= 0) children.splice(i, 1); },
-      appendChild(frag) { children.push(frag); },
+      get children() {
+        return children;
+      },
+      removeChild(c) {
+        const i = children.indexOf(c);
+        if (i >= 0) children.splice(i, 1);
+      },
+      appendChild(frag) {
+        children.push(frag);
+      },
     };
     assert.doesNotThrow(() => showConfetti(container, 3));
     assert.ok(children.length > 0, 'should have appended at least one child');

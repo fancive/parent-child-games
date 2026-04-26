@@ -1,20 +1,25 @@
 // ===== STATE =====
 const state = loadGameState();
 const cart = state.cart;
-if (cart.length === 0) { window.location.replace('index.html'); }
+if (cart.length === 0) {
+  window.location.replace('index.html');
+}
 
 const usedIngredients = new Set();
-const STEP_EMOJI = { wash:'🫧', cut:'🔪', pot:'🍳', stir:'🔥', plate:'🍽️' };
+const STEP_EMOJI = { wash: '🫧', cut: '🔪', pot: '🍳', stir: '🔥', plate: '🍽️' };
 
 let recipe = null;
 let stepList = [];
 let stepIdx = 0;
 let stepIngs = []; // all ingredient ids for this cook
-let washList = [], cutList = [];
+let washList = [],
+  cutList = [];
 let washedSet, cutIdx, chopCnt, potSet, stirProg, stirDir;
 const CHOPS = 3;
 
-function available() { return cart.filter(id => !usedIngredients.has(id)); }
+function available() {
+  return cart.filter((id) => !usedIngredients.has(id));
+}
 
 // ===== EVENTS =====
 document.getElementById('btn-back-shop').addEventListener('click', () => {
@@ -24,7 +29,8 @@ document.getElementById('btn-back-shop').addEventListener('click', () => {
 document.getElementById('btn-change-dish').addEventListener('click', backToRecipes);
 document.getElementById('btn-cook-again').addEventListener('click', () => {
   document.getElementById('celebration-overlay').classList.remove('active');
-  recipe = null; backToRecipes();
+  recipe = null;
+  backToRecipes();
 });
 document.getElementById('btn-restart').addEventListener('click', () => {
   clearGameState();
@@ -40,36 +46,45 @@ function showRecipes() {
   const avail = available();
 
   RECIPES.forEach((r, i) => {
-    const hasAll = r.required.every(id => avail.includes(id));
-    const missing = r.required.filter(id => !avail.includes(id));
+    const hasAll = r.required.every((id) => avail.includes(id));
+    const missing = r.required.filter((id) => !avail.includes(id));
     const card = document.createElement('div');
     card.className = 'recipe-card ' + (hasAll ? 'available' : 'unavailable');
     card.style.animationDelay = i * 70 + 'ms';
     card.innerHTML = `
       <div class="rc-emoji">${r.emoji}</div>
       <div class="rc-name">${r.name}</div>
-      <div class="rc-ingredients">必要: ${r.required.map(id => {
-        const g = getIngredient(id); const h = avail.includes(id);
-        return `<span style="opacity:${h?1:0.4}">${h?'':'❌'}${g.emoji}${g.name}</span>`;
-      }).join(' ')}</div>
-      <div class="rc-ingredients">可选: ${r.optional.map(id =>
-        `<span style="opacity:${avail.includes(id)?1:0.4}">${getIngredient(id).emoji}</span>`
-      ).join('')}</div>
-      ${!hasAll ? `<div class="rc-missing">缺少: ${missing.map(id => getIngredient(id).name).join('、')}</div>` : ''}`;
+      <div class="rc-ingredients">必要: ${r.required
+        .map((id) => {
+          const g = getIngredient(id);
+          const h = avail.includes(id);
+          return `<span style="opacity:${h ? 1 : 0.4}">${h ? '' : '❌'}${g.emoji}${g.name}</span>`;
+        })
+        .join(' ')}</div>
+      <div class="rc-ingredients">可选: ${r.optional
+        .map(
+          (id) =>
+            `<span style="opacity:${avail.includes(id) ? 1 : 0.4}">${getIngredient(id).emoji}</span>`,
+        )
+        .join('')}</div>
+      ${!hasAll ? `<div class="rc-missing">缺少: ${missing.map((id) => getIngredient(id).name).join('、')}</div>` : ''}`;
     if (hasAll) card.addEventListener('click', () => selectRecipe(r));
     cards.appendChild(card);
   });
 }
 
-function backToRecipes() { recipe = null; showRecipes(); }
+function backToRecipes() {
+  recipe = null;
+  showRecipes();
+}
 
 // ===== COOKING STEPS =====
 function selectRecipe(r) {
   recipe = r;
   const avail = available();
-  stepIngs = [...r.required, ...r.optional.filter(id => avail.includes(id))];
-  washList = stepIngs.filter(id => getIngredient(id).wash);
-  cutList  = stepIngs.filter(id => getIngredient(id).cut);
+  stepIngs = [...r.required, ...r.optional.filter((id) => avail.includes(id))];
+  washList = stepIngs.filter((id) => getIngredient(id).wash);
+  cutList = stepIngs.filter((id) => getIngredient(id).cut);
 
   stepList = [];
   if (washList.length) stepList.push('wash');
@@ -77,8 +92,12 @@ function selectRecipe(r) {
   stepList.push('pot', 'stir', 'plate');
 
   stepIdx = 0;
-  washedSet = new Set(); cutIdx = 0; chopCnt = 0;
-  potSet = new Set(); stirProg = 0; stirDir = false;
+  washedSet = new Set();
+  cutIdx = 0;
+  chopCnt = 0;
+  potSet = new Set();
+  stirProg = 0;
+  stirDir = false;
 
   playSound('bell');
   document.getElementById('recipe-selection').style.display = 'none';
@@ -114,7 +133,13 @@ function renderStep() {
   inner.className = 'step-inner';
   box.appendChild(inner);
 
-  const fn = { wash: renderWash, cut: renderCut, pot: renderPot, stir: renderStir, plate: renderPlate };
+  const fn = {
+    wash: renderWash,
+    cut: renderCut,
+    pot: renderPot,
+    stir: renderStir,
+    plate: renderPlate,
+  };
   fn[stepList[stepIdx]](inner, hint);
 }
 
@@ -122,7 +147,10 @@ function nextStep() {
   const dots = document.querySelectorAll('#step-progress .progress-dot');
   if (dots[stepIdx]) dots[stepIdx].classList.add('just-done');
   stepIdx++;
-  if (stepIdx < stepList.length) { playSound('ding'); renderStep(); }
+  if (stepIdx < stepList.length) {
+    playSound('ding');
+    renderStep();
+  }
 }
 
 // ----- WASH -----
@@ -138,12 +166,16 @@ function renderWash(box, hint) {
       <div class="wash-items" id="wash-items"></div>
     </div>`;
   const container = document.getElementById('wash-items');
-  washList.forEach(id => {
+  washList.forEach((id) => {
     const ing = getIngredient(id);
     const el = document.createElement('div');
-    el.className = 'wash-item dirty'; el.dataset.id = id;
+    el.className = 'wash-item dirty';
+    el.dataset.id = id;
     el.innerHTML = `<span class="wi-emoji">${ing.emoji}</span><span class="wi-name">${ing.name}</span>`;
-    el.addEventListener('click', debounceClick(() => doWash(id), 600));
+    el.addEventListener(
+      'click',
+      debounceClick(() => doWash(id), 600),
+    );
     container.appendChild(el);
   });
 }
@@ -161,10 +193,12 @@ function doWash(id) {
   const sink = document.querySelector('.sink');
   for (let i = 0; i < 3; i++) {
     const s = document.createElement('span');
-    s.className = 'sink-splash'; s.textContent = '💧';
-    s.style.left = (30 + Math.random() * 40) + '%';
-    s.style.top = (20 + Math.random() * 30) + '%';
-    sink.appendChild(s); setTimeout(() => s.remove(), 500);
+    s.className = 'sink-splash';
+    s.textContent = '💧';
+    s.style.left = 30 + Math.random() * 40 + '%';
+    s.style.top = 20 + Math.random() * 30 + '%';
+    sink.appendChild(s);
+    setTimeout(() => s.remove(), 500);
   }
 
   el.classList.add('washing');
@@ -175,14 +209,17 @@ function doWash(id) {
     cur.style.opacity = '0';
     const left = washList.length - washedSet.size;
     const h = document.getElementById('step-hint');
-    if (!left) { h.textContent = '✅ 全部洗好啦！'; setTimeout(nextStep, 700); }
-    else h.textContent = `👆 还有 ${left} 个要洗！`;
+    if (!left) {
+      h.textContent = '✅ 全部洗好啦！';
+      setTimeout(nextStep, 700);
+    } else h.textContent = `👆 还有 ${left} 个要洗！`;
   }, 550);
 }
 
 // ----- CUT -----
 function renderCut(box, hint) {
-  cutIdx = 0; chopCnt = 0;
+  cutIdx = 0;
+  chopCnt = 0;
   hint.textContent = '👆 点击砧板切一切！';
   const first = getIngredient(cutList[0]);
   box.innerHTML = `
@@ -193,7 +230,7 @@ function renderCut(box, hint) {
       </div>
       <div class="cut-counter" id="cut-counter">
         <span>切 ${first.name}：</span>
-        ${Array.from({length: CHOPS}, (_, i) => `<span class="chop-dot" id="cd-${i}"></span>`).join('')}
+        ${Array.from({ length: CHOPS }, (_, i) => `<span class="chop-dot" id="cd-${i}"></span>`).join('')}
       </div>
       <div class="chopped-bowl" id="bowl">🥣 </div>
     </div>`;
@@ -204,21 +241,25 @@ function doChop() {
   if (cutIdx >= cutList.length) return;
   const knife = document.getElementById('knife');
   const item = document.getElementById('board-item');
-  knife.classList.remove('chop'); void knife.offsetWidth; knife.classList.add('chop');
+  knife.classList.remove('chop');
+  void knife.offsetWidth;
+  knife.classList.add('chop');
   item.style.transform = 'scale(0.85)';
-  setTimeout(() => item.style.transform = '', 90);
+  setTimeout(() => (item.style.transform = ''), 90);
   playSound('chop');
 
   // Particles
   const board = document.getElementById('board');
   for (let i = 0; i < 2; i++) {
     const p = document.createElement('span');
-    p.className = 'chop-fx'; p.textContent = '✨';
-    p.style.left = (40 + Math.random() * 20) + '%';
-    p.style.top = (30 + Math.random() * 20) + '%';
-    p.style.setProperty('--dx', (Math.random() * 50 - 25) + 'px');
-    p.style.setProperty('--dy', (Math.random() * -35 - 10) + 'px');
-    board.appendChild(p); setTimeout(() => p.remove(), 400);
+    p.className = 'chop-fx';
+    p.textContent = '✨';
+    p.style.left = 40 + Math.random() * 20 + '%';
+    p.style.top = 30 + Math.random() * 20 + '%';
+    p.style.setProperty('--dx', Math.random() * 50 - 25 + 'px');
+    p.style.setProperty('--dy', Math.random() * -35 - 10 + 'px');
+    board.appendChild(p);
+    setTimeout(() => p.remove(), 400);
   }
 
   chopCnt++;
@@ -229,10 +270,12 @@ function doChop() {
     const ing = getIngredient(cutList[cutIdx]);
     const bowl = document.getElementById('bowl');
     const ci = document.createElement('span');
-    ci.className = 'chopped-item'; ci.textContent = ing.emoji;
+    ci.className = 'chopped-item';
+    ci.textContent = ing.emoji;
     bowl.appendChild(ci);
 
-    cutIdx++; chopCnt = 0;
+    cutIdx++;
+    chopCnt = 0;
     if (cutIdx >= cutList.length) {
       document.getElementById('step-hint').textContent = '✅ 全部切好啦！';
       setTimeout(nextStep, 700);
@@ -241,7 +284,9 @@ function doChop() {
       item.textContent = next.emoji;
       document.getElementById('cut-counter').innerHTML =
         `<span>切 ${next.name}：</span>` +
-        Array.from({length: CHOPS}, (_, i) => `<span class="chop-dot" id="cd-${i}"></span>`).join('');
+        Array.from({ length: CHOPS }, (_, i) => `<span class="chop-dot" id="cd-${i}"></span>`).join(
+          '',
+        );
       document.getElementById('step-hint').textContent =
         `👆 继续切 ${next.name}！(${cutIdx + 1}/${cutList.length})`;
     }
@@ -263,12 +308,16 @@ function renderPot(box, hint) {
       <div class="pot-items" id="pot-items"></div>
     </div>`;
   const container = document.getElementById('pot-items');
-  stepIngs.forEach(id => {
+  stepIngs.forEach((id) => {
     const ing = getIngredient(id);
     const el = document.createElement('div');
-    el.className = 'pot-item'; el.dataset.id = id;
+    el.className = 'pot-item';
+    el.dataset.id = id;
     el.innerHTML = `<span class="pi-emoji">${ing.emoji}</span><span class="pi-name">${ing.name}</span>`;
-    el.addEventListener('click', debounceClick(() => doPot(id), 450));
+    el.addEventListener(
+      'click',
+      debounceClick(() => doPot(id), 450),
+    );
     container.appendChild(el);
   });
 }
@@ -281,9 +330,11 @@ function doPot(id) {
   playSound('plop');
   setTimeout(() => {
     potSet.add(id);
-    el.classList.remove('flying'); el.classList.add('added');
+    el.classList.remove('flying');
+    el.classList.add('added');
     const pc = document.getElementById('pot-contents');
-    const s = document.createElement('span'); s.textContent = getIngredient(id).emoji;
+    const s = document.createElement('span');
+    s.textContent = getIngredient(id).emoji;
     pc.appendChild(s);
     playSound('sizzle');
     if (potSet.size >= 2) {
@@ -292,14 +343,17 @@ function doPot(id) {
     }
     const left = stepIngs.length - potSet.size;
     const h = document.getElementById('step-hint');
-    if (!left) { h.textContent = '✅ 全部放进去啦！'; setTimeout(nextStep, 700); }
-    else h.textContent = `👆 还有 ${left} 个食材！`;
+    if (!left) {
+      h.textContent = '✅ 全部放进去啦！';
+      setTimeout(nextStep, 700);
+    } else h.textContent = `👆 还有 ${left} 个食材！`;
   }, 380);
 }
 
 // ----- STIR -----
 function renderStir(box, hint) {
-  stirProg = 0; stirDir = false;
+  stirProg = 0;
+  stirDir = false;
   hint.textContent = '👆 快速点击翻炒！';
   box.innerHTML = `
     <div class="stir-scene">
@@ -326,7 +380,8 @@ function doStir() {
   stirDir = !stirDir;
   document.getElementById('spatula').className = 'stir-spatula ' + (stirDir ? 'left' : 'right');
   const pot = document.getElementById('stir-pot');
-  pot.classList.add('stirring'); setTimeout(() => pot.classList.remove('stirring'), 200);
+  pot.classList.add('stirring');
+  setTimeout(() => pot.classList.remove('stirring'), 200);
 
   const fire = document.getElementById('stir-fire');
   if (stirProg > 60) fire.className = 'stir-fire big';
@@ -372,16 +427,21 @@ function renderPlate(box, hint) {
         </div>
       </div>
     </div>`;
-  stepIngs.forEach(id => usedIngredients.add(id));
-  setTimeout(() => { playSound('fanfare'); showCelebration(); }, 1400);
+  stepIngs.forEach((id) => usedIngredients.add(id));
+  setTimeout(() => {
+    playSound('fanfare');
+    showCelebration();
+  }, 1400);
 }
 
 // ===== CELEBRATION =====
 function showCelebration() {
   document.getElementById('celeb-dish').textContent = recipe.emoji;
-  const optUsed = stepIngs.filter(id => recipe.optional.includes(id)).length;
+  const optUsed = stepIngs.filter((id) => recipe.optional.includes(id)).length;
   const stars = Math.min(optUsed + 1, 3);
-  document.getElementById('celeb-title').textContent = ['不错哦！', '太棒了！', '完美大厨！'][stars - 1];
+  document.getElementById('celeb-title').textContent = ['不错哦！', '太棒了！', '完美大厨！'][
+    stars - 1
+  ];
   document.getElementById('celeb-msg').textContent = [
     `你做了一道${recipe.name}！`,
     `好厉害！你的${recipe.name}真好看！`,
@@ -390,8 +450,11 @@ function showCelebration() {
   document.getElementById('celeb-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
 
   const avail = available();
-  document.getElementById('btn-cook-again').style.display =
-    RECIPES.some(r => r.required.every(id => avail.includes(id))) ? '' : 'none';
+  document.getElementById('btn-cook-again').style.display = RECIPES.some((r) =>
+    r.required.every((id) => avail.includes(id)),
+  )
+    ? ''
+    : 'none';
 
   document.getElementById('celebration-overlay').classList.add('active');
   showConfetti(document.body, 40);

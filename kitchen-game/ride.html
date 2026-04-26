@@ -1,45 +1,50 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'">
-<title>小厨师做饭 - 骑车回家</title>
-<link rel="stylesheet" href="shared.css">
-<link rel="stylesheet" href="ride.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'"
+    />
+    <title>小厨师做饭 - 骑车回家</title>
+    <link rel="stylesheet" href="shared.css" />
+    <link rel="stylesheet" href="ride.css" />
+  </head>
+  <body>
+    <nav class="phase-bar" aria-label="游戏进度">
+      <div class="phase-dot done">🛒 超市</div>
+      <div class="phase-connector" aria-hidden="true"></div>
+      <div class="phase-dot active" aria-current="step">🚲 回家</div>
+      <div class="phase-connector" aria-hidden="true"></div>
+      <div class="phase-dot">🍳 做饭</div>
+    </nav>
 
-<nav class="phase-bar" aria-label="游戏进度">
-  <div class="phase-dot done">🛒 超市</div>
-  <div class="phase-connector" aria-hidden="true"></div>
-  <div class="phase-dot active" aria-current="step">🚲 回家</div>
-  <div class="phase-connector" aria-hidden="true"></div>
-  <div class="phase-dot">🍳 做饭</div>
-</nav>
+    <main class="page" aria-label="骑车回家动画">
+      <div class="sky-layer parallax-layer" id="sky-layer"></div>
+      <div class="building-layer parallax-layer">
+        <div class="building-strip" id="building-strip"></div>
+      </div>
+      <div class="road-layer parallax-layer">
+        <div class="road-strip" id="road-strip"></div>
+      </div>
+      <div class="marker" id="marker-start">
+        <span>🏪</span><span class="marker-label">超市</span>
+      </div>
+      <div class="marker" id="marker-end">
+        <span id="home-icon">🏠</span><span class="marker-label">我的家</span>
+      </div>
+      <div class="biker">
+        <div class="biker-body">🚲</div>
+        <div class="shopping-bag">🛍️</div>
+      </div>
+    </main>
 
-<main class="page" aria-label="骑车回家动画">
-  <div class="sky-layer parallax-layer" id="sky-layer"></div>
-  <div class="building-layer parallax-layer">
-    <div class="building-strip" id="building-strip"></div>
-  </div>
-  <div class="road-layer parallax-layer">
-    <div class="road-strip" id="road-strip"></div>
-  </div>
-  <div class="marker" id="marker-start">
-    <span>🏪</span><span class="marker-label">超市</span>
-  </div>
-  <div class="marker" id="marker-end">
-    <span id="home-icon">🏠</span><span class="marker-label">我的家</span>
-  </div>
-  <div class="biker">
-    <div class="biker-body">🚲</div>
-    <div class="shopping-bag">🛍️</div>
-  </div>
-</div>
-
-<script src="../shared/utils.js"></script>
-<script src="shared.js"></script>
-<script src="ride.js"></script>
-</body>
+    <script src="../shared/utils.js"></script>
+    <script src="shared.js"></script>
+    <script src="ride.js"></script>
+  </body>
 </html>

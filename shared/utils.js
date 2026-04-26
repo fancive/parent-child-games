@@ -8,7 +8,9 @@ function _pcgGetAudio() {
 }
 
 function vibrate(pattern) {
-  try { navigator.vibrate && navigator.vibrate(pattern); } catch (e) {}
+  try {
+    navigator.vibrate && navigator.vibrate(pattern);
+  } catch (e) {}
 }
 
 function playSound(type) {
@@ -17,13 +19,16 @@ function playSound(type) {
     const t = ctx.currentTime;
 
     const makeOsc = (freq, dur, vol = 0.2, wave = 'sine') => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
+      const o = ctx.createOscillator(),
+        g = ctx.createGain();
+      o.connect(g);
+      g.connect(ctx.destination);
       o.type = wave;
       o.frequency.setValueAtTime(freq, t);
       g.gain.setValueAtTime(vol, t);
       g.gain.exponentialRampToValueAtTime(0.01, t + dur);
-      o.start(t); o.stop(t + dur);
+      o.start(t);
+      o.stop(t + dur);
       return o;
     };
 
@@ -32,9 +37,11 @@ function playSound(type) {
       const buf = ctx.createBuffer(1, bs, ctx.sampleRate);
       const d = buf.getChannelData(0);
       for (let i = 0; i < bs; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / bs);
-      const s = ctx.createBufferSource(); s.buffer = buf;
+      const s = ctx.createBufferSource();
+      s.buffer = buf;
       const g = ctx.createGain();
-      s.connect(g); g.connect(ctx.destination);
+      s.connect(g);
+      g.connect(ctx.destination);
       g.gain.setValueAtTime(vol, t);
       g.gain.exponentialRampToValueAtTime(0.01, t + dur);
       s.start(t);
@@ -81,12 +88,15 @@ function playSound(type) {
       }
       case 'fanfare': {
         [0, 0.12, 0.24, 0.4].forEach((dt, i) => {
-          const o = ctx.createOscillator(), g = ctx.createGain();
-          o.connect(g); g.connect(ctx.destination);
+          const o = ctx.createOscillator(),
+            g = ctx.createGain();
+          o.connect(g);
+          g.connect(ctx.destination);
           o.frequency.value = [523, 659, 784, 1047][i];
           g.gain.setValueAtTime(0.18, t + dt);
           g.gain.exponentialRampToValueAtTime(0.01, t + dt + 0.25);
-          o.start(t + dt); o.stop(t + dt + 0.25);
+          o.start(t + dt);
+          o.stop(t + dt + 0.25);
         });
         vibrate([30, 50, 30, 50, 100]);
         break;
@@ -111,13 +121,23 @@ function playSound(type) {
   if (document.getElementById('_pcg_confetti_style')) return;
   const s = document.createElement('style');
   s.id = '_pcg_confetti_style';
-  s.textContent = '@keyframes pcgConfettiFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}';
+  s.textContent =
+    '@keyframes pcgConfettiFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}';
   document.head.appendChild(s);
 })();
 
 function showConfetti(container, count = 30) {
   while (container.children.length > 30) container.removeChild(container.firstChild);
-  const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181', '#AA96DA', '#FCBAD3', '#A8D8EA'];
+  const colors = [
+    '#FF6B6B',
+    '#4ECDC4',
+    '#FFE66D',
+    '#95E1D3',
+    '#F38181',
+    '#AA96DA',
+    '#FCBAD3',
+    '#A8D8EA',
+  ];
   const frag = document.createDocumentFragment();
 
   for (let i = 0; i < count; i++) {
@@ -127,8 +147,8 @@ function showConfetti(container, count = 30) {
     el.style.cssText =
       'position:fixed;top:-10px;pointer-events:none;z-index:9999;' +
       `left:${(Math.random() * 100).toFixed(1)}%;` +
-      `width:${8 + (Math.random() * 8 | 0)}px;height:${8 + (Math.random() * 8 | 0)}px;` +
-      `background:${colors[Math.random() * colors.length | 0]};` +
+      `width:${8 + ((Math.random() * 8) | 0)}px;height:${8 + ((Math.random() * 8) | 0)}px;` +
+      `background:${colors[(Math.random() * colors.length) | 0]};` +
       `border-radius:${Math.random() > 0.5 ? '50%' : '2px'};` +
       `animation:pcgConfettiFall ${dur}s linear ${delay}s forwards`;
     frag.appendChild(el);
@@ -145,18 +165,24 @@ function debounceClick(fn, ms = 300) {
     if (blocked) return;
     blocked = true;
     fn.apply(this, args);
-    setTimeout(() => { blocked = false; }, ms);
+    setTimeout(() => {
+      blocked = false;
+    }, ms);
   };
 }
 
 // ===== STATE =====
 function saveState(key, value) {
-  try { localStorage.setItem('pcg_' + key, JSON.stringify(value)); } catch (e) {}
+  try {
+    localStorage.setItem('pcg_' + key, JSON.stringify(value));
+  } catch (e) {}
 }
 
 function loadState(key, defaultValue = null) {
   try {
     const raw = localStorage.getItem('pcg_' + key);
     return raw === null ? defaultValue : JSON.parse(raw);
-  } catch (e) { return defaultValue; }
+  } catch (e) {
+    return defaultValue;
+  }
 }

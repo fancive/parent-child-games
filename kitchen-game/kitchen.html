@@ -1,62 +1,86 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'">
-<title>小厨师做饭 - 厨房</title>
-<link rel="stylesheet" href="shared.css">
-<link rel="stylesheet" href="cook.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'"
+    />
+    <title>小厨师做饭 - 厨房</title>
+    <link rel="stylesheet" href="shared.css" />
+    <link rel="stylesheet" href="cook.css" />
+  </head>
+  <body>
+    <nav class="phase-bar" aria-label="游戏进度">
+      <div class="phase-dot done">🛒 超市</div>
+      <div class="phase-connector" aria-hidden="true"></div>
+      <div class="phase-dot done">🚲 回家</div>
+      <div class="phase-connector" aria-hidden="true"></div>
+      <div class="phase-dot active" aria-current="step">🍳 做饭</div>
+    </nav>
 
-<nav class="phase-bar" aria-label="游戏进度">
-  <div class="phase-dot done">🛒 超市</div>
-  <div class="phase-connector" aria-hidden="true"></div>
-  <div class="phase-dot done">🚲 回家</div>
-  <div class="phase-connector" aria-hidden="true"></div>
-  <div class="phase-dot active" aria-current="step">🍳 做饭</div>
-</nav>
+    <main class="page">
+      <!-- Recipe selection -->
+      <section class="recipe-selection" id="recipe-selection" aria-label="选择食谱">
+        <h1 class="recipe-title">📖 选一道菜来做吧！</h1>
+        <div class="recipe-cards" id="recipe-cards" role="list" aria-label="可做的菜"></div>
+        <div style="text-align: center; padding: 8px">
+          <button class="btn btn-secondary" id="btn-back-shop" aria-label="回超市买更多食材">
+            🛒 回超市买更多
+          </button>
+        </div>
+      </section>
 
-<main class="page">
-  <!-- Recipe selection -->
-  <section class="recipe-selection" id="recipe-selection" aria-label="选择食谱">
-    <h1 class="recipe-title">📖 选一道菜来做吧！</h1>
-    <div class="recipe-cards" id="recipe-cards" role="list" aria-label="可做的菜"></div>
-    <div style="text-align:center;padding:8px;">
-      <button class="btn btn-secondary" id="btn-back-shop" aria-label="回超市买更多食材">🛒 回超市买更多</button>
+      <!-- Cooking steps -->
+      <section class="cooking-steps" id="cooking-steps" style="display: none" aria-label="烹饪步骤">
+        <header class="cooking-header">
+          <button
+            class="btn btn-secondary"
+            style="padding: 6px 12px; font-size: 0.8rem"
+            id="btn-change-dish"
+            aria-label="换一道菜"
+          >
+            ← 换菜
+          </button>
+          <div class="cooking-dish-name" id="cooking-dish-name" role="heading" aria-level="2"></div>
+          <div style="width: 56px"></div>
+        </header>
+        <div class="progress-row" id="step-progress" role="progressbar" aria-label="烹饪进度"></div>
+        <div class="step-hint" id="step-hint" role="status" aria-live="polite"></div>
+        <div class="step-content" id="step-content"></div>
+      </section>
+    </main>
+
+    <!-- Celebration -->
+    <div
+      class="celebration-overlay"
+      id="celebration-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="完成庆祝"
+    >
+      <div class="celeb-card">
+        <div class="dish-result" id="celeb-dish" aria-hidden="true"></div>
+        <h2 id="celeb-title"></h2>
+        <p id="celeb-msg"></p>
+        <div class="stars" id="celeb-stars" aria-label="星级评价"></div>
+        <div class="celeb-buttons">
+          <button class="btn btn-primary" id="btn-cook-again" aria-label="再做一道菜">
+            🍳 再做一道！
+          </button>
+          <button class="btn btn-secondary" id="btn-restart" aria-label="重新购物">
+            🛒 重新购物！
+          </button>
+        </div>
+      </div>
     </div>
-  </section>
 
-  <!-- Cooking steps -->
-  <section class="cooking-steps" id="cooking-steps" style="display:none" aria-label="烹饪步骤">
-    <header class="cooking-header">
-      <button class="btn btn-secondary" style="padding:6px 12px;font-size:0.8rem" id="btn-change-dish" aria-label="换一道菜">← 换菜</button>
-      <div class="cooking-dish-name" id="cooking-dish-name" role="heading" aria-level="2"></div>
-      <div style="width:56px"></div>
-    </header>
-    <div class="progress-row" id="step-progress" role="progressbar" aria-label="烹饪进度"></div>
-    <div class="step-hint" id="step-hint" role="status" aria-live="polite"></div>
-    <div class="step-content" id="step-content"></div>
-  </section>
-</main>
-
-<!-- Celebration -->
-<div class="celebration-overlay" id="celebration-overlay" role="dialog" aria-modal="true" aria-label="完成庆祝">
-  <div class="celeb-card">
-    <div class="dish-result" id="celeb-dish" aria-hidden="true"></div>
-    <h2 id="celeb-title"></h2>
-    <p id="celeb-msg"></p>
-    <div class="stars" id="celeb-stars" aria-label="星级评价"></div>
-    <div class="celeb-buttons">
-      <button class="btn btn-primary" id="btn-cook-again" aria-label="再做一道菜">🍳 再做一道！</button>
-      <button class="btn btn-secondary" id="btn-restart" aria-label="重新购物">🛒 重新购物！</button>
-    </div>
-  </div>
-</div>
-
-<script src="../shared/utils.js"></script>
-<script src="shared.js"></script>
-<script src="cook.js"></script>
-</body>
+    <script src="../shared/utils.js"></script>
+    <script src="shared.js"></script>
+    <script src="cook.js"></script>
+  </body>
 </html>
