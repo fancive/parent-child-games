@@ -7,12 +7,20 @@ function _pcgGetAudio() {
   return _pcgAudioCtx;
 }
 
+/**
+ * Trigger device vibration if supported.
+ * @param {number|number[]} pattern - Vibration duration (ms) or pattern array
+ */
 function vibrate(pattern) {
   try {
     navigator.vibrate && navigator.vibrate(pattern);
   } catch (e) {}
 }
 
+/**
+ * Play a synthesized sound effect via Web Audio API.
+ * @param {'buy'|'return'|'error'|'splash'|'chop'|'plop'|'sizzle'|'fanfare'|'bell'|'ding'} type
+ */
 function playSound(type) {
   try {
     const ctx = _pcgGetAudio();
@@ -126,6 +134,11 @@ function playSound(type) {
   document.head.appendChild(s);
 })();
 
+/**
+ * Spawn falling confetti pieces inside a container element.
+ * @param {HTMLElement} container - DOM element to append confetti into
+ * @param {number} [count=30] - Number of confetti pieces to create
+ */
 function showConfetti(container, count = 30) {
   while (container.children.length > 30) container.removeChild(container.firstChild);
   const colors = [
@@ -159,6 +172,12 @@ function showConfetti(container, count = 30) {
 }
 
 // ===== DEBOUNCE =====
+/**
+ * Create a click handler that blocks rapid re-invocations.
+ * @param {Function} fn - The handler to debounce
+ * @param {number} [ms=300] - Blocking window in milliseconds
+ * @returns {Function} Debounced handler
+ */
 function debounceClick(fn, ms = 300) {
   let blocked = false;
   return function (...args) {
@@ -172,12 +191,23 @@ function debounceClick(fn, ms = 300) {
 }
 
 // ===== STATE =====
+/**
+ * Save a value to localStorage with pcg_ prefix.
+ * @param {string} key - Storage key (auto-prefixed with pcg_)
+ * @param {*} value - Value to store (JSON-serialized)
+ */
 function saveState(key, value) {
   try {
     localStorage.setItem('pcg_' + key, JSON.stringify(value));
   } catch (e) {}
 }
 
+/**
+ * Load a value from localStorage with pcg_ prefix.
+ * @param {string} key - Storage key (auto-prefixed with pcg_)
+ * @param {*} [defaultValue=null] - Fallback if key is missing or corrupt
+ * @returns {*} Parsed value or defaultValue
+ */
 function loadState(key, defaultValue = null) {
   try {
     const raw = localStorage.getItem('pcg_' + key);
