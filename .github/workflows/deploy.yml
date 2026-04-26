@@ -48,6 +48,7 @@ jobs:
       - name: Stage web files
         run: |
           mkdir -p _site
+          touch _site/.nojekyll
           cp index.html _site/
           cp -r kitchen-game _site/
           cp -r bear-supermarket _site/

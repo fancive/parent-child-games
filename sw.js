@@ -1,4 +1,4 @@
-const CACHE = 'pcg-v1';
+const CACHE = 'pcg-v2';
 const ASSETS = [
   './',
   './index.html',
