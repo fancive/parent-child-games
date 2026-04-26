@@ -52,6 +52,7 @@ body {
 
 .welcome-bear {
   font-size: 120px;
+  will-change: transform;
   animation: bearBounce 2s ease-in-out infinite;
   filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
 }
@@ -593,6 +594,7 @@ body {
   width: 12px;
   height: 12px;
   border-radius: 2px;
+  will-change: transform, opacity;
   animation: confettiFall linear forwards;
 }
 
@@ -613,6 +615,7 @@ body {
   font-size: 32px;
   z-index: 99;
   pointer-events: none;
+  will-change: transform, opacity;
   animation: coinFlyUp 1s ease-out forwards;
 }
 
