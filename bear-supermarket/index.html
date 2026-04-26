@@ -825,6 +825,7 @@
 
 <div class="confetti-container" id="confetti"></div>
 
+<script src="../shared/utils.js"></script>
 <script>
 // ==================== GAME DATA ====================
 const TOYS = [
@@ -987,36 +988,48 @@ function renderInventory() {
     const mobile = document.getElementById('mobile-inventory');
     if (!grid) return;
 
-    grid.innerHTML = state.inventory.map(toy => {
-        const isOut = toy.stock <= 0;
-        const isHighlight = state.currentToy && state.currentToy.id === toy.id;
-        const dots = [];
-        const maxDots = Math.min(toy.maxStock, 8);
-        for (let i = 0; i < maxDots; i++) {
-            dots.push(`<div class="stock-dot ${i < toy.stock ? '' : 'empty'}"></div>`);
-        }
-        return `
-            <div class="toy-card ${isOut ? 'out-of-stock' : ''} ${isHighlight ? 'highlight' : ''}">
-                <div class="toy-emoji">${toy.emoji}</div>
-                <div class="toy-name">${toy.name}</div>
-                <div class="toy-price">${toy.price}元</div>
-                <div class="toy-stock">库存: ${toy.stock}个</div>
-                <div class="stock-dots">${dots.join('')}</div>
-                ${isOut ? '<div class="sold-badge">售罄</div>' : ''}
-            </div>
-        `;
-    }).join('');
+    const gridFrag = document.createDocumentFragment();
+    const mobileFrag = document.createDocumentFragment();
 
-    mobile.innerHTML = state.inventory.map(toy => {
+    for (const toy of state.inventory) {
         const isOut = toy.stock <= 0;
         const isHighlight = state.currentToy && state.currentToy.id === toy.id;
-        return `
-            <div class="mobile-toy-chip ${isOut ? 'out-of-stock' : ''} ${isHighlight ? 'highlight' : ''}">
-                <span class="chip-emoji">${toy.emoji}</span>
-                <span class="chip-stock">${toy.stock}</span>
-            </div>
-        `;
-    }).join('');
+
+        const card = document.createElement('div');
+        card.className = 'toy-card' + (isOut ? ' out-of-stock' : '') + (isHighlight ? ' highlight' : '');
+        const maxDots = Math.min(toy.maxStock, 8);
+        const dotsFrag = document.createDocumentFragment();
+        for (let i = 0; i < maxDots; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'stock-dot' + (i < toy.stock ? '' : ' empty');
+            dotsFrag.appendChild(dot);
+        }
+        const dotsContainer = document.createElement('div');
+        dotsContainer.className = 'stock-dots';
+        dotsContainer.appendChild(dotsFrag);
+        card.innerHTML = `<div class="toy-emoji">${toy.emoji}</div>` +
+            `<div class="toy-name">${toy.name}</div>` +
+            `<div class="toy-price">${toy.price}元</div>` +
+            `<div class="toy-stock">库存: ${toy.stock}个</div>`;
+        card.appendChild(dotsContainer);
+        if (isOut) {
+            const badge = document.createElement('div');
+            badge.className = 'sold-badge';
+            badge.textContent = '售罄';
+            card.appendChild(badge);
+        }
+        gridFrag.appendChild(card);
+
+        const chip = document.createElement('div');
+        chip.className = 'mobile-toy-chip' + (isOut ? ' out-of-stock' : '') + (isHighlight ? ' highlight' : '');
+        chip.innerHTML = `<span class="chip-emoji">${toy.emoji}</span><span class="chip-stock">${toy.stock}</span>`;
+        mobileFrag.appendChild(chip);
+    }
+
+    grid.innerHTML = '';
+    grid.appendChild(gridFrag);
+    mobile.innerHTML = '';
+    mobile.appendChild(mobileFrag);
 }
 
 function renderHeader() {
@@ -1027,6 +1040,10 @@ function renderHeader() {
 
 function addChatMessage(from, text, extra = '') {
     const chat = document.getElementById('chat-area');
+    // Trim oldest messages to cap DOM size
+    while (chat.children.length >= 25) {
+        chat.removeChild(chat.firstChild);
+    }
     const avatar = from === 'customer' ? state.currentCustomer.emoji :
                    from === 'bear' ? '🐻' : '';
     const className = from;
@@ -1201,9 +1218,13 @@ function showPriceSetter() {
 
     renderPriceUI();
 
+    let _priceAdjusting = false;
     window.adjustPrice = function(delta) {
+        if (_priceAdjusting) return;
+        _priceAdjusting = true;
         state.myPrice = clamp(state.myPrice + delta, 1, 99);
         renderPriceUI();
+        setTimeout(() => { _priceAdjusting = false; }, 80);
     };
 }
 
@@ -1355,7 +1376,7 @@ function completeDeal(finalPrice) {
     `);
     scrollChatToBottom();
 
-    showConfetti();
+    showConfetti(document.getElementById('confetti'), 25);
     showCoinAnimation(finalPrice);
 
     renderActions(`
@@ -1419,7 +1440,7 @@ function endDay() {
         </div>
     `;
 
-    if (stars >= 3) showConfetti();
+    if (stars >= 3) showConfetti(document.getElementById('confetti'), 25);
 }
 
 function startNewDay() {
@@ -1447,26 +1468,6 @@ function backToWelcome() {
 }
 
 // ==================== ANIMATIONS ====================
-function showConfetti() {
-    const container = document.getElementById('confetti');
-    container.innerHTML = '';
-    const colors = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#95E1D3', '#F38181', '#AA96DA', '#FCBAD3', '#A8D8EA'];
-
-    for (let i = 0; i < 50; i++) {
-        const piece = document.createElement('div');
-        piece.className = 'confetti-piece';
-        piece.style.left = Math.random() * 100 + '%';
-        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-        piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
-        piece.style.animationDelay = Math.random() * 0.5 + 's';
-        piece.style.width = (8 + Math.random() * 8) + 'px';
-        piece.style.height = (8 + Math.random() * 8) + 'px';
-        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-        container.appendChild(piece);
-    }
-
-    setTimeout(() => container.innerHTML = '', 4000);
-}
 
 function showCoinAnimation(amount) {
     const coins = Math.min(amount, 8);

@@ -1,0 +1,16 @@
+{
+  "name": "亲子游戏",
+  "short_name": "亲子游戏",
+  "description": "适合 3-6 岁小朋友的亲子互动小游戏",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e8f5e9",
+  "theme_color": "#43a047",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

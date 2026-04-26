@@ -82,6 +82,11 @@ body {
   transition: opacity 0.35s ease, transform 0.35s ease;
 }
 .shop-item.entered { opacity: 1; transform: none; }
+.shop-item.entering { animation: shop-item-enter 0.35s ease both; }
+@keyframes shop-item-enter {
+  from { opacity: 0; transform: translateY(16px) scale(0.95); }
+  to   { opacity: 1; transform: none; }
+}
 .shop-item:active { transform: scale(0.92) !important; }
 .shop-item .item-emoji { font-size: 2.8rem; line-height: 1; transition: transform 0.3s; }
 .shop-item .item-name { font-size: 0.8rem; color: #555; font-weight: 600; }
@@ -266,6 +271,7 @@ body {
   </div>
 </div>
 
+<script src="../shared/utils.js"></script>
 <script src="shared.js"></script>
 <script>
 let money = 20;
@@ -273,11 +279,11 @@ let cart = [];
 
 // ===== INIT =====
 (function init() {
-  if (localStorage.getItem('kitchen-back-to-shop')) {
+  if (localStorage.getItem('pcg_kitchen-back-to-shop')) {
     const state = loadGameState();
     money = state.money;
     cart = state.cart;
-    localStorage.removeItem('kitchen-back-to-shop');
+    localStorage.removeItem('pcg_kitchen-back-to-shop');
   }
   document.getElementById('wallet-amount').textContent = money;
   buildShelves();
@@ -321,10 +327,9 @@ function buildShelves() {
         <span class="item-name">${ing.name}</span>
         <span class="item-price">${ing.price}元</span>`;
       el.addEventListener('click', onShopItemClick);
-      // Stagger entrance
-      const d = idx * 40;
       if (!cart.includes(ing.id)) {
-        setTimeout(() => el.classList.add('entered'), d + 80);
+        el.style.animationDelay = (idx * 40 + 80) + 'ms';
+        el.classList.add('entering');
       }
       grid.appendChild(el);
       idx++;

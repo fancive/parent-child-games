@@ -341,6 +341,7 @@ body { background: linear-gradient(180deg, #fff8e1 0%, #ffecb3 100%); }
   </div>
 </div>
 
+<script src="../shared/utils.js"></script>
 <script src="shared.js"></script>
 <script>
 // ===== STATE =====
@@ -363,7 +364,7 @@ function available() { return cart.filter(id => !usedIngredients.has(id)); }
 
 // ===== EVENTS =====
 document.getElementById('btn-back-shop').addEventListener('click', () => {
-  localStorage.setItem('kitchen-back-to-shop', '1');
+  localStorage.setItem('pcg_kitchen-back-to-shop', '1');
   navigateTo('index.html');
 });
 document.getElementById('btn-change-dish').addEventListener('click', backToRecipes);
@@ -739,7 +740,7 @@ function showCelebration() {
     RECIPES.some(r => r.required.every(id => avail.includes(id))) ? '' : 'none';
 
   document.getElementById('celebration-overlay').classList.add('active');
-  spawnConfetti();
+  showConfetti(document.body, 40);
 }
 
 // ===== INIT =====
