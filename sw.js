@@ -13,6 +13,8 @@ const ASSETS = [
   './kitchen-game/shop.js',
   './kitchen-game/cook.css',
   './kitchen-game/cook.js',
+  './kitchen-game/ride.css',
+  './kitchen-game/ride.js',
   './bear-supermarket/index.html',
   './bear-supermarket/styles.css',
   './bear-supermarket/data.js',
