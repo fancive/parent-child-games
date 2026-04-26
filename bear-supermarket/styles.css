@@ -21,20 +21,13 @@
   --shadow: rgba(0, 0, 0, 0.12);
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Reset and base font inherited from shared/variables.css */
 
 body {
-  font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
   background: var(--bg-warm);
   min-height: 100vh;
   overflow-x: hidden;
   color: var(--brown-dark);
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
 }
 
 /* ===== SCREENS ===== */

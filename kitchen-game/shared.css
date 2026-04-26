@@ -21,23 +21,12 @@
   --ease-overshoot: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-/* ===== RESET ===== */
-*,
-*::before,
-*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Reset and base font inherited from shared/variables.css */
 
 body {
-  font-family: -apple-system, 'Helvetica Rounded', 'Arial Rounded MT Bold', Arial, sans-serif;
   min-height: 100vh;
   min-height: 100dvh;
   overflow: hidden;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-tap-highlight-color: transparent;
 }
 
 /* ===== PHASE BAR ===== */
