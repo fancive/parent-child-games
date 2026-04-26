@@ -9,6 +9,8 @@ const ASSETS = [
   './kitchen-game/ride.html',
   './kitchen-game/shared.js',
   './kitchen-game/shared.css',
+  './kitchen-game/shop.css',
+  './kitchen-game/shop.js',
   './bear-supermarket/index.html',
   './bear-supermarket/styles.css',
   './bear-supermarket/data.js',
