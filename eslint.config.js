@@ -47,6 +47,8 @@ export default [
         loadGameState: 'readonly',
         clearGameState: 'readonly',
         navigateTo: 'readonly',
+        STARTING_MONEY: 'readonly',
+        NAV_FADE_DURATION: 'readonly',
         TOYS: 'readonly',
         CUSTOMERS: 'readonly',
         BUDGET_RANGES: 'readonly',

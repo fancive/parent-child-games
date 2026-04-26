@@ -1,3 +1,7 @@
+// ===== CONSTANTS =====
+const STARTING_MONEY = 20;
+const NAV_FADE_DURATION = 200;
+
 // ===== GAME DATA =====
 const ALL_INGREDIENTS = [
   { id: 'tomato', emoji: '🍅', name: '番茄', price: 2, category: '蔬菜', wash: true, cut: true },
@@ -117,13 +121,13 @@ function saveGameState(money, cart) {
 
 function loadGameState() {
   try {
-    const money = JSON.parse(localStorage.getItem('pcg_kitchen-money') || '20');
+    const money = JSON.parse(localStorage.getItem('pcg_kitchen-money') || String(STARTING_MONEY));
     const cart = JSON.parse(localStorage.getItem('pcg_kitchen-cart') || '[]');
     if (typeof money !== 'number' || !Array.isArray(cart)) throw new Error();
     return { money, cart };
   } catch (e) {
     clearGameState();
-    return { money: 20, cart: [] };
+    return { money: STARTING_MONEY, cart: [] };
   }
 }
 
@@ -139,5 +143,5 @@ function navigateTo(url) {
   document.body.style.transition = 'opacity 0.2s';
   setTimeout(() => {
     window.location.href = url;
-  }, 200);
+  }, NAV_FADE_DURATION);
 }

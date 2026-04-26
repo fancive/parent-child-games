@@ -1,4 +1,4 @@
-let money = 20;
+let money = STARTING_MONEY;
 let cart = [];
 
 // ===== INIT =====
