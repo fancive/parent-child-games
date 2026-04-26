@@ -31,6 +31,7 @@ export default [
         Math: 'readonly',
         JSON: 'readonly',
         Error: 'readonly',
+        performance: 'readonly',
         // Cross-file globals (shared via <script> tags)
         playSound: 'readonly',
         vibrate: 'readonly',
