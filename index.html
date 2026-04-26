@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#43a047" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'"
     />
     <link rel="manifest" href="manifest.json" />
     <title>亲子游戏</title>
@@ -179,10 +179,6 @@
 
     <footer class="footer">适合 3-6 岁小朋友 ❤️</footer>
 
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
-      }
-    </script>
+    <script src="shared/init.js"></script>
   </body>
 </html>
