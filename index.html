@@ -111,40 +111,42 @@ h1 {
 </head>
 <body>
 
-<h1>🎮 亲子游戏</h1>
-<p class="subtitle">和宝贝一起玩吧！</p>
+<header>
+  <h1>🎮 亲子游戏</h1>
+  <p class="subtitle">和宝贝一起玩吧！</p>
+</header>
 
-<div class="games-grid">
-  <a class="game-card" href="kitchen-game/index.html">
-    <span class="card-emoji">🍳</span>
+<main class="games-grid" role="list" aria-label="游戏列表">
+  <a class="game-card" href="kitchen-game/index.html" role="listitem" aria-label="小厨师做饭 - 可以玩啦">
+    <span class="card-emoji" aria-hidden="true">🍳</span>
     <span class="card-title">小厨师做饭</span>
     <span class="card-desc">去超市购物、骑车回家、选食谱做出美味的菜肴！</span>
     <span class="card-tag tag-ready">可以玩啦</span>
   </a>
 
-  <a class="game-card" href="bear-supermarket/index.html">
-    <span class="card-emoji">🧸</span>
+  <a class="game-card" href="bear-supermarket/index.html" role="listitem" aria-label="小熊超市 - 可以玩啦">
+    <span class="card-emoji" aria-hidden="true">🧸</span>
     <span class="card-title">小熊超市</span>
     <span class="card-desc">当小店员接待顾客，练习报价和简单算数！</span>
     <span class="card-tag tag-ready">可以玩啦</span>
   </a>
 
-  <div class="game-card" style="opacity:0.5;cursor:default;">
-    <span class="card-emoji">🎨</span>
+  <div class="game-card" style="opacity:0.5;cursor:default;" role="listitem" aria-label="涂色画板 - 即将上线" aria-disabled="true">
+    <span class="card-emoji" aria-hidden="true">🎨</span>
     <span class="card-title">涂色画板</span>
     <span class="card-desc">选颜色给可爱的图案涂上漂亮的颜色</span>
     <span class="card-tag tag-coming">即将上线</span>
   </div>
 
-  <div class="game-card" style="opacity:0.5;cursor:default;">
-    <span class="card-emoji">🔢</span>
+  <div class="game-card" style="opacity:0.5;cursor:default;" role="listitem" aria-label="数字冒险 - 即将上线" aria-disabled="true">
+    <span class="card-emoji" aria-hidden="true">🔢</span>
     <span class="card-title">数字冒险</span>
     <span class="card-desc">在游戏中认识数字和简单的加减法</span>
     <span class="card-tag tag-coming">即将上线</span>
   </div>
-</div>
+</main>
 
-<p class="footer">适合 3-6 岁小朋友 ❤️</p>
+<footer class="footer">适合 3-6 岁小朋友 ❤️</footer>
 
 <script>
 if ('serviceWorker' in navigator) {
