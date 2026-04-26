@@ -20,7 +20,18 @@ const sandbox = {
   performance: { now: () => Date.now() },
   requestAnimationFrame: (fn) => setTimeout(fn, 0),
   document: {
-    getElementById: () => null,
+    getElementById: () => ({
+      addEventListener() {},
+      classList: { add() {}, remove() {}, contains() { return false; } },
+      textContent: '',
+      innerHTML: '',
+      style: {},
+      scrollTop: 0,
+      scrollHeight: 0,
+      children: [],
+      appendChild() {},
+      insertAdjacentHTML() {},
+    }),
     querySelectorAll: () => [],
     head: { appendChild: () => {} },
     createElement: (tag) => ({

@@ -563,3 +563,8 @@ function showCoinAnimation(amount) {
     }, i * 100);
   }
 }
+
+// ==================== EVENT BINDINGS ====================
+document.getElementById('btn-start').addEventListener('click', startGame);
+document.getElementById('btn-new-day').addEventListener('click', startNewDay);
+document.getElementById('btn-back-welcome').addEventListener('click', backToWelcome);

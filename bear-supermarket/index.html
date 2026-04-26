@@ -24,7 +24,7 @@
         <div class="feature-tag">💰 讨价还价</div>
         <div class="feature-tag">🌟 赚取金币</div>
       </div>
-      <button class="btn-start" onclick="startGame()" aria-label="开始营业">开始营业！</button>
+      <button class="btn-start" id="btn-start" aria-label="开始营业">开始营业！</button>
     </div>
 
     <div id="game" class="screen" role="region" aria-label="游戏界面">
@@ -70,13 +70,13 @@
       <div class="stars" id="summary-stars" aria-label="星级评价"></div>
       <div class="star-label" id="summary-star-label"></div>
       <div class="summary-stats" id="summary-stats" aria-label="营业统计"></div>
-      <button class="btn-restart" onclick="startNewDay()" aria-label="开始新一天营业">
+      <button class="btn-restart" id="btn-new-day" aria-label="开始新一天营业">
         明天继续营业！
       </button>
       <button
         class="btn-restart"
         style="background: linear-gradient(135deg, var(--blue), var(--blue-dark)); margin-top: 0"
-        onclick="backToWelcome()"
+        id="btn-back-welcome"
         aria-label="返回首页"
       >
         回到首页
