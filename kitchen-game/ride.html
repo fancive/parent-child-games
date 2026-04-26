@@ -10,15 +10,15 @@
 </head>
 <body>
 
-<div class="phase-bar">
+<nav class="phase-bar" aria-label="游戏进度">
   <div class="phase-dot done">🛒 超市</div>
-  <div class="phase-connector"></div>
-  <div class="phase-dot active">🚲 回家</div>
-  <div class="phase-connector"></div>
+  <div class="phase-connector" aria-hidden="true"></div>
+  <div class="phase-dot active" aria-current="step">🚲 回家</div>
+  <div class="phase-connector" aria-hidden="true"></div>
   <div class="phase-dot">🍳 做饭</div>
-</div>
+</nav>
 
-<div class="page">
+<main class="page" aria-label="骑车回家动画">
   <div class="sky-layer parallax-layer" id="sky-layer"></div>
   <div class="building-layer parallax-layer">
     <div class="building-strip" id="building-strip"></div>
