@@ -56,6 +56,7 @@ jobs:
           cp manifest.json _site/ 2>/dev/null || true
           cp sw.js _site/ 2>/dev/null || true
           cp offline.html _site/ 2>/dev/null || true
+          cp 404.html _site/ 2>/dev/null || true
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
