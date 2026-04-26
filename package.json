@@ -1,0 +1,8 @@
+{
+  "name": "parent-child-games",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "serve": "npx serve ."
+  }
+}
