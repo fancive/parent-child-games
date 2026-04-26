@@ -19,6 +19,7 @@ const ASSETS = [
   './bear-supermarket/index.html',
   './bear-supermarket/styles.css',
   './bear-supermarket/data.js',
+  './bear-supermarket/renderer.js',
   './bear-supermarket/game.js',
 ];
 

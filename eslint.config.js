@@ -57,6 +57,18 @@ export default [
         ACCEPT_PHRASES: 'readonly',
         LEAVE_PHRASES: 'readonly',
         COUNTER_RESPONSE: 'readonly',
+        // bear-supermarket game state (shared between game.js and renderer.js)
+        state: 'writable',
+        // bear-supermarket/renderer.js exports
+        scrollChatToBottom: 'readonly',
+        renderInventory: 'readonly',
+        renderHeader: 'readonly',
+        addChatMessage: 'readonly',
+        addToyDisplay: 'readonly',
+        renderActions: 'readonly',
+        clearChat: 'readonly',
+        showScreen: 'readonly',
+        showCoinAnimation: 'readonly',
       },
     },
     rules: {
