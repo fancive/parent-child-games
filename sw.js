@@ -11,6 +11,8 @@ const ASSETS = [
   './kitchen-game/shared.css',
   './bear-supermarket/index.html',
   './bear-supermarket/styles.css',
+  './bear-supermarket/data.js',
+  './bear-supermarket/game.js',
 ];
 
 self.addEventListener('install', e => {
