@@ -1,15 +1,18 @@
 const CACHE = 'pcg-v1';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/shared/utils.js',
-  '/kitchen-game/index.html',
-  '/kitchen-game/kitchen.html',
-  '/kitchen-game/ride.html',
-  '/kitchen-game/shared.js',
-  '/kitchen-game/shared.css',
-  '/bear-supermarket/index.html',
+  './',
+  './index.html',
+  './manifest.json',
+  './shared/utils.js',
+  './kitchen-game/index.html',
+  './kitchen-game/kitchen.html',
+  './kitchen-game/ride.html',
+  './kitchen-game/shared.js',
+  './kitchen-game/shared.css',
+  './bear-supermarket/index.html',
+  './bear-supermarket/styles.css',
+  './bear-supermarket/data.js',
+  './bear-supermarket/game.js',
 ];
 
 self.addEventListener('install', e => {
