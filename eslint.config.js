@@ -1,0 +1,79 @@
+import prettier from 'eslint-config-prettier';
+
+export default [
+  {
+    ignores: ['node_modules/**', 'godot-project/**', '.agent/**'],
+  },
+  {
+    files: ['**/*.js'],
+    ignores: ['eslint.config.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'script',
+      globals: {
+        // Browser globals
+        window: 'readonly',
+        document: 'readonly',
+        navigator: 'readonly',
+        localStorage: 'readonly',
+        setTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearTimeout: 'readonly',
+        clearInterval: 'readonly',
+        requestAnimationFrame: 'readonly',
+        caches: 'readonly',
+        fetch: 'readonly',
+        self: 'readonly',
+        console: 'readonly',
+        AudioContext: 'readonly',
+        webkitAudioContext: 'readonly',
+        Promise: 'readonly',
+        Math: 'readonly',
+        JSON: 'readonly',
+        Error: 'readonly',
+        // Cross-file globals (shared via <script> tags)
+        playSound: 'readonly',
+        vibrate: 'readonly',
+        showConfetti: 'readonly',
+        debounceClick: 'readonly',
+        saveState: 'readonly',
+        loadState: 'readonly',
+        ALL_INGREDIENTS: 'readonly',
+        RECIPES: 'readonly',
+        INGREDIENT_MAP: 'readonly',
+        getIngredient: 'readonly',
+        saveGameState: 'readonly',
+        loadGameState: 'readonly',
+        clearGameState: 'readonly',
+        navigateTo: 'readonly',
+        TOYS: 'readonly',
+        CUSTOMERS: 'readonly',
+        BUDGET_RANGES: 'readonly',
+        GREETINGS: 'readonly',
+        WANT_PHRASES: 'readonly',
+        AFFORDABLE_PHRASES: 'readonly',
+        CANT_AFFORD_PHRASES: 'readonly',
+        ACCEPT_PHRASES: 'readonly',
+        LEAVE_PHRASES: 'readonly',
+        COUNTER_RESPONSE: 'readonly',
+      },
+    },
+    rules: {
+      // Warn on unused vars, but ignore: underscore-prefixed args, catch
+      // bindings, and top-level declarations (cross-file globals).
+      'no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_|^e$',
+          varsIgnorePattern: '^_',
+        },
+      ],
+      'no-undef': 'error',
+      eqeqeq: ['error', 'always'],
+      'no-var': 'error',
+      'prefer-const': ['warn', { destructuring: 'all' }],
+    },
+  },
+  prettier,
+];
