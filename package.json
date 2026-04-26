@@ -8,11 +8,13 @@
     "test": "node --test 'tests/*.test.js'",
     "lint": "eslint .",
     "lint:fix": "eslint --fix . && prettier --write '**/*.{js,css,html,json}'",
-    "format": "prettier --write '**/*.{js,css,html,json}'"
+    "format": "prettier --write '**/*.{js,css,html,json}'",
+    "prepare": "husky"
   },
   "devDependencies": {
     "eslint": "^10.2.1",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
     "prettier": "^3.8.3"
   }
 }
