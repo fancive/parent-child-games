@@ -1,3 +1,22 @@
+// ==================== CONSTANTS ====================
+const MAX_CUSTOMERS_PER_DAY = 8;
+const MAX_NEGOTIATION_ROUNDS = 3;
+const MAX_PRICE = 99;
+const MIN_PRICE = 1;
+const RECENT_CUSTOMER_MEMORY = 4;
+const CONFETTI_COUNT = 25;
+const MAX_COIN_ANIMATION = 8;
+const STAR_THRESHOLDS = [30, 60, 100, 150, 200];
+const STAR_LABELS = [
+  '继续加油哦！',
+  '不错不错！',
+  '很棒！',
+  '太厉害了！',
+  '超级售货员！',
+  '传说级售货员！',
+];
+const CONFETTI_STAR_THRESHOLD = 3;
+
 // ==================== GAME STATE ====================
 let state = {
   screen: 'welcome',
@@ -6,7 +25,7 @@ let state = {
   todayEarnings: 0,
   customersServed: 0,
   todayCustomers: 0,
-  maxCustomersPerDay: 8,
+  maxCustomersPerDay: MAX_CUSTOMERS_PER_DAY,
   dayNumber: 1,
   currentCustomer: null,
   currentToy: null,
@@ -14,7 +33,7 @@ let state = {
   customerBudget: 0,
   customerOffer: 0,
   round: 0,
-  maxRounds: 3,
+  maxRounds: MAX_NEGOTIATION_ROUNDS,
   inventory: JSON.parse(JSON.stringify(TOYS)),
   itemsSoldToday: 0,
   recentCustomerIndices: [],
@@ -96,7 +115,8 @@ function nextCustomer() {
     ci = Math.floor(Math.random() * CUSTOMERS.length);
   } while (state.recentCustomerIndices.includes(ci) && CUSTOMERS.length > 3);
   state.recentCustomerIndices.push(ci);
-  if (state.recentCustomerIndices.length > 4) state.recentCustomerIndices.shift();
+  if (state.recentCustomerIndices.length > RECENT_CUSTOMER_MEMORY)
+    state.recentCustomerIndices.shift();
 
   state.currentCustomer = { ...CUSTOMERS[ci] };
 
@@ -159,7 +179,7 @@ function showPriceSetter() {
   window.adjustPrice = function (delta) {
     if (_priceAdjusting) return;
     _priceAdjusting = true;
-    state.myPrice = clamp(state.myPrice + delta, 1, 99);
+    state.myPrice = clamp(state.myPrice + delta, MIN_PRICE, MAX_PRICE);
     renderPriceUI();
     setTimeout(() => {
       _priceAdjusting = false;
@@ -310,7 +330,7 @@ function completeDeal(finalPrice) {
   );
   scrollChatToBottom();
 
-  showConfetti(document.getElementById('confetti'), 25);
+  showConfetti(document.getElementById('confetti'), CONFETTI_COUNT);
   showCoinAnimation(finalPrice);
 
   renderActions(`
@@ -346,24 +366,13 @@ function endDay() {
   showScreen('summary');
 
   let stars = 0;
-  if (state.todayEarnings >= 30) stars = 1;
-  if (state.todayEarnings >= 60) stars = 2;
-  if (state.todayEarnings >= 100) stars = 3;
-  if (state.todayEarnings >= 150) stars = 4;
-  if (state.todayEarnings >= 200) stars = 5;
-
-  const starLabels = [
-    '继续加油哦！',
-    '不错不错！',
-    '很棒！',
-    '太厉害了！',
-    '超级售货员！',
-    '传说级售货员！',
-  ];
+  for (let i = 0; i < STAR_THRESHOLDS.length; i++) {
+    if (state.todayEarnings >= STAR_THRESHOLDS[i]) stars = i + 1;
+  }
 
   document.getElementById('summary-stars').textContent =
     '⭐'.repeat(stars) + '☆'.repeat(5 - stars);
-  document.getElementById('summary-star-label').textContent = starLabels[stars];
+  document.getElementById('summary-star-label').textContent = STAR_LABELS[stars];
 
   document.getElementById('summary-stats').innerHTML = `
     <div class="summary-stat">
@@ -384,7 +393,8 @@ function endDay() {
     </div>
   `;
 
-  if (stars >= 3) showConfetti(document.getElementById('confetti'), 25);
+  if (stars >= CONFETTI_STAR_THRESHOLD)
+    showConfetti(document.getElementById('confetti'), CONFETTI_COUNT);
 }
 
 function startNewDay() {

@@ -57,7 +57,17 @@ export default [
         ACCEPT_PHRASES: 'readonly',
         LEAVE_PHRASES: 'readonly',
         COUNTER_RESPONSE: 'readonly',
-        // bear-supermarket game state (shared between game.js and renderer.js)
+        // bear-supermarket game constants and state (shared across modules)
+        MAX_CUSTOMERS_PER_DAY: 'readonly',
+        MAX_NEGOTIATION_ROUNDS: 'readonly',
+        MAX_PRICE: 'readonly',
+        MIN_PRICE: 'readonly',
+        RECENT_CUSTOMER_MEMORY: 'readonly',
+        CONFETTI_COUNT: 'readonly',
+        MAX_COIN_ANIMATION: 'readonly',
+        STAR_THRESHOLDS: 'readonly',
+        STAR_LABELS: 'readonly',
+        CONFETTI_STAR_THRESHOLD: 'readonly',
         state: 'writable',
         // bear-supermarket/renderer.js exports
         scrollChatToBottom: 'readonly',

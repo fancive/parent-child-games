@@ -116,7 +116,7 @@ function showScreen(name) {
 
 // ==================== ANIMATIONS ====================
 function showCoinAnimation(amount) {
-  const coins = Math.min(amount, 8);
+  const coins = Math.min(amount, MAX_COIN_ANIMATION);
   for (let i = 0; i < coins; i++) {
     setTimeout(() => {
       const coin = document.createElement('div');
