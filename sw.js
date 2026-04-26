@@ -5,6 +5,7 @@ const ASSETS = [
   './manifest.json',
   './shared/utils.js',
   './shared/init.js',
+  './shared/variables.css',
   './kitchen-game/index.html',
   './kitchen-game/kitchen.html',
   './kitchen-game/ride.html',
