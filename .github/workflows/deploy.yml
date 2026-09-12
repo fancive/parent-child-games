@@ -52,6 +52,7 @@ jobs:
           cp index.html _site/
           cp -r kitchen-game _site/
           cp -r bear-supermarket _site/
+          cp -r bee-game _site/
           cp -r shared _site/ 2>/dev/null || true
           cp manifest.json _site/ 2>/dev/null || true
           cp sw.js _site/ 2>/dev/null || true
