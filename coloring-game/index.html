@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#d9eee9" />
+    <title>涂色画板 · 小小画室</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <a href="../index.html" class="back">‹ 游戏屋</a>
+      <h1>小小画室 <span>每一种颜色，都很漂亮</span></h1>
+      <button id="download">↓ 保存图片</button>
+    </header>
+    <main>
+      <nav class="pages" aria-label="选择画纸">
+        <h2>今天画什么？</h2>
+        <div id="pages"></div>
+        <p>不用涂得一样，<br />画出你的想象！</p>
+      </nav>
+      <section class="studio" aria-label="画画区">
+        <div class="paper-caption">
+          <h2 id="page-title">花园里的好朋友</h2>
+          <span id="save-status" role="status">作品会自动保存在这里</span>
+        </div>
+        <div class="paper">
+          <svg
+            id="drawing"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 720 520"
+            aria-label="涂色画纸"
+          ></svg>
+        </div>
+        <p id="hint" class="hint">先选一支蜡笔，再点点画里的空白，颜色就住进去啦。</p>
+        <div class="tools" aria-label="画画工具">
+          <button data-tool="fill" aria-pressed="true">🪣 涂颜色</button
+          ><button data-tool="brush" aria-pressed="false">✎ 自由画</button
+          ><button data-tool="erase" aria-pressed="false">▱ 橡皮擦</button>
+          <label
+            >笔尖
+            <select id="size" aria-label="笔尖粗细">
+              <option value="6">细</option>
+              <option value="14" selected>中</option>
+              <option value="26">粗</option>
+            </select></label
+          >
+          <button id="undo" disabled>↶ 撤销</button><button id="redo" disabled>↷ 重做</button
+          ><button id="clear">重新画</button>
+        </div>
+      </section>
+      <aside class="palette" aria-label="选择颜色">
+        <h2>我的蜡笔</h2>
+        <div id="colors"></div>
+        <p id="color-name">正在用：珊瑚红</p>
+      </aside>
+    </main>
+    <footer>小手点一点，世界多一点颜色。</footer>
+    <dialog id="clear-dialog">
+      <h2>换回一张干净的画纸？</h2>
+      <p>只会清空这张画，清空后也可以撤销。</p>
+      <form method="dialog">
+        <button value="cancel">继续画</button><button value="clear">清空这张</button>
+      </form>
+    </dialog>
+    <script src="model.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>

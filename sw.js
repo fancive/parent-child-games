@@ -1,4 +1,4 @@
-const CACHE = 'pcg-v5-bee';
+const CACHE = 'pcg-v6-coloring';
 const ASSETS = [
   './',
   './index.html',
@@ -26,6 +26,10 @@ const ASSETS = [
   './bee-game/styles.css',
   './bee-game/model.js',
   './bee-game/game.js',
+  './coloring-game/index.html',
+  './coloring-game/styles.css',
+  './coloring-game/model.js',
+  './coloring-game/game.js',
   './offline.html',
 ];
 
