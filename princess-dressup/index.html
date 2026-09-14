@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'"
+    />
+    <title>小公主换装</title>
+    <link rel="stylesheet" href="../shared/variables.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="welcome" class="screen active" role="region" aria-label="欢迎页面">
+      <div class="welcome-decor" aria-hidden="true">
+        <span class="wd wd-1">✨</span>
+        <span class="wd wd-2">👑</span>
+        <span class="wd wd-3">💖</span>
+        <span class="wd wd-4">🌸</span>
+        <span class="wd wd-5">⭐</span>
+        <span class="wd wd-6">🦋</span>
+      </div>
+      <div class="welcome-stage">
+        <div class="welcome-halo" aria-hidden="true"></div>
+        <div class="welcome-princess" aria-hidden="true">👸</div>
+      </div>
+      <h1 class="welcome-title">小公主换装</h1>
+      <p class="welcome-subtitle">挑选发型、裙子和鞋子，把小公主打扮得漂漂亮亮！</p>
+      <div class="welcome-features" aria-label="游戏特色">
+        <div class="feature-tag">💇 五种发型</div>
+        <div class="feature-tag">👗 六条裙子</div>
+        <div class="feature-tag">👑 闪亮发饰</div>
+        <div class="feature-tag">🎲 随机搭配</div>
+      </div>
+      <button class="btn-start" id="btn-start-dressup" aria-label="开始打扮">开始打扮！</button>
+    </div>
+
+    <div id="dressing" class="screen" role="region" aria-label="换装界面">
+      <header class="dress-header">
+        <div class="dress-title" aria-hidden="true">👸 小公主换装</div>
+        <div class="dress-tools" role="toolbar" aria-label="工具">
+          <button class="tool-btn" id="btn-random" aria-label="随机搭配">🎲 随机</button>
+          <button class="tool-btn" id="btn-reset" aria-label="重来">🧺 重来</button>
+          <button class="tool-btn primary" id="btn-done" aria-label="完成，看看漂亮的小公主">
+            📸 好啦！
+          </button>
+        </div>
+      </header>
+
+      <main class="dress-main">
+        <div class="stage-wrap">
+          <div class="stage bg-castle" id="stage">
+            <div class="stage-decor" id="stage-decor" aria-hidden="true"></div>
+            <div class="doll" id="doll"></div>
+            <div class="doll-sparkles" id="doll-sparkles" aria-hidden="true"></div>
+          </div>
+        </div>
+
+        <div class="wardrobe">
+          <div class="tabs" id="tabs" role="tablist" aria-label="分类"></div>
+          <div class="tray" id="tray" role="list" aria-label="衣柜"></div>
+        </div>
+      </main>
+    </div>
+
+    <div id="celebrate" class="overlay" role="dialog" aria-label="打扮完成" hidden>
+      <div class="celebrate-inner">
+        <div class="celebrate-doll bg-castle" id="celebrate-doll"></div>
+        <div class="celebrate-praise" id="celebrate-praise"></div>
+        <div class="celebrate-btns">
+          <button class="btn-continue" id="btn-continue" aria-label="继续打扮">继续打扮</button>
+          <a class="btn-home" href="../index.html" aria-label="回到首页">回到首页</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="confetti-container" id="confetti" aria-hidden="true"></div>
+
+    <script src="../shared/utils.js"></script>
+    <script src="data.js"></script>
+    <script src="renderer.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>

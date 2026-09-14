@@ -96,10 +96,10 @@ function showIdleState() {
   `;
 
   renderActions(`
-    <button class="action-btn next" onclick="nextCustomer()">
+    <button class="action-btn next" data-action="next-customer">
       🔔 迎接下一位顾客！
     </button>
-    <button class="action-btn secondary" style="margin-top:6px" onclick="endDay()">
+    <button class="action-btn secondary" style="margin-top:6px" data-action="end-day">
       🌙 今天打烊
     </button>
   `);
@@ -161,12 +161,12 @@ function showPriceSetter() {
         ${state.currentToy.stock <= 2 ? ' · <span style="color:var(--red)">快卖完啦！</span>' : ''}
       </div>
       <div class="price-setter">
-        <button class="price-btn minus" onclick="adjustPrice(-1)">−</button>
+        <button class="price-btn minus" data-action="price-down">−</button>
         <div class="price-display">${state.myPrice}<small>元</small></div>
-        <button class="price-btn plus" onclick="adjustPrice(1)">+</button>
+        <button class="price-btn plus" data-action="price-up">+</button>
       </div>
       <div class="action-buttons">
-        <button class="action-btn primary" onclick="confirmPrice()">
+        <button class="action-btn primary" data-action="confirm-price">
           💬 就卖 ${state.myPrice} 元！
         </button>
       </div>
@@ -231,17 +231,17 @@ function showNegotiationOptions() {
     counterHtml = `
       <div style="font-size:14px;color:var(--brown-light);margin-top:4px;margin-bottom:4px;text-align:center">或者便宜一点？</div>
       <div class="counter-options">
-        ${counterOptions.map((p) => `<button class="counter-option" onclick="makeCounterOffer(${p})">${p}元</button>`).join('')}
+        ${counterOptions.map((p) => `<button class="counter-option" data-action="counter-offer" data-price="${p}">${p}元</button>`).join('')}
       </div>
     `;
   }
 
   renderActions(`
     <div class="action-buttons">
-      <button class="action-btn accept" onclick="acceptOffer()">
+      <button class="action-btn accept" data-action="accept-offer">
         😊 好吧，${state.customerOffer}元卖给你！
       </button>
-      <button class="action-btn reject" onclick="rejectOffer()">
+      <button class="action-btn reject" data-action="reject-offer">
         😤 不行，太少了！
       </button>
       ${counterHtml}
@@ -334,7 +334,7 @@ function completeDeal(finalPrice) {
   showCoinAnimation(finalPrice);
 
   renderActions(`
-    <button class="action-btn next" onclick="showIdleState()">
+    <button class="action-btn next" data-action="idle">
       👋 下一位顾客
     </button>
   `);
@@ -356,7 +356,7 @@ function customerLeaves() {
   scrollChatToBottom();
 
   renderActions(`
-    <button class="action-btn next" onclick="showIdleState()">
+    <button class="action-btn next" data-action="idle">
       💪 下一位顾客
     </button>
   `);
@@ -370,8 +370,7 @@ function endDay() {
     if (state.todayEarnings >= STAR_THRESHOLDS[i]) stars = i + 1;
   }
 
-  document.getElementById('summary-stars').textContent =
-    '⭐'.repeat(stars) + '☆'.repeat(5 - stars);
+  document.getElementById('summary-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(5 - stars);
   document.getElementById('summary-star-label').textContent = STAR_LABELS[stars];
 
   document.getElementById('summary-stats').innerHTML = `
@@ -424,3 +423,21 @@ function backToWelcome() {
 document.getElementById('btn-start').addEventListener('click', startGame);
 document.getElementById('btn-new-day').addEventListener('click', startNewDay);
 document.getElementById('btn-back-welcome').addEventListener('click', backToWelcome);
+
+// Dynamic buttons use delegated listeners so taps work under script-src 'self'.
+document.getElementById('action-area').addEventListener('click', (event) => {
+  const button = event.target.closest('button[data-action]');
+  if (!button || !event.currentTarget.contains(button)) return;
+  const actions = {
+    'next-customer': nextCustomer,
+    'end-day': endDay,
+    'price-down': () => window.adjustPrice(-1),
+    'price-up': () => window.adjustPrice(1),
+    'confirm-price': confirmPrice,
+    'counter-offer': () => makeCounterOffer(Number(button.dataset.price)),
+    'accept-offer': acceptOffer,
+    'reject-offer': rejectOffer,
+    idle: showIdleState,
+  };
+  actions[button.dataset.action]?.();
+});

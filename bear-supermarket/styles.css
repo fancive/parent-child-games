@@ -906,3 +906,52 @@ body {
   font-size: 64px;
   margin: 10px 0;
 }
+
+body,
+.screen {
+  min-height: 100dvh;
+}
+#game {
+  height: 100dvh;
+}
+.game-header {
+  padding-top: max(8px, env(safe-area-inset-top));
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.game-main,
+.interaction-panel {
+  min-width: 0;
+  min-height: 0;
+}
+.action-area {
+  max-height: 60dvh;
+  overflow-y: auto;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+}
+.action-btn {
+  min-height: 44px;
+}
+@media (max-height: 500px) and (pointer: coarse) {
+  .action-area {
+    padding-top: 6px;
+  }
+  .action-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .action-btn {
+    padding: 8px 12px;
+    font-size: 15px;
+  }
+  .price-setter {
+    margin-bottom: 4px;
+  }
+  .price-display {
+    font-size: 30px;
+  }
+}

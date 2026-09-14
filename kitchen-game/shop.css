@@ -2,7 +2,7 @@ body {
   background: linear-gradient(180deg, #e3f2fd 0%, #bbdefb 100%);
 }
 .page {
-  padding-top: 56px;
+  padding-top: calc(56px + env(safe-area-inset-top));
 }
 
 /* ===== HEADER ===== */
@@ -398,8 +398,9 @@ body {
   color: #e65100;
 }
 .rb-close {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
   border-radius: 50%;
   border: none;
   background: var(--c-red);
@@ -481,4 +482,20 @@ body {
 }
 .rb-card.can-make {
   border-left: 4px solid var(--c-green);
+}
+
+.shop-header,
+.cart-area,
+.rb-header {
+  flex-shrink: 0;
+}
+.shop-header {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.shelves {
+  min-height: 0;
+}
+.recipe-book {
+  max-height: calc(100dvh - 32px);
 }

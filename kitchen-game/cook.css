@@ -2,7 +2,7 @@ body {
   background: linear-gradient(180deg, #fff8e1 0%, #ffecb3 100%);
 }
 .page {
-  padding-top: 56px;
+  padding-top: calc(56px + env(safe-area-inset-top));
 }
 
 /* ===== Recipe selection ===== */
@@ -636,4 +636,21 @@ body {
     transform: translateY(-8px) scale(1.2);
     opacity: 0.5;
   }
+}
+
+/* Short landscape screens can scroll the cooking scene without clipping actions. */
+.cooking-steps {
+  min-height: 0;
+}
+.cooking-header,
+.cooking-steps > .progress-row,
+.step-hint {
+  flex-shrink: 0;
+}
+.step-content {
+  overflow-y: auto;
+  justify-content: flex-start;
+}
+.step-content > * {
+  flex-shrink: 0;
 }

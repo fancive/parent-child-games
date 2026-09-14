@@ -54,6 +54,7 @@ jobs:
           cp -r bear-supermarket _site/
           cp -r bee-game _site/
           cp -r coloring-game _site/
+          cp -r princess-dressup _site/
           cp -r shared _site/ 2>/dev/null || true
           cp manifest.json _site/ 2>/dev/null || true
           cp sw.js _site/ 2>/dev/null || true

@@ -6,7 +6,7 @@ const { join } = require('node:path');
 const artifacts = mkdtempSync(join(tmpdir(), 'coloring-qa-'));
 const base = process.env.COLORING_BASE_URL || 'http://127.0.0.1:8099';
 (async () => {
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ headless: true, channel: process.env.BROWSER_CHANNEL });
   const context = await browser.newContext({
     viewport: { width: 1365, height: 1000 },
     acceptDownloads: true,
@@ -94,6 +94,7 @@ const base = process.env.COLORING_BASE_URL || 'http://127.0.0.1:8099';
   assert.equal(await phone.locator('body').evaluate((el) => el.scrollWidth <= innerWidth), true);
   await phone.screenshot({ path: join(artifacts, 'mobile.png'), fullPage: true });
   await phone.getByRole('button', { name: '自由画', exact: true }).tap();
+  await phone.locator('#drawing').scrollIntoViewIfNeeded();
   const mb = await phone.locator('#drawing').boundingBox();
   const cdp = await mobile.newCDPSession(phone);
   await cdp.send('Input.dispatchTouchEvent', {

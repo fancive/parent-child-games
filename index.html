@@ -2,7 +2,7 @@
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content="适合 3-6 岁小朋友的亲子互动小游戏" />
     <meta name="theme-color" content="#43a047" />
     <meta
@@ -25,7 +25,8 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        padding: 40px 16px;
+        padding: max(24px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+          max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
       }
 
       h1 {
@@ -44,7 +45,7 @@
 
       .games-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
         gap: 24px;
         max-width: 900px;
         width: 100%;
@@ -186,6 +187,17 @@
         <span class="card-desc">在游戏中认识数字和简单的加减法</span>
         <span class="card-tag tag-coming">即将上线</span>
       </div>
+      <a
+        class="game-card"
+        href="princess-dressup/index.html"
+        role="listitem"
+        aria-label="小公主换装 - 可以玩啦"
+      >
+        <span class="card-emoji" aria-hidden="true">👸</span>
+        <span class="card-title">小公主换装</span>
+        <span class="card-desc">挑选发型、裙子和鞋子，把小公主打扮得漂漂亮亮！</span>
+        <span class="card-tag tag-ready">可以玩啦</span>
+      </a>
     </main>
 
     <footer class="footer">适合 3-6 岁小朋友 ❤️</footer>

@@ -35,7 +35,10 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: 48px;
+  height: calc(48px + env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -385,4 +388,18 @@ body {
   .page {
     animation: none;
   }
+}
+
+.page {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.celeb-card {
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+}
+button,
+[role='button'] {
+  touch-action: manipulation;
 }

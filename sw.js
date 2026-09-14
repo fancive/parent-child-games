@@ -1,4 +1,4 @@
-const CACHE = 'pcg-v7-coloring-patterns';
+const CACHE = 'pcg-v8-mobile-layout';
 const ASSETS = [
   './',
   './index.html',
@@ -30,6 +30,11 @@ const ASSETS = [
   './coloring-game/styles.css',
   './coloring-game/model.js',
   './coloring-game/game.js',
+  './princess-dressup/index.html',
+  './princess-dressup/styles.css',
+  './princess-dressup/data.js',
+  './princess-dressup/renderer.js',
+  './princess-dressup/game.js',
   './offline.html',
 ];
 
