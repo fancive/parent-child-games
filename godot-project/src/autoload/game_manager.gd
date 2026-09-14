@@ -38,15 +38,6 @@ var game_registry: Array[Dictionary] = [
 		"scene": "res://src/bear_supermarket/bear_main.tscn",
 		"unlocked": true,
 	},
-	{
-		"id": "runner",
-		"title": "放学回家",
-		"description": "放学啦！跳过障碍，收集星星，跑回家！",
-		"icon": "🏃",
-		"color": Color(0.35, 0.7, 0.9),
-		"scene": "res://src/runner_game/runner_main.tscn",
-		"unlocked": true,
-	},
 ]
 
 
