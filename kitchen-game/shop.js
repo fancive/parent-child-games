@@ -1,29 +1,6 @@
 let money = STARTING_MONEY;
 let cart = [];
 
-// ===== INIT =====
-(function init() {
-  if (localStorage.getItem('pcg_kitchen-back-to-shop')) {
-    const state = loadGameState();
-    money = state.money;
-    cart = state.cart;
-    localStorage.removeItem('pcg_kitchen-back-to-shop');
-  }
-  document.getElementById('wallet-amount').textContent = money;
-  buildShelves();
-  syncCartDOM();
-  updateCartBadge();
-  updateGoHomeBtn();
-
-  // Event delegation
-  document.getElementById('btn-go-home').addEventListener('click', goHome);
-  document.getElementById('btn-recipe').addEventListener('click', openRecipeBook);
-  document.getElementById('btn-rb-close').addEventListener('click', closeRecipeBook);
-  document.getElementById('recipe-book-overlay').addEventListener('click', (e) => {
-    if (e.target === e.currentTarget) closeRecipeBook();
-  });
-})();
-
 // ===== SHELVES =====
 function buildShelves() {
   const shelves = document.getElementById('shelves');
@@ -258,3 +235,25 @@ function flashClass(id, cls, ms) {
   el.classList.add(cls);
   setTimeout(() => el.classList.remove(cls), ms);
 }
+
+// ===== INIT =====
+(function init() {
+  if (localStorage.getItem('pcg_kitchen-back-to-shop')) {
+    const state = loadGameState();
+    money = state.money;
+    cart = state.cart;
+    localStorage.removeItem('pcg_kitchen-back-to-shop');
+  }
+  document.getElementById('wallet-amount').textContent = money;
+  buildShelves();
+  syncCartDOM();
+  updateCartBadge();
+  updateGoHomeBtn();
+
+  document.getElementById('btn-go-home').addEventListener('click', goHome);
+  document.getElementById('btn-recipe').addEventListener('click', openRecipeBook);
+  document.getElementById('btn-rb-close').addEventListener('click', closeRecipeBook);
+  document.getElementById('recipe-book-overlay').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeRecipeBook();
+  });
+})();
