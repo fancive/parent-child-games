@@ -5,6 +5,25 @@ import vm from 'node:vm';
 const ColoringBook = vm.runInNewContext(
   `${readFileSync(new URL('../coloring-game/model.js', import.meta.url), 'utf8')}\nColoringBook`,
 );
+test('offers six coloring patterns plus a blank canvas with independent saved state', () => {
+  const book = new ColoringBook({
+    dinosaur: { fills: { body: '#a5cc65' }, strokes: [] },
+    ocean: { fills: { fish: '#79c8e6' }, strokes: [] },
+    castle: { fills: { door: '#ad8064' }, strokes: [] },
+  });
+  assert.deepEqual(Object.keys(book.pages), [
+    'garden',
+    'cat',
+    'rocket',
+    'dinosaur',
+    'ocean',
+    'castle',
+    'blank',
+  ]);
+  assert.equal(book.pages.dinosaur.fills.body, '#a5cc65');
+  assert.equal(book.pages.ocean.fills.fish, '#79c8e6');
+  assert.equal(book.pages.castle.fills.door, '#ad8064');
+});
 test('page switching keeps each drawing and independent undo history', () => {
   const book = new ColoringBook();
   book.change('garden', (p) => {

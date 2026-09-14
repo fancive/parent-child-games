@@ -1,4 +1,4 @@
-const CACHE = 'pcg-v6-coloring';
+const CACHE = 'pcg-v7-coloring-patterns';
 const ASSETS = [
   './',
   './index.html',

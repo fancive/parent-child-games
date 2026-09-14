@@ -4,7 +4,7 @@ class ColoringBook {
     this.pages = {};
     this.histories = {};
     this.futures = {};
-    for (const id of ['garden', 'cat', 'rocket', 'blank']) {
+    for (const id of ['garden', 'cat', 'rocket', 'dinosaur', 'ocean', 'castle', 'blank']) {
       const page = saved?.[id];
       this.pages[id] =
         page && typeof page.fills === 'object' && page.fills !== null && Array.isArray(page.strokes)

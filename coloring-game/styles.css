@@ -275,10 +275,13 @@ dialog form {
   #pages {
     display: flex;
     gap: 6px;
+    overflow-x: auto;
+    padding: 3px 3px 8px;
+    scrollbar-width: thin;
   }
   #pages button {
-    flex: 1;
-    padding: 8px 2px;
+    flex: 0 0 auto;
+    padding: 8px 10px;
     justify-content: center;
     gap: 4px;
     font-size: 14px;

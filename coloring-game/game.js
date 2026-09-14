@@ -21,6 +21,9 @@
     ['garden', '🌷', '小花园', '花园里的好朋友'],
     ['cat', '🐱', '小猫咪', '小猫的午后时光'],
     ['rocket', '🚀', '小火箭', '去星星家做客'],
+    ['dinosaur', '🦕', '小恐龙', '小恐龙去散步'],
+    ['ocean', '🐠', '海底世界', '海底朋友游呀游'],
+    ['castle', '🏰', '童话城堡', '欢迎来到彩虹城堡'],
     ['blank', '✏️', '自由画', '这里装着你的想象'],
   ];
   let saved = {};
@@ -161,6 +164,116 @@
           id,
           '小星星',
         );
+    } else if (pageId === 'dinosaur') {
+      shape('ellipse', { cx: 360, cy: 467, rx: 310, ry: 31 }, 'dinosaur-grass', '恐龙脚下的草地');
+      shape(
+        'path',
+        { d: 'M240 342 Q119 291 67 359 Q142 347 264 402Z' },
+        'dinosaur-tail',
+        '恐龙尾巴',
+      );
+      shape('ellipse', { cx: 342, cy: 342, rx: 139, ry: 94 }, 'dinosaur-body', '恐龙身体');
+      shape(
+        'path',
+        { d: 'M431 342 Q437 221 510 193 L565 253 Q493 283 481 381Z' },
+        'dinosaur-neck',
+        '恐龙脖子',
+      );
+      shape('ellipse', { cx: 548, cy: 203, rx: 82, ry: 65 }, 'dinosaur-head', '恐龙脑袋');
+      shape('ellipse', { cx: 365, cy: 359, rx: 76, ry: 49 }, 'dinosaur-belly', '恐龙肚皮');
+      shape('path', { d: 'M271 405 L268 470 L326 470 L334 416Z' }, 'dinosaur-leg-left', '恐龙左腿');
+      shape(
+        'path',
+        { d: 'M407 411 L414 470 L472 470 L465 387Z' },
+        'dinosaur-leg-right',
+        '恐龙右腿',
+      );
+      for (const [x, y, id] of [
+        [274, 282, 'dinosaur-spot-one'],
+        [345, 310, 'dinosaur-spot-two'],
+        [415, 278, 'dinosaur-spot-three'],
+      ])
+        shape('circle', { cx: x, cy: y, r: 22 }, id, '恐龙身上的圆点');
+      for (const [x, y, id] of [
+        [249, 258, 'dinosaur-plate-one'],
+        [321, 233, 'dinosaur-plate-two'],
+        [394, 247, 'dinosaur-plate-three'],
+      ])
+        shape(
+          'path',
+          { d: `M${x - 28} ${y + 26} L${x} ${y - 28} L${x + 30} ${y + 25}Z` },
+          id,
+          '恐龙背上的小尖角',
+        );
+      shape('circle', { cx: 576, cy: 187, r: 7 });
+      shape('path', { d: 'M555 225 Q583 243 608 219' });
+      shape('circle', { cx: 114, cy: 100, r: 43 }, 'dinosaur-sun', '太阳');
+    } else if (pageId === 'ocean') {
+      shape(
+        'path',
+        {
+          d: 'M26 415 Q115 367 202 419 Q290 365 379 419 Q473 362 566 419 Q630 386 694 413 L694 497 L26 497Z',
+        },
+        'seabed',
+        '海底沙滩',
+      );
+      shape('ellipse', { cx: 361, cy: 251, rx: 136, ry: 82 }, 'fish', '大鱼身体');
+      shape('path', { d: 'M231 252 L119 170 Q132 252 119 335Z' }, 'fish-tail', '大鱼尾巴');
+      shape('path', { d: 'M333 173 Q378 100 421 185Z' }, 'fish-fin-top', '大鱼上面的鱼鳍');
+      shape('path', { d: 'M341 328 Q385 382 418 318Z' }, 'fish-fin-bottom', '大鱼下面的鱼鳍');
+      shape('path', { d: 'M420 246 Q481 203 493 257 Q453 286 420 275Z' }, 'fish-face', '大鱼脸蛋');
+      shape('circle', { cx: 457, cy: 240, r: 8 });
+      shape('path', { d: 'M468 274 Q488 286 503 269' });
+      for (const [x, y, r, id] of [
+        [552, 185, 24, 'bubble-one'],
+        [596, 125, 15, 'bubble-two'],
+        [627, 78, 9, 'bubble-three'],
+      ])
+        shape('circle', { cx: x, cy: y, r }, id, '圆圆的泡泡');
+      shape('path', { d: 'M82 450 Q51 391 91 341 Q129 398 104 456Z' }, 'seaweed-left', '左边海草');
+      shape(
+        'path',
+        { d: 'M586 456 Q552 387 593 332 Q637 393 611 458Z' },
+        'seaweed-right',
+        '右边海草',
+      );
+      shape('path', { d: 'M493 454 Q523 391 553 454Z' }, 'shell', '小贝壳');
+      shape('path', { d: 'M507 441 L523 405 L539 442 M523 405 L523 454' });
+    } else if (pageId === 'castle') {
+      shape(
+        'path',
+        { d: 'M34 441 Q182 389 337 435 Q527 380 686 440 L686 497 L34 497Z' },
+        'castle-grass',
+        '城堡前的草地',
+      );
+      shape('rect', { x: 255, y: 206, width: 211, height: 250 }, 'castle-center', '城堡大厅');
+      shape('rect', { x: 135, y: 254, width: 127, height: 202 }, 'castle-left', '左边塔楼');
+      shape('rect', { x: 459, y: 254, width: 127, height: 202 }, 'castle-right', '右边塔楼');
+      shape('path', { d: 'M118 258 L198 141 L279 258Z' }, 'castle-roof-left', '左边屋顶');
+      shape('path', { d: 'M442 258 L522 141 L603 258Z' }, 'castle-roof-right', '右边屋顶');
+      shape('path', { d: 'M237 211 L360 73 L483 211Z' }, 'castle-roof-center', '中间屋顶');
+      shape('path', { d: 'M360 73 L360 29 L430 51 L360 73Z' }, 'castle-flag', '城堡旗子');
+      shape(
+        'path',
+        { d: 'M319 456 L319 377 Q360 329 401 377 L401 456Z' },
+        'castle-door',
+        '城堡大门',
+      );
+      for (const [x, y, id, name] of [
+        [198, 326, 'castle-window-left', '左边窗户'],
+        [360, 273, 'castle-window-center', '中间窗户'],
+        [522, 326, 'castle-window-right', '右边窗户'],
+      ])
+        shape('circle', { cx: x, cy: y, r: 25 }, id, name);
+      shape(
+        'path',
+        {
+          d: 'M73 136 C42 99 85 65 118 88 C135 43 192 60 196 96 C245 83 269 139 228 154 L94 154 Q73 154 73 136Z',
+        },
+        'castle-cloud',
+        '云朵',
+      );
+      shape('circle', { cx: 611, cy: 91, r: 40 }, 'castle-sun', '太阳');
     }
     const strokes = element('g', { id: 'strokes', 'pointer-events': 'none' });
     for (const stroke of book.pages[pageId].strokes) strokes.append(strokeNode(stroke));
