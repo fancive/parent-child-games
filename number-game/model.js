@@ -2,14 +2,6 @@
   'use strict';
   const LEVELS = [
     {
-      name: '苹果林',
-      skill: '数一数',
-      icon: '🍎',
-      item: '苹果',
-      intro: '帮小兔摘苹果',
-      reward: '苹果篮',
-    },
-    {
       name: '胡萝卜田',
       skill: '加一加',
       icon: '🥕',
@@ -40,8 +32,7 @@
     return Array.from({ length: LENGTH }, (_, i) => {
       let a;
       let b = 0;
-      if (stage === 0) a = int(1 + i * 2, 2 + i * 2);
-      else if (stage === 1) {
+      if (stage === 0) {
         const total = int(2 + i * 2, Math.min(10, 3 + i * 2));
         a = int(1, total - 1);
         b = total - a;
@@ -49,7 +40,7 @@
         a = int(2 + i, Math.min(10, 5 + i));
         b = i === LENGTH - 1 ? a : int(1, a - 1);
       }
-      const answer = stage === 0 ? a : stage === 1 ? a + b : a - b;
+      const answer = stage === 0 ? a + b : a - b;
       const candidates = Array.from({ length: 11 }, (_, n) => n).filter((n) => n !== answer);
       const options = [answer];
       while (options.length < 3)
@@ -62,26 +53,32 @@
     });
   }
   function fresh() {
-    return { version: 1, completed: 0, round: null };
+    return { version: 2, completed: 0, round: null };
   }
   function restore(raw) {
     try {
       const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
       if (
         !data ||
-        data.version !== 1 ||
+        ![1, 2].includes(data.version) ||
         !Number.isInteger(data.completed) ||
         data.completed < 0 ||
-        data.completed > 3
+        data.completed > (data.version === 1 ? 3 : LEVELS.length)
       )
         return fresh();
-      const result = { version: 1, completed: data.completed, round: null };
+      const legacy = data.version === 1;
+      const result = {
+        version: 2,
+        completed: legacy ? Math.max(0, data.completed - 1) : data.completed,
+        round: null,
+      };
       const r = data.round;
       if (
         r &&
         Number.isInteger(r.stage) &&
         r.stage >= 0 &&
-        r.stage < 3 &&
+        r.stage < (legacy ? 3 : LEVELS.length) &&
+        (!legacy || r.stage > 0) &&
         r.stage <= data.completed &&
         Number.isInteger(r.index) &&
         r.index >= 0 &&
@@ -91,7 +88,12 @@
         r.seed <= 4294967295 &&
         typeof r.solved === 'boolean'
       ) {
-        result.round = { stage: r.stage, index: r.index, seed: r.seed, solved: r.solved };
+        result.round = {
+          stage: legacy ? r.stage - 1 : r.stage,
+          index: r.index,
+          seed: r.seed,
+          solved: r.solved,
+        };
       }
       return result;
     } catch {
@@ -103,7 +105,12 @@
       this.progress = restore(saved);
     }
     start(stage, seed = Math.floor(Math.random() * 4294967296)) {
-      if (!Number.isInteger(stage) || stage < 0 || stage >= 3 || stage > this.progress.completed)
+      if (
+        !Number.isInteger(stage) ||
+        stage < 0 ||
+        stage >= LEVELS.length ||
+        stage > this.progress.completed
+      )
         return false;
       this.progress.round = { stage, index: 0, seed: seed >>> 0, solved: false };
       return true;

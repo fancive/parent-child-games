@@ -10,26 +10,26 @@ const { Adventure, questions, restore } = sandbox.window.NumberAdventure;
 
 test('all generated problems have valid arithmetic and three distinct bounded choices', () => {
   for (let seed = 0; seed < 500; seed++) {
-    for (let stage = 0; stage < 3; stage++) {
+    for (let stage = 0; stage < 2; stage++) {
       const batch = questions(stage, seed);
       assert.equal(batch.length, 5);
       for (const q of batch) {
-        assert.equal(q.answer, stage === 0 ? q.a : stage === 1 ? q.a + q.b : q.a - q.b);
+        assert.equal(q.answer, stage === 0 ? q.a + q.b : q.a - q.b);
         assert.ok(q.a >= 1 && q.a <= 10);
         assert.ok(q.answer >= 0 && q.answer <= 10);
-        if (stage === 1) assert.ok(q.a > 0 && q.b > 0);
-        if (stage === 2) assert.ok(q.b > 0 && q.b <= q.a);
+        if (stage === 0) assert.ok(q.a > 0 && q.b > 0);
+        if (stage === 1) assert.ok(q.b > 0 && q.b <= q.a);
         assert.equal(q.options.length, 3);
         assert.equal(new Set(q.options).size, 3);
         assert.ok(q.options.includes(q.answer));
         assert.ok(q.options.every((x) => Number.isInteger(x) && x >= 0 && x <= 10));
       }
-      if (stage < 2) {
+      if (stage === 0) {
         for (let i = 1; i < batch.length; i++) {
           assert.ok(batch[i].answer > batch[i - 1].answer, 'quantity grows across the round');
         }
       }
-      if (stage === 2) assert.equal(batch[4].answer, 0, 'every subtraction round teaches zero');
+      if (stage === 1) assert.equal(batch[4].answer, 0, 'every subtraction round teaches zero');
     }
   }
 });
@@ -50,9 +50,9 @@ test('wrong answers, skipping and repeated answers never advance or duplicate re
   assert.equal(game.progress.round.index, 1);
 });
 
-test('fifteen problems unlock three stages; replay never removes completed stages', () => {
+test('ten problems unlock two stages; replay never removes completed stages', () => {
   const game = new Adventure();
-  for (let stage = 0; stage < 3; stage++) {
+  for (let stage = 0; stage < 2; stage++) {
     assert.equal(game.start(stage, 123), true);
     for (let i = 0; i < 5; i++) {
       game.answer(game.question.answer);
@@ -68,7 +68,7 @@ test('fifteen problems unlock three stages; replay never removes completed stage
     game.answer(game.question.answer);
     game.next();
   }
-  assert.equal(game.progress.completed, 3);
+  assert.equal(game.progress.completed, 2);
 });
 
 test('refresh restores the exact question, choices and solved state', () => {
@@ -107,7 +107,7 @@ test('invalid or incompatible saves fall back safely, retaining valid completed 
     { solved: 'yes' },
   ]) {
     const saved = {
-      version: 1,
+      version: 2,
       completed: 1,
       round: { stage: 1, index: 0, seed: 5, solved: false, ...patch },
     };
@@ -127,4 +127,54 @@ test('home, offline cache and published artifact include every game resource', (
     assert.ok(sw.includes(`'./number-game/${name}'`));
     assert.ok(existsSync(new URL(`number-game/${name}`, root)));
   }
+});
+
+test('legacy counting progress is removed without unlocking subtraction', () => {
+  for (const completed of [0, 1]) {
+    const progress = restore({
+      version: 1,
+      completed,
+      round: { stage: 0, index: 4, seed: 42, solved: true },
+    });
+    assert.equal(progress.version, 2);
+    assert.equal(progress.completed, 0);
+    assert.equal(progress.round, null);
+    const game = new Adventure(progress);
+    assert.equal(game.start(1), false);
+    assert.equal(game.start(0), true);
+    assert.equal(game.question.answer, game.question.a + game.question.b);
+  }
+});
+
+test('legacy arithmetic saves keep their exact question and migrate only once', () => {
+  const fixtures = [
+    { stage: 1, completed: 1, expected: { a: 6, b: 1, answer: 7, options: [0, 5, 7] } },
+    { stage: 2, completed: 2, expected: { a: 6, b: 5, answer: 1, options: [0, 6, 1] } },
+  ];
+  for (const { stage, completed, expected } of fixtures) {
+    for (const solved of [false, true]) {
+      const game = new Adventure({
+        version: 1,
+        completed,
+        round: { stage, index: 2, seed: 42, solved },
+      });
+      assert.equal(game.progress.completed, completed - 1);
+      assert.equal(game.progress.round.stage, stage - 1);
+      assert.equal(game.progress.round.solved, solved);
+      assert.deepEqual(JSON.parse(JSON.stringify(game.question)), expected);
+      assert.equal(new Adventure(game.serialize()).serialize(), game.serialize());
+    }
+  }
+  assert.equal(restore({ version: 1, completed: 3, round: null }).completed, 2);
+});
+
+test('map and entry advertise only addition and subtraction', () => {
+  assert.deepEqual(
+    Array.from(sandbox.window.NumberAdventure.LEVELS, (level) => level.skill),
+    ['加一加', '减一减'],
+  );
+  const html = readFileSync(new URL('number-game/index.html', root), 'utf8');
+  const home = readFileSync(new URL('index.html', root), 'utf8');
+  assert.doesNotMatch(html, /数一数、|苹果林/);
+  assert.doesNotMatch(home, /陪小兔数苹果/);
 });

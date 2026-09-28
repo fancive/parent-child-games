@@ -2,6 +2,7 @@
   'use strict';
   const { Adventure, LEVELS, LENGTH } = window.NumberAdventure;
   const $ = (id) => document.getElementById(id);
+  // Keep the existing key so version 1 saves can migrate without losing arithmetic progress.
   const SAVE_KEY = 'pcg-number-adventure-v1';
   let saved = null;
   let storageAvailable = true;
@@ -69,9 +70,9 @@
     $('resume').hidden = !r;
     if (r) $('resume').textContent = `继续${LEVELS[r.stage].name} · 第 ${r.index + 1} 题`;
     $('collection').textContent =
-      game.progress.completed === 3
-        ? '🍎 🥕 🍓 野餐准备好啦！也可以再去玩一遍。'
-        : `🧺 野餐徽章 ${game.progress.completed} / 3`;
+      game.progress.completed === LEVELS.length
+        ? '🥕 🍓 野餐准备好啦！也可以再去玩一遍。'
+        : `🧺 野餐徽章 ${game.progress.completed} / ${LEVELS.length}`;
     screen('map', focus ? 'map-title' : null);
   }
   function makePile(amount, title, icon, given = false) {
@@ -133,21 +134,12 @@
     $('steps').setAttribute('aria-label', `第 ${r.index + 1} 题，共 ${LENGTH} 题`);
     $('story').textContent =
       r.stage === 0
-        ? '帮小兔摘苹果'
-        : r.stage === 1
-          ? `摘了 ${q.a} 根，又摘了 ${q.b} 根。`
-          : `有 ${q.a} 颗草莓，送给朋友 ${q.b} 颗。`;
-    $('question-title').textContent =
-      r.stage === 0
-        ? '树下有几个苹果？'
-        : r.stage === 1
-          ? '一共有几根胡萝卜？'
-          : '还剩下几颗草莓？';
-    $('equation').textContent =
-      r.stage === 0 ? '数一数，选数字' : `${q.a} ${r.stage === 1 ? '+' : '−'} ${q.b} = ?`;
+        ? `摘了 ${q.a} 根，又摘了 ${q.b} 根。`
+        : `有 ${q.a} 颗草莓，送给朋友 ${q.b} 颗。`;
+    $('question-title').textContent = r.stage === 0 ? '一共有几根胡萝卜？' : '还剩下几颗草莓？';
+    $('equation').textContent = `${q.a} ${r.stage === 0 ? '+' : '−'} ${q.b} = ?`;
     $('objects').replaceChildren();
-    if (r.stage === 0) $('objects').appendChild(makePile(q.a, '摘好的苹果', level.icon));
-    if (r.stage === 1) {
+    if (r.stage === 0) {
       const plus = document.createElement('span');
       plus.className = 'operator';
       plus.textContent = '+';
@@ -157,14 +149,14 @@
         plus,
         makePile(q.b, '又摘的', level.icon),
       );
-    }
-    if (r.stage === 2)
+    } else {
       $('objects').append(
         makePile(q.b, '送给朋友的', level.icon, true),
         makePile(q.answer, '留下的', level.icon),
       );
+    }
     $('count-help').textContent =
-      r.stage === 2
+      r.stage === 1
         ? q.answer === 0
           ? '一个也没留下，就是 0。'
           : '点一点留下的草莓，送走的不用数。'
@@ -211,13 +203,13 @@
     }
   }
   function renderReward() {
-    const all = game.progress.completed === 3;
+    const all = game.progress.completed === LEVELS.length;
     $('reward-subtitle').textContent = `${LEVELS[lastStage].name} · 5 题完成`;
     $('reward-title').textContent = all
       ? '开饭啦，数字小探险家！'
       : `收好你的${LEVELS[lastStage].reward}！`;
     $('reward-description').textContent = all
-      ? '会数数、会加法、会分享。谢谢你帮小兔准备了这场野餐！'
+      ? '会加法、会减法、会分享。谢谢你帮小兔准备了这场野餐！'
       : '这一站完成啦！带着新本领，去看看下一站吧。';
     $('badges').innerHTML = LEVELS.slice(0, game.progress.completed)
       .map(
@@ -241,7 +233,7 @@
   $('reward-map').addEventListener('click', () => renderMap());
   $('resume').addEventListener('click', () => renderQuestion());
   $('continue').addEventListener('click', () => {
-    if (game.progress.completed === 3) renderMap();
+    if (game.progress.completed === LEVELS.length) renderMap();
     else {
       game.start(game.progress.completed);
       persist();

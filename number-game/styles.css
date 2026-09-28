@@ -144,13 +144,13 @@ h1 {
 .stages {
   position: relative;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: flex-start;
   gap: 24px;
   z-index: 1;
 }
 .stage {
-  width: 30%;
+  width: 40%;
   max-width: 230px;
   min-height: 210px;
   background: var(--paper);
@@ -168,9 +168,6 @@ h1 {
   margin-top: 30px;
 }
 .stage:nth-child(2) {
-  margin-top: 0;
-}
-.stage:nth-child(3) {
   margin-top: 55px;
 }
 .stage:not(:disabled):hover {
@@ -553,14 +550,13 @@ footer {
     text-align: left;
   }
   .stage:nth-child(1),
-  .stage:nth-child(2),
-  .stage:nth-child(3) {
+  .stage:nth-child(2) {
     margin-top: 0;
   }
   .stage:nth-child(1) {
     align-self: flex-start;
   }
-  .stage:nth-child(3) {
+  .stage:nth-child(2) {
     align-self: flex-end;
   }
   .stage-icon {
