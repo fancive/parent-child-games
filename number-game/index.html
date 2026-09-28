@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#d9edb5" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'"
+    />
+    <title>数字冒险 · 小兔的野餐之旅</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a href="../index.html" class="home-link">⌂ 游戏乐园</a>
+      <span class="brand">🐰 数字冒险</span>
+      <button id="voice" class="quiet" aria-pressed="false">声音：关</button>
+    </header>
+    <main>
+      <section id="map" aria-labelledby="map-title">
+        <div class="intro">
+          <span class="little-cloud cloud-one" aria-hidden="true">☁</span>
+          <span class="little-cloud cloud-two" aria-hidden="true">☁</span>
+          <p class="invitation">小兔的野餐之旅</p>
+          <h1 id="map-title" tabindex="-1">带上数字，一起出发！</h1>
+          <p>数一数、加一加、减一减，帮朋友们准备野餐。</p>
+        </div>
+        <div class="adventure-map">
+          <svg class="trail" viewBox="0 0 900 330" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M100 190 C230 310 300 40 445 150 S690 300 800 100" />
+          </svg>
+          <span class="scenery tree" aria-hidden="true">🌳</span>
+          <span class="scenery rabbit" aria-hidden="true">🐰</span>
+          <span class="scenery picnic" aria-hidden="true">🧺</span>
+          <div id="stages" class="stages"></div>
+        </div>
+        <div class="map-bottom">
+          <p id="collection" class="collection"></p>
+          <button id="resume" class="primary" hidden>继续冒险</button>
+          <p class="grownup-note">每站 5 题 · 不用赶时间 · 点一点物品就能数数</p>
+        </div>
+      </section>
+      <section id="play" aria-labelledby="question-title" hidden>
+        <div class="play-top">
+          <button id="to-map" class="quiet">‹ 冒险地图</button><span id="stage-name"></span
+          ><span id="progress-label"></span>
+        </div>
+        <div id="steps" class="steps" aria-label="本关进度"></div>
+        <div class="question-heading">
+          <p id="story"></p>
+          <h1 id="question-title" tabindex="-1"></h1>
+          <button id="read" class="quiet" aria-label="朗读题目">♫ 听题目</button>
+        </div>
+        <div id="equation" class="equation" aria-label="算式"></div>
+        <div id="objects" class="objects"></div>
+        <p id="count-help" class="count-help" aria-live="polite">点一点物品，一起数数。</p>
+        <div id="answers" class="answers" role="group" aria-label="选择答案"></div>
+        <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+        <button id="next" class="primary next" hidden>下一题</button>
+      </section>
+      <section id="celebrate" class="celebrate" aria-labelledby="reward-title" hidden>
+        <div class="reward-art" aria-hidden="true">🐰 🧺</div>
+        <p id="reward-subtitle"></p>
+        <h1 id="reward-title" tabindex="-1"></h1>
+        <p id="reward-description"></p>
+        <div id="badges" class="badges"></div>
+        <button id="continue" class="primary">去下一站</button>
+        <button id="reward-map" class="quiet">回到冒险地图</button>
+      </section>
+      <p id="storage-note" class="storage-note" role="status"></p>
+    </main>
+    <footer>和宝贝一起，慢慢发现数字的乐趣。</footer>
+    <script src="model.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>

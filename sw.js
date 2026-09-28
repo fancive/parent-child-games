@@ -1,4 +1,4 @@
-const CACHE = 'pcg-v8-mobile-layout';
+const CACHE = 'pcg-v9-number-adventure';
 const ASSETS = [
   './',
   './index.html',
@@ -35,6 +35,10 @@ const ASSETS = [
   './princess-dressup/data.js',
   './princess-dressup/renderer.js',
   './princess-dressup/game.js',
+  './number-game/index.html',
+  './number-game/styles.css',
+  './number-game/model.js',
+  './number-game/game.js',
   './offline.html',
 ];
 
