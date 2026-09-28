@@ -50,9 +50,9 @@ test('wrong answers, skipping and repeated answers never advance or duplicate re
   assert.equal(game.progress.round.index, 1);
 });
 
-test('ten problems unlock two stages; replay never removes completed stages', () => {
+test('fifteen problems unlock three stages; replay never removes completed stages', () => {
   const game = new Adventure();
-  for (let stage = 0; stage < 2; stage++) {
+  for (let stage = 0; stage < 3; stage++) {
     assert.equal(game.start(stage, 123), true);
     for (let i = 0; i < 5; i++) {
       game.answer(game.question.answer);
@@ -68,7 +68,7 @@ test('ten problems unlock two stages; replay never removes completed stages', ()
     game.answer(game.question.answer);
     game.next();
   }
-  assert.equal(game.progress.completed, 2);
+  assert.equal(game.progress.completed, 3);
 });
 
 test('refresh restores the exact question, choices and solved state', () => {
@@ -136,7 +136,7 @@ test('legacy counting progress is removed without unlocking subtraction', () => 
       completed,
       round: { stage: 0, index: 4, seed: 42, solved: true },
     });
-    assert.equal(progress.version, 2);
+    assert.equal(progress.version, 3);
     assert.equal(progress.completed, 0);
     assert.equal(progress.round, null);
     const game = new Adventure(progress);
@@ -168,13 +168,80 @@ test('legacy arithmetic saves keep their exact question and migrate only once', 
   assert.equal(restore({ version: 1, completed: 3, round: null }).completed, 2);
 });
 
-test('map and entry advertise only addition and subtraction', () => {
+test('map offers two introductory stages then advanced arithmetic', () => {
   assert.deepEqual(
     Array.from(sandbox.window.NumberAdventure.LEVELS, (level) => level.skill),
-    ['加一加', '减一减'],
+    ['加一加', '减一减', '20 以内加减法'],
   );
   const html = readFileSync(new URL('number-game/index.html', root), 'utf8');
   const home = readFileSync(new URL('index.html', root), 'utf8');
   assert.doesNotMatch(html, /数一数、|苹果林/);
   assert.doesNotMatch(home, /陪小兔数苹果/);
+});
+
+test('advanced rounds mix arithmetic within twenty with crossing-ten examples', () => {
+  let sawZero = false;
+  for (let seed = 0; seed < 500; seed++) {
+    const batch = questions(2, seed);
+    assert.equal(batch.length, 5);
+    assert.deepEqual(
+      Array.from(batch, (q) => q.operation),
+      ['+', '−', '+', '−', '+'],
+    );
+    for (const q of batch) {
+      assert.equal(q.answer, q.operation === '+' ? q.a + q.b : q.a - q.b);
+      assert.ok([q.a, q.b, q.answer].every((n) => Number.isInteger(n) && n >= 0 && n <= 20));
+      assert.equal(q.options.length, 3);
+      assert.equal(new Set(q.options).size, 3);
+      assert.ok(q.options.includes(q.answer));
+      assert.ok(q.options.every((n) => Number.isInteger(n) && n >= 0 && n <= 20));
+      if (q.answer === 0) sawZero = true;
+    }
+    assert.ok(batch[2].a < 10 && batch[2].b < 10 && batch[2].answer > 10);
+    assert.ok(batch[3].a > 10 && batch[3].b > batch[3].a % 10 && batch[3].answer < 10);
+    assert.equal(batch[4].answer, 20);
+  }
+  assert.ok(sawZero, 'zero remains a valid subtraction result');
+});
+
+test('previous two-stage completion unlocks the new stage without completing it', () => {
+  for (const saved of [
+    { version: 2, completed: 2, round: null },
+    { version: 1, completed: 3, round: null },
+  ]) {
+    const game = new Adventure(saved);
+    assert.equal(game.progress.completed, 2);
+    assert.equal(game.start(2, 42), true);
+    assert.equal(game.start(3), false);
+    const before = game.serialize();
+    assert.equal(game.answer(game.question.answer + 1), 'retry');
+    assert.equal(game.serialize(), before);
+    game.answer(game.question.answer);
+    const restored = new Adventure(game.serialize());
+    assert.equal(restored.progress.round.stage, 2);
+    assert.equal(restored.progress.round.solved, true);
+    assert.deepEqual(
+      JSON.parse(JSON.stringify(restored.question)),
+      JSON.parse(JSON.stringify(game.question)),
+    );
+    assert.equal(restored.answer(restored.question.answer), 'ignored');
+    assert.equal(restored.next(), 'question');
+    assert.equal(restored.progress.round.index, 1);
+  }
+  assert.equal(new Adventure({ version: 2, completed: 1, round: null }).start(2), false);
+});
+
+test('version two in-flight questions survive upgrade exactly', () => {
+  for (const stage of [0, 1]) {
+    const original = {
+      version: 2,
+      completed: stage,
+      round: { stage, index: 3, seed: 71, solved: true },
+    };
+    const game = new Adventure(original);
+    assert.deepEqual(JSON.parse(JSON.stringify(game.progress.round)), original.round);
+    assert.equal(game.progress.completed, stage);
+    assert.equal(game.progress.version, 3);
+    assert.equal(new Adventure(game.serialize()).serialize(), game.serialize());
+  }
 });

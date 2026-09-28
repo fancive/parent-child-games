@@ -17,6 +17,14 @@
       intro: '给朋友们分草莓',
       reward: '分享徽章',
     },
+    {
+      name: '星光山坡',
+      skill: '20 以内加减法',
+      icon: '🌟',
+      item: '星星',
+      intro: '点亮山坡上的星星',
+      reward: '星光徽章',
+    },
   ];
   const LENGTH = 5;
   function randomFrom(seed) {
@@ -32,16 +40,36 @@
     return Array.from({ length: LENGTH }, (_, i) => {
       let a;
       let b = 0;
+      let operation = null;
       if (stage === 0) {
         const total = int(2 + i * 2, Math.min(10, 3 + i * 2));
         a = int(1, total - 1);
         b = total - a;
-      } else {
+      } else if (stage === 1) {
         a = int(2 + i, Math.min(10, 5 + i));
         b = i === LENGTH - 1 ? a : int(1, a - 1);
+      } else {
+        operation = i % 2 === 0 ? '+' : '−';
+        if (i === 2) {
+          // Both groups are below ten, but combining them crosses ten.
+          a = int(6, 9);
+          b = int(11 - a, 9);
+        } else if (i === 3) {
+          // Taking away more than the ones digit requires breaking a ten.
+          a = int(11, 18);
+          b = int(a - 9, 9);
+        } else if (operation === '+') {
+          a = int(10, 15);
+          b = i === LENGTH - 1 ? 20 - a : int(1, 20 - a);
+        } else {
+          a = int(11, 20);
+          b = int(1, a);
+        }
       }
-      const answer = stage === 0 ? a + b : a - b;
-      const candidates = Array.from({ length: 11 }, (_, n) => n).filter((n) => n !== answer);
+      const answer = stage === 0 || operation === '+' ? a + b : a - b;
+      const candidates = Array.from({ length: stage === 2 ? 21 : 11 }, (_, n) => n).filter(
+        (n) => n !== answer,
+      );
       const options = [answer];
       while (options.length < 3)
         options.push(candidates.splice(int(0, candidates.length - 1), 1)[0]);
@@ -49,26 +77,26 @@
         const k = int(0, j);
         [options[j], options[k]] = [options[k], options[j]];
       }
-      return { a, b, answer, options };
+      return operation ? { a, b, answer, options, operation } : { a, b, answer, options };
     });
   }
   function fresh() {
-    return { version: 2, completed: 0, round: null };
+    return { version: 3, completed: 0, round: null };
   }
   function restore(raw) {
     try {
       const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
       if (
         !data ||
-        ![1, 2].includes(data.version) ||
+        ![1, 2, 3].includes(data.version) ||
         !Number.isInteger(data.completed) ||
         data.completed < 0 ||
-        data.completed > (data.version === 1 ? 3 : LEVELS.length)
+        data.completed > (data.version === 1 ? 3 : data.version === 2 ? 2 : LEVELS.length)
       )
         return fresh();
       const legacy = data.version === 1;
       const result = {
-        version: 2,
+        version: 3,
         completed: legacy ? Math.max(0, data.completed - 1) : data.completed,
         round: null,
       };
@@ -77,7 +105,7 @@
         r &&
         Number.isInteger(r.stage) &&
         r.stage >= 0 &&
-        r.stage < (legacy ? 3 : LEVELS.length) &&
+        r.stage < (legacy ? 3 : data.version === 2 ? 2 : LEVELS.length) &&
         (!legacy || r.stage > 0) &&
         r.stage <= data.completed &&
         Number.isInteger(r.index) &&

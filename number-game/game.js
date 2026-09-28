@@ -71,18 +71,19 @@
     if (r) $('resume').textContent = `继续${LEVELS[r.stage].name} · 第 ${r.index + 1} 题`;
     $('collection').textContent =
       game.progress.completed === LEVELS.length
-        ? '🥕 🍓 野餐准备好啦！也可以再去玩一遍。'
+        ? '🥕 🍓 🌟 野餐准备好啦！也可以再去玩一遍。'
         : `🧺 野餐徽章 ${game.progress.completed} / ${LEVELS.length}`;
     screen('map', focus ? 'map-title' : null);
   }
-  function makePile(amount, title, icon, given = false) {
+  function makePile(amount, title, icon, given = false, tens = false) {
     const pile = document.createElement('div');
     pile.className = given ? 'pile given' : 'pile';
     const label = document.createElement('p');
     label.className = 'pile-label';
     label.textContent = title;
     const tokens = document.createElement('div');
-    tokens.className = 'tokens';
+    tokens.className = tens ? 'ten-groups' : 'tokens';
+    let tokenGroup = tokens;
     pile.append(label, tokens);
     if (amount === 0) {
       const zero = document.createElement('p');
@@ -91,10 +92,16 @@
       tokens.appendChild(zero);
     }
     for (let i = 0; i < amount; i++) {
+      if (tens && i % 10 === 0) {
+        tokenGroup = document.createElement('div');
+        tokenGroup.className = 'ten-group';
+        tokenGroup.setAttribute('aria-label', '每框最多 10 颗星星');
+        tokens.appendChild(tokenGroup);
+      }
       const token = document.createElement(given ? 'span' : 'button');
       token.className = 'token';
       token.textContent = icon;
-      if (given) token.setAttribute('aria-label', '已送走的草莓');
+      if (given) token.setAttribute('aria-label', `已送走的${icon === '🌟' ? '星星' : '草莓'}`);
       else {
         token.setAttribute('aria-label', `${title}，第 ${i + 1} 个，点一点数数`);
         token.setAttribute('aria-pressed', 'false');
@@ -111,7 +118,7 @@
           speak(String(counted));
         });
       }
-      tokens.appendChild(token);
+      tokenGroup.appendChild(token);
     }
     return pile;
   }
@@ -132,31 +139,42 @@
         `<span class="step ${i < r.index ? 'done' : i === r.index ? 'current' : ''}" aria-hidden="true"></span>`,
     ).join('');
     $('steps').setAttribute('aria-label', `第 ${r.index + 1} 题，共 ${LENGTH} 题`);
-    $('story').textContent =
-      r.stage === 0
-        ? `摘了 ${q.a} 根，又摘了 ${q.b} 根。`
-        : `有 ${q.a} 颗草莓，送给朋友 ${q.b} 颗。`;
-    $('question-title').textContent = r.stage === 0 ? '一共有几根胡萝卜？' : '还剩下几颗草莓？';
-    $('equation').textContent = `${q.a} ${r.stage === 0 ? '+' : '−'} ${q.b} = ?`;
+    const advanced = r.stage === 2;
+    const addition = advanced ? q.operation === '+' : r.stage === 0;
+    const unit = advanced ? '颗' : addition ? '根' : '颗';
+    const item = advanced ? '星星' : addition ? '胡萝卜' : '草莓';
+    $('story').textContent = addition
+      ? `${advanced ? '亮了' : '摘了'} ${q.a} ${unit}，又${advanced ? '亮了' : '摘了'} ${q.b} ${unit}。`
+      : `有 ${q.a} ${unit}${item}，送给朋友 ${q.b} ${unit}。`;
+    $('question-title').textContent = addition
+      ? `一共有几${unit}${item}？`
+      : `还剩下几${unit}${item}？`;
+    $('equation').textContent = `${q.a} ${addition ? '+' : '−'} ${q.b} = ?`;
     $('objects').replaceChildren();
-    if (r.stage === 0) {
+    $('objects').classList.toggle('advanced', advanced);
+    if (addition) {
       const plus = document.createElement('span');
       plus.className = 'operator';
       plus.textContent = '+';
       plus.setAttribute('aria-hidden', 'true');
       $('objects').append(
-        makePile(q.a, '先摘的', level.icon),
+        makePile(q.a, advanced ? '先亮起的' : '先摘的', level.icon, false, advanced),
         plus,
-        makePile(q.b, '又摘的', level.icon),
+        makePile(q.b, advanced ? '又亮起的' : '又摘的', level.icon, false, advanced),
       );
     } else {
       $('objects').append(
-        makePile(q.b, '送给朋友的', level.icon, true),
-        makePile(q.answer, '留下的', level.icon),
+        makePile(q.b, '送给朋友的', level.icon, true, advanced),
+        makePile(q.answer, '留下的', level.icon, false, advanced),
       );
     }
-    $('count-help').textContent =
-      r.stage === 1
+    $('count-help').textContent = advanced
+      ? addition
+        ? '每框最多 10 颗。先找出一组十，再加上剩下的。'
+        : q.answer === 0
+          ? '全都送走了，就是 0。'
+          : '每框最多 10 颗，只看留下的星星。'
+      : !addition
         ? q.answer === 0
           ? '一个也没留下，就是 0。'
           : '点一点留下的草莓，送走的不用数。'
@@ -209,7 +227,7 @@
       ? '开饭啦，数字小探险家！'
       : `收好你的${LEVELS[lastStage].reward}！`;
     $('reward-description').textContent = all
-      ? '会加法、会减法、会分享。谢谢你帮小兔准备了这场野餐！'
+      ? '20 以内的加减法也完成啦。谢谢你帮小兔准备了这场野餐！'
       : '这一站完成啦！带着新本领，去看看下一站吧。';
     $('badges').innerHTML = LEVELS.slice(0, game.progress.completed)
       .map(
