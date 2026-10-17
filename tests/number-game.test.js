@@ -1,12 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import vm from 'node:vm';
 const root = new URL('../', import.meta.url);
 const code = readFileSync(new URL('number-game/model.js', root), 'utf8');
 const sandbox = { window: {} };
 vm.runInNewContext(code, sandbox);
-const { Adventure, questions, restore } = sandbox.window.NumberAdventure;
+const { Adventure, questions, restore, LEVELS } = sandbox.window.NumberAdventure;
 
 test('all generated problems have valid arithmetic and three distinct bounded choices', () => {
   for (let seed = 0; seed < 500; seed++) {
@@ -50,9 +51,9 @@ test('wrong answers, skipping and repeated answers never advance or duplicate re
   assert.equal(game.progress.round.index, 1);
 });
 
-test('twenty problems unlock four stages; replay never removes completed stages', () => {
+test('forty problems unlock eight stages; replay never removes completed stages', () => {
   const game = new Adventure();
-  for (let stage = 0; stage < 4; stage++) {
+  for (let stage = 0; stage < 8; stage++) {
     assert.equal(game.start(stage + 1, 123), false);
     assert.equal(game.start(stage, 123), true);
     for (let i = 0; i < 5; i++) {
@@ -69,7 +70,7 @@ test('twenty problems unlock four stages; replay never removes completed stages'
     game.answer(game.question.answer);
     game.next();
   }
-  assert.equal(game.progress.completed, 4);
+  assert.equal(game.progress.completed, 8);
 });
 
 test('refresh restores the exact question, choices and solved state', () => {
@@ -137,7 +138,7 @@ test('legacy counting progress is removed without unlocking subtraction', () => 
       completed,
       round: { stage: 0, index: 4, seed: 42, solved: true },
     });
-    assert.equal(progress.version, 4);
+    assert.equal(progress.version, 5);
     assert.equal(progress.completed, 0);
     assert.equal(progress.round, null);
     const game = new Adventure(progress);
@@ -172,7 +173,16 @@ test('legacy arithmetic saves keep their exact question and migrate only once', 
 test('map offers introductory arithmetic, twenty-range arithmetic and missing numbers', () => {
   assert.deepEqual(
     Array.from(sandbox.window.NumberAdventure.LEVELS, (level) => level.skill),
-    ['加一加', '减一减', '20 以内加减法', '20 以内填空加减法'],
+    [
+      '加一加',
+      '减一减',
+      '20 以内加减法',
+      '20 以内填空加减法',
+      '50 以内加减法',
+      '50 以内填空加减法',
+      '100 以内加减法',
+      '100 以内填空加减法',
+    ],
   );
   const html = readFileSync(new URL('number-game/index.html', root), 'utf8');
   const home = readFileSync(new URL('index.html', root), 'utf8');
@@ -242,7 +252,7 @@ test('version two in-flight questions survive upgrade exactly', () => {
     const game = new Adventure(original);
     assert.deepEqual(JSON.parse(JSON.stringify(game.progress.round)), original.round);
     assert.equal(game.progress.completed, stage);
-    assert.equal(game.progress.version, 4);
+    assert.equal(game.progress.version, 5);
     assert.equal(new Adventure(game.serialize()).serialize(), game.serialize());
   }
 });
@@ -269,19 +279,26 @@ const oldQuestionFixtures = [
     { a: 18, b: 9, answer: 9, options: [3, 9, 12], operation: '−' },
     { a: 15, b: 5, answer: 20, options: [16, 20, 2], operation: '+' },
   ],
+  [
+    { a: 7, b: 4, operation: '+', result: 11, unknown: 'b', answer: 4, options: [11, 12, 4] },
+    { a: 11, b: 5, operation: '−', result: 6, unknown: 'a', answer: 11, options: [11, 6, 2] },
+    { a: 17, b: 2, operation: '+', result: 19, unknown: 'a', answer: 17, options: [17, 19, 12] },
+    { a: 11, b: 3, operation: '−', result: 8, unknown: 'b', answer: 3, options: [3, 8, 20] },
+    { a: 20, b: 20, operation: '−', result: 0, unknown: 'b', answer: 20, options: [11, 0, 20] },
+  ],
 ];
 
-test('all original stage questions and choices retain the pre-upgrade fixed seed fixtures', () => {
-  for (let stage = 0; stage < 3; stage++) {
+test('all four original stages retain the 99ab414 question and choice fixtures', () => {
+  for (let stage = 0; stage < 4; stage++) {
     assert.deepEqual(JSON.parse(JSON.stringify(questions(stage, 42))), oldQuestionFixtures[stage]);
     for (const solved of [false, true]) {
       const original = {
-        version: 3,
+        version: 4,
         completed: stage,
         round: { stage, index: 3, seed: 42, solved },
       };
       const game = new Adventure(original);
-      assert.equal(game.progress.version, 4);
+      assert.equal(game.progress.version, 5);
       assert.equal(game.progress.completed, stage);
       assert.deepEqual(JSON.parse(JSON.stringify(game.progress.round)), original.round);
       assert.deepEqual(JSON.parse(JSON.stringify(game.question)), oldQuestionFixtures[stage][3]);
@@ -341,7 +358,7 @@ test('version three completion unlocks rainbow but cannot claim fourth-stage pro
     });
     assert.equal(progress.round, null);
     assert.equal(progress.completed, completed === 3 ? 3 : 0);
-    assert.equal(progress.version, 4);
+    assert.equal(progress.version, 5);
   }
   assert.equal(restore({ version: 4, completed: 5, round: null }).completed, 0);
 });
@@ -356,7 +373,7 @@ test('rainbow retries, refresh, solved refresh and replay preserve progress and 
     assert.equal(game.answer(wrong), 'retry');
     assert.equal(game.serialize(), before);
     let restored = new Adventure(before);
-    assert.equal(restored.progress.version, 4);
+    assert.equal(restored.progress.version, 5);
     assert.equal(restored.progress.round.stage, 3);
     assert.equal(JSON.stringify(restored.question), JSON.stringify(game.question));
     assert.equal(restored.progress.round.solved, false);
@@ -379,5 +396,219 @@ test('rainbow retries, refresh, solved refresh and replay preserve progress and 
       game.next();
     }
     assert.equal(game.progress.completed, 4);
+  }
+});
+
+test('eight levels increase the numeric range every two stages', () => {
+  assert.equal(LEVELS.length, 8);
+  assert.deepEqual(
+    Array.from(LEVELS, (level) => level.max),
+    [10, 10, 20, 20, 50, 50, 100, 100],
+  );
+  assert.deepEqual(
+    Array.from(LEVELS, (level) => level.kind),
+    ['addition', 'subtraction', 'mixed', 'missing', 'mixed', 'missing', 'mixed', 'missing'],
+  );
+  assert.deepEqual(
+    Array.from(LEVELS.slice(4), (level) => [level.name, level.icon, level.reward]),
+    [
+      ['松果溪谷', '🪵', '溪谷徽章'],
+      ['迷雾森林', '🌲', '森林徽章'],
+      ['云朵城堡', '🏰', '城堡徽章'],
+      ['星空航站', '🚀', '航站徽章'],
+    ],
+  );
+});
+
+test('the original four stages retain every generated question and option across 500 seeds', () => {
+  // Captured from the published fourth-level candidate 99ab414 before this expansion.
+  const hash = createHash('sha256');
+  for (let seed = 0; seed < 500; seed++) {
+    for (let stage = 0; stage < 4; stage++)
+      hash.update(JSON.stringify(questions(stage, seed)) + '\n');
+  }
+  assert.equal(
+    hash.digest('hex'),
+    '9f0ad2496477267ce613412195f807f81b6b20b9824555d4e01af9355643b0b3',
+  );
+});
+
+test('new fifty and hundred rounds use larger numbers, carrying, borrowing and bounded distinct choices', () => {
+  for (let stage = 4; stage < 8; stage++) {
+    const { max, kind } = LEVELS[stage];
+    const previousMax = LEVELS[stage - 2].max;
+    const boundaryAnswers = new Set();
+    for (let seed = 0; seed < 500; seed++) {
+      const batch = questions(stage, seed);
+      assert.equal(batch.length, 5);
+      assert.equal(JSON.stringify(batch), JSON.stringify(questions(stage, seed)));
+      assert.ok(batch.some((q) => q.operation === '+'));
+      assert.ok(batch.some((q) => q.operation === '−'));
+      const skills = new Set();
+      for (const q of batch) {
+        const result = q.operation === '+' ? q.a + q.b : q.a - q.b;
+        const values = [q.a, q.b, q.answer, ...q.options];
+        assert.ok(['+', '−'].includes(q.operation));
+        assert.ok(
+          [q.a, q.b, result].some((n) => n > previousMax),
+          'each question reaches the new range',
+        );
+        assert.equal(q.options.length, 3);
+        assert.equal(new Set(q.options).size, 3);
+        assert.ok(q.options.includes(q.answer));
+        if (kind === 'missing') {
+          assert.ok(['a', 'b'].includes(q.unknown));
+          assert.equal(q.result, result);
+          assert.equal(q.answer, q[q.unknown]);
+          assert.notEqual(
+            q.answer,
+            q.result,
+            'solve the unknown operand rather than the visible result',
+          );
+          assert.ok(
+            q.options.includes(q.result),
+            'the visible result remains a meaningful distractor',
+          );
+          values.push(q.result);
+          skills.add(`${q.operation}${q.unknown}`);
+        } else {
+          assert.equal(q.answer, result);
+          assert.equal(q.result, undefined);
+          assert.equal(q.unknown, undefined);
+        }
+        assert.ok(values.every((n) => Number.isInteger(n) && n >= 0 && n <= max));
+      }
+      assert.ok(
+        batch.some((q) => q.operation === '+' && (q.a % 10) + (q.b % 10) >= 10),
+        'each round includes carrying',
+      );
+      assert.ok(
+        batch.some((q) => q.operation === '−' && q.b % 10 > q.a % 10),
+        'each round includes borrowing',
+      );
+      if (kind === 'missing') {
+        for (const skill of ['+a', '+b', '−a', '−b']) assert.ok(skills.has(skill));
+        assert.ok(
+          batch.some((q) => q.answer > previousMax),
+          'unknown operands also reach the new range',
+        );
+      }
+      assert.ok([0, max].includes(batch[4].answer), 'last question practices a range boundary');
+      boundaryAnswers.add(batch[4].answer);
+    }
+    assert.ok(
+      boundaryAnswers.has(0) && boundaryAnswers.has(max),
+      'both boundaries occur across seeds',
+    );
+  }
+});
+
+test('version four completion unlocks the fifth stage without claiming the eight-stage finale', () => {
+  const game = new Adventure({ version: 4, completed: 4, round: null });
+  assert.equal(game.progress.version, 5);
+  assert.equal(game.progress.completed, 4);
+  assert.equal(game.start(4, 42), true);
+  assert.equal(game.start(5, 42), false);
+  assert.equal(game.progress.completed < LEVELS.length, true);
+  assert.equal(
+    restore({ version: 4, completed: 4, round: { stage: 4, index: 1, seed: 42, solved: false } })
+      .round,
+    null,
+  );
+  assert.equal(
+    restore({ version: 4, completed: 5, round: { stage: 4, index: 1, seed: 42, solved: false } })
+      .completed,
+    0,
+  );
+});
+
+test('every historical save version retains its own completed and active-stage limit', () => {
+  for (const [version, limit] of [
+    [1, 3],
+    [2, 2],
+    [3, 3],
+    [4, 4],
+    [5, 8],
+  ]) {
+    assert.equal(restore({ version, completed: limit + 1, round: null }).completed, 0);
+    const restored = restore({
+      version,
+      completed: limit,
+      round: { stage: limit, index: 1, seed: 42, solved: false },
+    });
+    assert.equal(restored.version, 5);
+    assert.equal(restored.completed, version === 1 ? limit - 1 : limit);
+    assert.equal(restored.round, null);
+  }
+});
+
+test('all historical in-flight arithmetic questions retain seed, index, options and solved status', () => {
+  for (const [version, count] of [
+    [1, 2],
+    [2, 2],
+    [3, 3],
+    [4, 4],
+  ]) {
+    for (let stage = 0; stage < count; stage++) {
+      for (let index = 0; index < 5; index++) {
+        for (const solved of [false, true]) {
+          const oldStage = version === 1 ? stage + 1 : stage;
+          const saved = {
+            version,
+            completed: oldStage,
+            round: { stage: oldStage, index, seed: 42, solved },
+          };
+          const game = new Adventure(saved);
+          assert.equal(game.progress.version, 5);
+          assert.equal(game.progress.completed, stage);
+          assert.deepEqual(JSON.parse(JSON.stringify(game.progress.round)), {
+            stage,
+            index,
+            seed: 42,
+            solved,
+          });
+          assert.deepEqual(
+            JSON.parse(JSON.stringify(game.question)),
+            oldQuestionFixtures[stage][index],
+          );
+          assert.equal(new Adventure(game.serialize()).serialize(), game.serialize());
+        }
+      }
+    }
+  }
+});
+
+test('new stages retain retries, refresh, solved refresh, repeated answers and replay without losing unlocks', () => {
+  let game = new Adventure({ version: 4, completed: 4, round: null });
+  for (let stage = 4; stage < 8; stage++) {
+    assert.equal(game.start(stage, 71), true);
+    for (let index = 0; index < 5; index++) {
+      const before = game.serialize();
+      const question = JSON.stringify(game.question);
+      const wrong = game.question.options.find((value) => value !== game.question.answer);
+      assert.equal(game.next(), 'ignored');
+      assert.equal(game.answer(wrong), 'retry');
+      assert.equal(game.serialize(), before);
+      game = new Adventure(before);
+      assert.equal(JSON.stringify(game.question), question);
+      assert.equal(game.progress.round.index, index);
+      assert.equal(game.answer(game.question.answer), 'correct');
+      game = new Adventure(game.serialize());
+      assert.equal(JSON.stringify(game.question), question);
+      assert.equal(game.progress.round.solved, true);
+      assert.equal(game.answer(game.question.answer), 'ignored');
+      assert.equal(game.progress.completed, stage);
+      assert.equal(game.next(), index === 4 ? 'complete' : 'question');
+    }
+    assert.equal(game.progress.completed, stage + 1);
+    assert.equal(game.progress.round, null);
+  }
+  for (const stage of [0, 4, 7]) {
+    assert.equal(game.start(stage, 42), true);
+    for (let index = 0; index < 5; index++) {
+      game.answer(game.question.answer);
+      game.next();
+    }
+    assert.equal(game.progress.completed, 8);
   }
 });

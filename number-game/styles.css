@@ -43,6 +43,7 @@ a:focus-visible {
   display: none !important;
 }
 h1,
+h2,
 p {
   margin: 0;
 }
@@ -121,9 +122,9 @@ h1 {
 .adventure-map {
   position: relative;
   background: var(--grass);
-  border-radius: 49% 43% 35px 35px / 30% 28% 35px 35px;
+  border-radius: 70px 70px 35px 35px;
   margin-top: 36px;
-  padding: 25px 32px 45px;
+  padding: 25px 26px 52px;
   min-height: 330px;
   border-bottom: 8px solid #badb91;
 }
@@ -144,10 +145,35 @@ h1 {
 .stages {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
-  gap: 16px;
+  gap: 22px;
   z-index: 1;
+}
+.stage-group {
+  min-width: 0;
+  padding: 16px;
+  background: #ffffff66;
+  border: 2px solid #a9ca88;
+  border-radius: 30px;
+}
+.stage-group h2 {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 6px 12px;
+  margin-bottom: 16px;
+  font-size: 24px;
+}
+.stage-group h2 span {
+  font-size: 14px;
+  font-weight: 600;
+}
+.stage-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 .stage {
   width: 100%;
@@ -164,18 +190,6 @@ h1 {
   gap: 7px;
   transition: transform 0.15s;
 }
-.stage:nth-child(1) {
-  margin-top: 30px;
-}
-.stage:nth-child(2) {
-  margin-top: 0;
-}
-.stage:nth-child(3) {
-  margin-top: 55px;
-}
-.stage:nth-child(4) {
-  margin-top: 18px;
-}
 .stage:not(:disabled):hover {
   transform: translateY(-5px);
 }
@@ -189,7 +203,13 @@ h1 {
   line-height: 1.2;
 }
 .stage strong {
-  font-size: 23px;
+  font-size: 22px;
+}
+.stage-number {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #557644;
 }
 .stage small {
   font-size: 14px;
@@ -269,6 +289,11 @@ h1 {
 }
 #stage-name {
   font-weight: 800;
+  text-align: center;
+  line-height: 1.6;
+}
+#progress-label {
+  flex-shrink: 0;
 }
 .steps {
   display: flex;
@@ -308,7 +333,7 @@ h1 {
   font-size: 34px;
   font-weight: 800;
   margin: 14px 0;
-  letter-spacing: 6px;
+  letter-spacing: 3px;
 }
 .objects {
   background: var(--paper);
@@ -342,6 +367,9 @@ h1 {
 }
 .token {
   position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
   background: #edf3dd;
   border-radius: 16px;
   width: 58px;
@@ -358,8 +386,9 @@ h1 {
   position: absolute;
   top: -6px;
   right: -5px;
-  width: 23px;
+  min-width: 23px;
   height: 23px;
+  padding: 0 4px;
   border-radius: 50%;
   background: var(--ink);
   color: white;
@@ -531,7 +560,7 @@ h1 {
   flex-wrap: wrap;
   justify-content: center;
   gap: 18px;
-  max-width: 454px;
+  max-width: 600px;
   margin: 28px auto;
 }
 .badge {
@@ -578,17 +607,14 @@ footer {
 }
 @media (min-width: 601px) and (max-width: 900px) {
   .stages {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
+    grid-template-columns: minmax(0, 1fr);
   }
-  .stage:nth-child(n) {
-    margin-top: 0;
-    max-width: 260px;
-    min-height: 210px;
-    justify-self: center;
+  .stage {
+    min-height: 205px;
   }
-  .adventure-map {
-    border-radius: 60px 60px 35px 35px;
+  .stage-pair {
+    max-width: 570px;
+    margin: auto;
   }
 }
 @media (max-width: 600px) {
@@ -623,36 +649,32 @@ footer {
     margin-top: 15px;
   }
   .stages {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    grid-template-columns: minmax(0, 1fr);
     gap: 18px;
   }
+  .stage-group {
+    padding: 12px 10px;
+    border-radius: 28px;
+  }
+  .stage-group h2 {
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+  .stage-pair {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
   .stage {
-    min-height: 110px;
-    width: 84%;
-    max-width: 300px;
-    border-radius: 36px;
-    padding: 13px 14px;
+    min-height: 125px;
+    border-radius: 28px;
+    padding: 13px 12px;
     display: grid;
-    grid-template-columns: 55px 1fr;
-    gap: 5px 10px;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 4px 8px;
     text-align: left;
   }
-  .stage:nth-child(1),
-  .stage:nth-child(2),
-  .stage:nth-child(3),
-  .stage:nth-child(4) {
-    margin-top: 0;
-  }
-  .stage:nth-child(odd) {
-    align-self: flex-start;
-  }
-  .stage:nth-child(even) {
-    align-self: flex-end;
-  }
   .stage-icon {
-    grid-row: span 3;
+    grid-row: span 4;
     font-size: 43px;
   }
   .stage strong {
@@ -730,7 +752,7 @@ footer {
     font-size: 12px;
   }
   .badges {
-    max-width: 178px;
+    max-width: 390px;
     gap: 12px;
   }
   .reward-art {
@@ -796,5 +818,59 @@ footer {
   }
   .equation {
     letter-spacing: 3px;
+  }
+}
+
+.place-value {
+  display: grid;
+  gap: 12px;
+}
+.value-section {
+  padding: 10px 8px;
+  border: 2px solid #d5b766;
+  border-radius: 18px;
+  background: #fff8db;
+}
+.value-label {
+  margin-bottom: 10px;
+  text-align: center;
+  color: #6f6036;
+  font-size: 13px;
+  font-weight: 700;
+}
+.value-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 9px;
+}
+.ten-token {
+  border: 2px solid #c49c3f;
+  border-radius: 10px;
+  background: repeating-linear-gradient(90deg, #f9dc79 0 9px, #efd070 9px 11px);
+  font-size: 25px;
+  font-weight: 900;
+  color: #57431d;
+  text-shadow: 0 1px #fffbe7;
+}
+.ten-token.counted {
+  background: #dceeca;
+  border-color: #528840;
+}
+.grouped .pile-label {
+  font-weight: 700;
+}
+.grouped .parts > .pile {
+  flex-basis: 0;
+}
+@media (max-width: 600px) {
+  .value-section {
+    padding: 10px 6px;
+  }
+  .value-tokens {
+    gap: 8px;
+  }
+  .ten-token {
+    font-size: 23px;
   }
 }

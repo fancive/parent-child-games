@@ -48,23 +48,41 @@
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
   function renderMap(focus = true) {
+    $('map-description').textContent =
+      `每两关升一级，从 10 以内到 ${LEVELS.at(-1).max} 以内，走过 ${LEVELS.length} 站，集齐野餐徽章。`;
     $('stages').replaceChildren();
     LEVELS.forEach((level, index) => {
+      if (index % 2 === 0) {
+        const group = document.createElement('section');
+        group.className = 'stage-group';
+        const heading = document.createElement('h2');
+        heading.id = `tier-${index / 2}`;
+        heading.innerHTML = `<span>第 ${index + 1}–${Math.min(index + 2, LEVELS.length)} 关</span>${level.max} 以内`;
+        group.setAttribute('aria-labelledby', heading.id);
+        const pair = document.createElement('div');
+        pair.className = 'stage-pair';
+        group.append(heading, pair);
+        $('stages').appendChild(group);
+      }
       const complete = index < game.progress.completed;
       const locked = index > game.progress.completed;
       const button = document.createElement('button');
       button.className = 'stage';
+      button.dataset.stage = index;
       button.disabled = locked;
       const label = locked ? '先完成上一站' : complete ? '✓ 已完成 · 再玩一次' : '出发';
-      button.innerHTML = `<span class="stage-icon" aria-hidden="true">${level.icon}</span><strong>${level.name}</strong><small>${level.skill}</small><span class="stage-state">${label}</span>`;
-      button.setAttribute('aria-label', `${level.name}，${level.skill}，${label}`);
+      button.innerHTML = `<span class="stage-icon" aria-hidden="true">${level.icon}</span><span class="stage-number">第 ${index + 1} 关 · ${level.max} 以内</span><strong>${level.name}</strong><small>${level.skill}</small><span class="stage-state">${label}</span>`;
+      button.setAttribute(
+        'aria-label',
+        `第 ${index + 1} 关，${level.max} 以内，${level.name}，${level.skill}，${label}`,
+      );
       button.addEventListener('click', () => {
         if (game.progress.round?.stage !== index) game.start(index);
         else if (complete) game.start(index);
         persist();
         renderQuestion();
       });
-      $('stages').appendChild(button);
+      $('stages').lastElementChild.querySelector('.stage-pair').appendChild(button);
     });
     const r = game.progress.round;
     $('resume').hidden = !r;
@@ -74,11 +92,20 @@
       .join(' ');
     $('collection').textContent =
       game.progress.completed === LEVELS.length
-        ? `${collected} 四枚徽章集齐啦！也可以再去玩一遍。`
+        ? `${collected} ${LEVELS.length} 枚徽章集齐啦！也可以再去玩一遍。`
         : `🧺 野餐徽章 ${game.progress.completed} / ${LEVELS.length}${collected ? ` · ${collected}` : ''}`;
     screen('map', focus ? 'map-title' : null);
   }
-  function makePile(amount, title, icon, given = false, tens = false, independent = false) {
+  function makePile(amount, title, options) {
+    const {
+      icon,
+      given = false,
+      tenFrames = false,
+      independent = false,
+      grouped = false,
+      item,
+      unit,
+    } = options;
     let pileCount = 0;
     const pile = document.createElement('div');
     pile.className = given ? 'pile given' : 'pile';
@@ -86,38 +113,33 @@
     label.className = 'pile-label';
     label.textContent = title;
     const tokens = document.createElement('div');
-    tokens.className = tens ? 'ten-groups' : 'tokens';
-    let tokenGroup = tokens;
+    tokens.className = grouped ? 'place-value' : tenFrames ? 'ten-groups' : 'tokens';
     pile.append(label, tokens);
     if (amount === 0) {
       const zero = document.createElement('p');
       zero.className = 'zero';
-      zero.textContent = independent
-        ? '这里没有积木，就是 0。'
-        : '全都送走啦！一个也没有，就是 0。';
+      zero.textContent =
+        independent || given ? `这里没有${item}，就是 0。` : '全都送走啦！一个也没有，就是 0。';
       tokens.appendChild(zero);
     }
-    for (let i = 0; i < amount; i++) {
-      if (tens && i % 10 === 0) {
-        tokenGroup = document.createElement('div');
-        tokenGroup.className = 'ten-group';
-        tokenGroup.setAttribute(
-          'aria-label',
-          independent ? '每框最多 10 块积木' : '每框最多 10 颗星星',
-        );
-        tokens.appendChild(tokenGroup);
-      }
+    function makeToken(value, index) {
       const token = document.createElement(given ? 'span' : 'button');
-      token.className = 'token';
-      token.textContent = icon;
-      if (given) token.setAttribute('aria-label', `已送走的${icon === '🌟' ? '星星' : '草莓'}`);
-      else {
-        token.setAttribute('aria-label', `${title}，第 ${i + 1} 个，点一点数数`);
+      token.className = `token${grouped ? (value === 10 ? ' ten-token' : ' one-token') : ''}`;
+      token.textContent = value === 10 ? '10' : icon;
+      const tokenLabel =
+        value === 10
+          ? `一组10块${item}，${title}，第 ${index + 1} 组`
+          : `${title}，第 ${index + 1} ${unit}${item}`;
+      token.setAttribute(
+        'aria-label',
+        given ? `${tokenLabel}，已送走` : `${tokenLabel}，点一点数数`,
+      );
+      if (!given) {
         token.setAttribute('aria-pressed', 'false');
         token.addEventListener('click', () => {
           if (token.classList.contains('counted')) return;
-          if (independent) pileCount++;
-          else counted++;
+          if (independent) pileCount += value;
+          else counted += value;
           token.classList.add('counted');
           token.setAttribute('aria-pressed', 'true');
           const badge = document.createElement('span');
@@ -125,12 +147,45 @@
           badge.textContent = independent ? pileCount : counted;
           token.appendChild(badge);
           $('count-help').textContent = independent
-            ? `${title}，数到 ${pileCount} 块啦！每一组分开数。`
-            : `数到 ${counted} 啦！每个物品只数一次。`;
+            ? `${title}，数到 ${pileCount} ${unit}啦！每个托盘分开数。`
+            : grouped
+              ? `数到 ${counted} 块啦！十位一组数 10，个位一块数 1。`
+              : `数到 ${counted} 啦！每个物品只数一次。`;
           speak(String(independent ? pileCount : counted));
         });
       }
-      tokenGroup.appendChild(token);
+      return token;
+    }
+    if (grouped) {
+      const tens = Math.floor(amount / 10);
+      const ones = amount % 10;
+      [
+        [tens, 10, '十位 · 每组 10 块', 'block-tens'],
+        [ones, 1, '个位 · 每块 1', 'block-ones'],
+      ].forEach(([quantity, value, caption, className]) => {
+        if (!quantity) return;
+        const section = document.createElement('div');
+        section.className = `value-section ${className}`;
+        const heading = document.createElement('p');
+        heading.className = 'value-label';
+        heading.textContent = caption;
+        const group = document.createElement('div');
+        group.className = 'value-tokens';
+        for (let i = 0; i < quantity; i++) group.appendChild(makeToken(value, i));
+        section.append(heading, group);
+        tokens.appendChild(section);
+      });
+    } else {
+      let tokenGroup = tokens;
+      for (let i = 0; i < amount; i++) {
+        if (tenFrames && i % 10 === 0) {
+          tokenGroup = document.createElement('div');
+          tokenGroup.className = 'ten-group';
+          tokenGroup.setAttribute('aria-label', `每框最多 10 ${unit}${item}`);
+          tokens.appendChild(tokenGroup);
+        }
+        tokenGroup.appendChild(makeToken(1, i));
+      }
     }
     return pile;
   }
@@ -144,7 +199,7 @@
   function questionSpeech() {
     return game.question.unknown
       ? `${missingEquation(game.question, false, true)}。请找出方框里的数字。`
-      : `${$('story').textContent}。${$('question-title').textContent}`;
+      : `${$('story').textContent}${game.question.a} ${game.question.operation === '+' || LEVELS[game.progress.round.stage].kind === 'addition' ? '加' : '减'} ${game.question.b} 等于几？${$('question-title').textContent}`;
   }
   function hiddenPile(title) {
     const pile = document.createElement('div');
@@ -160,9 +215,16 @@
     pile.append(label, number);
     return pile;
   }
-  function renderMissingObjects(q) {
+  function renderMissingObjects(q, level) {
     const knownPile = (amount, title) =>
-      makePile(amount, `${title} · ${amount} 块`, '🟨', false, true, true);
+      makePile(amount, `${title} · ${amount} 块`, {
+        icon: '🟨',
+        tenFrames: level.max === 20,
+        grouped: level.max > 20,
+        independent: true,
+        item: '积木',
+        unit: '块',
+      });
     const diagram = document.createElement('div');
     diagram.className = 'part-whole';
     const whole = document.createElement('div');
@@ -205,7 +267,8 @@
     counted = 0;
     const q = game.question;
     const level = LEVELS[r.stage];
-    $('stage-name').textContent = `${level.icon} ${level.name}`;
+    $('stage-name').textContent =
+      `${level.icon} 第 ${r.stage + 1} 关 · ${level.name} · ${level.max} 以内`;
     $('progress-label').textContent = `${r.index + 1} / ${LENGTH}`;
     $('steps').innerHTML = Array.from(
       { length: LENGTH },
@@ -213,15 +276,25 @@
         `<span class="step ${i < r.index ? 'done' : i === r.index ? 'current' : ''}" aria-hidden="true"></span>`,
     ).join('');
     $('steps').setAttribute('aria-label', `第 ${r.index + 1} 题，共 ${LENGTH} 题`);
-    const missing = Boolean(q.unknown);
-    const advanced = r.stage === 2;
-    const addition = advanced ? q.operation === '+' : r.stage === 0;
-    const unit = advanced ? '颗' : addition ? '根' : '颗';
-    const item = advanced ? '星星' : addition ? '胡萝卜' : '草莓';
+    const missing = level.kind === 'missing';
+    const advanced = level.max > 10;
+    const grouped = level.max > 20;
+    const addition = level.kind === 'addition' || q.operation === '+';
+    const unit = grouped ? '块' : advanced ? '颗' : addition ? '根' : '颗';
+    const item = level.item;
+    const pileOptions = {
+      icon: grouped ? '🟨' : level.icon,
+      tenFrames: advanced && !grouped,
+      grouped,
+      item,
+      unit,
+    };
     $('story').textContent = missing
       ? '一个数字藏起来了，算式两边要一样多。'
       : addition
-        ? `${advanced ? '亮了' : '摘了'} ${q.a} ${unit}，又${advanced ? '亮了' : '摘了'} ${q.b} ${unit}。`
+        ? grouped
+          ? `有 ${q.a} 块积木，又放入 ${q.b} 块。`
+          : `${advanced ? '亮了' : '摘了'} ${q.a} ${unit}${item}，又${advanced ? '亮了' : '摘了'} ${q.b} ${unit}。`
         : `有 ${q.a} ${unit}${item}，送给朋友 ${q.b} ${unit}。`;
     $('question-title').textContent = missing
       ? '方框里应该填几？'
@@ -233,42 +306,51 @@
       : `${q.a} ${addition ? '+' : '−'} ${q.b} = ?`;
     $('equation').setAttribute(
       'aria-label',
-      missing ? missingEquation(q, false, true) : $('equation').textContent,
+      missing ? missingEquation(q, false, true) : `${q.a} ${addition ? '加' : '减'} ${q.b} 等于几`,
     );
     $('objects').replaceChildren();
     $('objects').classList.toggle('advanced', advanced);
     $('objects').classList.toggle('missing', missing);
+    $('objects').classList.toggle('grouped', grouped);
     if (missing) {
-      renderMissingObjects(q);
+      renderMissingObjects(q, level);
     } else if (addition) {
       const plus = document.createElement('span');
       plus.className = 'operator';
       plus.textContent = '+';
       plus.setAttribute('aria-hidden', 'true');
       $('objects').append(
-        makePile(q.a, advanced ? '先亮起的' : '先摘的', level.icon, false, advanced),
+        makePile(q.a, grouped ? '原来有的' : advanced ? '先亮起的' : '先摘的', pileOptions),
         plus,
-        makePile(q.b, advanced ? '又亮起的' : '又摘的', level.icon, false, advanced),
+        makePile(q.b, grouped ? '又放入的' : advanced ? '又亮起的' : '又摘的', pileOptions),
       );
     } else {
       $('objects').append(
-        makePile(q.b, '送给朋友的', level.icon, true, advanced),
-        makePile(q.answer, '留下的', level.icon, false, advanced),
+        makePile(q.b, '送给朋友的', { ...pileOptions, given: true }),
+        makePile(q.answer, '留下的', pileOptions),
       );
     }
     $('count-help').textContent = missing
-      ? '点一点已知的积木，每组分开数。问号只表示藏起来的一部分。'
-      : advanced
+      ? grouped
+        ? '十位每组 10 块，个位每块 1。每个托盘分开数，问号表示藏起来的数量。'
+        : '点一点已知的积木，每组分开数。问号只表示藏起来的一部分。'
+      : grouped
         ? addition
-          ? '每框最多 10 颗。先找出一组十，再加上剩下的。'
+          ? '十位每组 10 块，个位每块 1。点一点，把两个托盘合起来数。'
           : q.answer === 0
             ? '全都送走了，就是 0。'
-            : '每框最多 10 颗，只看留下的星星。'
-        : !addition
-          ? q.answer === 0
-            ? '一个也没留下，就是 0。'
-            : '点一点留下的草莓，送走的不用数。'
-          : '点一点物品，一起数数。';
+            : '十位每组 10 块，个位每块 1。只点留下的积木，送走的不用数。'
+        : advanced
+          ? addition
+            ? '每框最多 10 颗。先找出一组十，再加上剩下的。'
+            : q.answer === 0
+              ? '全都送走了，就是 0。'
+              : '每框最多 10 颗，只看留下的星星。'
+          : !addition
+            ? q.answer === 0
+              ? '一个也没留下，就是 0。'
+              : '点一点留下的草莓，送走的不用数。'
+            : '点一点物品，一起数数。';
     $('feedback').textContent = '';
     $('next').hidden = true;
     $('next').textContent = r.index === LENGTH - 1 ? '领取野餐徽章' : '下一题';
@@ -317,7 +399,14 @@
           : `✓ 原来有 ${q.a} 块，拿走 ${q.b} 块，还剩 ${q.result} 块，方框里填 ${q.answer}！`;
       $('count-help').textContent = '把找到的数字放回算式，两边一样多啦！';
     } else {
-      $('feedback').textContent = `✓ 答对啦，是 ${q.answer}！小兔和你击个掌。`;
+      const addition = LEVELS[game.progress.round.stage].kind === 'addition' || q.operation === '+';
+      $('equation').textContent = `${q.a} ${addition ? '+' : '−'} ${q.b} = ${q.answer}`;
+      $('equation').setAttribute(
+        'aria-label',
+        `${q.a} ${addition ? '加' : '减'} ${q.b} 等于 ${q.answer}`,
+      );
+      $('feedback').textContent =
+        `✓ ${q.a} ${addition ? '加' : '减'} ${q.b} 等于 ${q.answer}，答对啦！小兔和你击个掌。`;
     }
     $('next').hidden = false;
     if (announce) {
@@ -327,12 +416,12 @@
   }
   function renderReward() {
     const all = game.progress.completed === LEVELS.length;
-    $('reward-subtitle').textContent = `${LEVELS[lastStage].name} · 5 题完成`;
+    $('reward-subtitle').textContent = `${LEVELS[lastStage].name} · ${LENGTH} 题完成`;
     $('reward-title').textContent = all
       ? '开饭啦，数字小探险家！'
       : `收好你的${LEVELS[lastStage].reward}！`;
     $('reward-description').textContent = all
-      ? '从加一加、减一减到 20 以内填空，你找齐了四枚徽章。谢谢你陪小兔走过彩虹桥！'
+      ? `从 10 以内到 ${LEVELS.at(-1).max} 以内，你找齐了 ${LEVELS.length} 枚徽章。谢谢你陪小兔走到${LEVELS.at(-1).name}！`
       : '这一站完成啦！带着新本领，去看看下一站吧。';
     $('badges').innerHTML = LEVELS.slice(0, game.progress.completed)
       .map(

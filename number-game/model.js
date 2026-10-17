@@ -8,6 +8,8 @@
       item: '胡萝卜',
       intro: '把胡萝卜装在一起',
       reward: '胡萝卜篮',
+      max: 10,
+      kind: 'addition',
     },
     {
       name: '野餐地',
@@ -16,6 +18,8 @@
       item: '草莓',
       intro: '给朋友们分草莓',
       reward: '分享徽章',
+      max: 10,
+      kind: 'subtraction',
     },
     {
       name: '星光山坡',
@@ -24,6 +28,8 @@
       item: '星星',
       intro: '点亮山坡上的星星',
       reward: '星光徽章',
+      max: 20,
+      kind: 'mixed',
     },
     {
       name: '彩虹桥',
@@ -32,6 +38,48 @@
       item: '积木',
       intro: '找回彩虹桥上藏起来的数字',
       reward: '彩虹徽章',
+      max: 20,
+      kind: 'missing',
+    },
+    {
+      name: '松果溪谷',
+      skill: '50 以内加减法',
+      icon: '🪵',
+      item: '积木',
+      intro: '搭好溪谷里的积木小桥',
+      reward: '溪谷徽章',
+      max: 50,
+      kind: 'mixed',
+    },
+    {
+      name: '迷雾森林',
+      skill: '50 以内填空加减法',
+      icon: '🌲',
+      item: '积木',
+      intro: '找出藏在森林雾气里的数字',
+      reward: '森林徽章',
+      max: 50,
+      kind: 'missing',
+    },
+    {
+      name: '云朵城堡',
+      skill: '100 以内加减法',
+      icon: '🏰',
+      item: '积木',
+      intro: '用积木搭起云朵上的城堡',
+      reward: '城堡徽章',
+      max: 100,
+      kind: 'mixed',
+    },
+    {
+      name: '星空航站',
+      skill: '100 以内填空加减法',
+      icon: '🚀',
+      item: '积木',
+      intro: '找齐数字让星空飞船启航',
+      reward: '航站徽章',
+      max: 100,
+      kind: 'missing',
     },
   ];
   const LENGTH = 5;
@@ -43,6 +91,7 @@
     };
   }
   function questions(stage, seed) {
+    if (stage >= 4) return expandedQuestions(stage, seed);
     if (stage === 3) return rainbowQuestions(seed);
     const random = randomFrom(seed);
     const int = (min, max) => min + Math.floor(random() * (max - min + 1));
@@ -140,23 +189,79 @@
       return { a, b, operation, result, unknown, answer, options };
     });
   }
+  function expandedQuestions(stage, seed) {
+    const { max, kind } = LEVELS[stage];
+    const previousMax = LEVELS[stage - 2].max;
+    const missing = kind === 'missing';
+    const random = randomFrom(seed);
+    const int = (min, max) => min + Math.floor(random() * (max - min + 1));
+    return Array.from({ length: LENGTH }, (_, i) => {
+      let a;
+      let b;
+      let operation = i % 2 === 0 ? '+' : '−';
+      const unknown = i === 1 || i === 2 ? 'a' : 'b';
+      if (i === 0) {
+        a = int(previousMax + 1, max - 1);
+        b = int(1, max - a);
+      } else if (i === 1 || i === 3) {
+        // Taking a one-digit group from a larger number must borrow a ten.
+        const tens = int(previousMax / 10 + 1, max / 10 - 1);
+        const ones = int(0, 8);
+        a = tens * 10 + ones;
+        b = int(ones + 1, 9);
+      } else if (i === 2) {
+        // Keep the larger operand in this range while guaranteeing a carry.
+        const tens = int(previousMax / 10, max / 10 - 2);
+        const ones = int(1, 9);
+        a = tens * 10 + ones;
+        b = int(10 - ones, 9);
+      } else if (missing) {
+        operation = '−';
+        b = seed % 2 === 0 ? max : 0;
+        a = b === max ? max : int(previousMax + 1, max);
+      } else if (seed % 2 === 0) {
+        a = int(previousMax + 1, max - 1);
+        b = max - a;
+      } else {
+        operation = '−';
+        a = int(previousMax + 1, max);
+        b = a;
+      }
+      const result = operation === '+' ? a + b : a - b;
+      const answer = missing ? (unknown === 'a' ? a : b) : result;
+      const options = missing ? [answer, result] : [answer];
+      const candidates = Array.from({ length: max + 1 }, (_, n) => n).filter(
+        (n) => !options.includes(n),
+      );
+      while (options.length < 3)
+        options.push(candidates.splice(int(0, candidates.length - 1), 1)[0]);
+      for (let j = options.length - 1; j > 0; j--) {
+        const k = int(0, j);
+        [options[j], options[k]] = [options[k], options[j]];
+      }
+      return missing
+        ? { a, b, operation, result, unknown, answer, options }
+        : { a, b, operation, answer, options };
+    });
+  }
   function fresh() {
-    return { version: 4, completed: 0, round: null };
+    return { version: 5, completed: 0, round: null };
   }
   function restore(raw) {
     try {
       const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
       if (
         !data ||
-        ![1, 2, 3, 4].includes(data.version) ||
+        ![1, 2, 3, 4, 5].includes(data.version) ||
         !Number.isInteger(data.completed) ||
         data.completed < 0 ||
-        data.completed > (data.version === 2 ? 2 : data.version === 4 ? 4 : 3)
+        data.completed > [0, 3, 2, 3, 4, LEVELS.length][data.version]
       )
         return fresh();
+      const stageLimit = [0, 3, 2, 3, 4, LEVELS.length][data.version];
       const legacy = data.version === 1;
       const result = {
-        version: 4,
+        version: 5,
         completed: legacy ? Math.max(0, data.completed - 1) : data.completed,
         round: null,
       };
@@ -165,7 +270,7 @@
         r &&
         Number.isInteger(r.stage) &&
         r.stage >= 0 &&
-        r.stage < (data.version === 2 ? 2 : data.version === 4 ? 4 : 3) &&
+        r.stage < stageLimit &&
         (!legacy || r.stage > 0) &&
         r.stage <= data.completed &&
         Number.isInteger(r.index) &&
