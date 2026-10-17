@@ -1,4 +1,4 @@
-const CACHE = 'pcg-v11-advanced-arithmetic';
+const CACHE = 'pcg-v12-rainbow-bridge';
 const ASSETS = [
   './',
   './index.html',

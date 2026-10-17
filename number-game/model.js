@@ -25,6 +25,14 @@
       intro: '点亮山坡上的星星',
       reward: '星光徽章',
     },
+    {
+      name: '彩虹桥',
+      skill: '20 以内填空加减法',
+      icon: '🌈',
+      item: '积木',
+      intro: '找回彩虹桥上藏起来的数字',
+      reward: '彩虹徽章',
+    },
   ];
   const LENGTH = 5;
   function randomFrom(seed) {
@@ -35,6 +43,7 @@
     };
   }
   function questions(stage, seed) {
+    if (stage === 3) return rainbowQuestions(seed);
     const random = randomFrom(seed);
     const int = (min, max) => min + Math.floor(random() * (max - min + 1));
     return Array.from({ length: LENGTH }, (_, i) => {
@@ -80,23 +89,74 @@
       return operation ? { a, b, answer, options, operation } : { a, b, answer, options };
     });
   }
+  function rainbowQuestions(seed) {
+    const random = randomFrom(seed);
+    const int = (min, max) => min + Math.floor(random() * (max - min + 1));
+    return Array.from({ length: LENGTH }, (_, i) => {
+      let a;
+      let b;
+      let operation;
+      let unknown;
+      if (i === 0) {
+        operation = '+';
+        unknown = 'b';
+        a = int(6, 9);
+        b = int(11 - a, 9);
+      } else if (i === 1) {
+        operation = '−';
+        unknown = 'a';
+        a = int(11, 18);
+        b = int(a - 9, 9);
+      } else if (i === 2) {
+        operation = '+';
+        unknown = 'a';
+        a = int(0, 19);
+        b = int(1, 20 - a);
+      } else if (i === 3) {
+        operation = '−';
+        unknown = 'b';
+        a = int(11, 17);
+        const choices = Array.from({ length: 9 }, (_, n) => n + 1).filter(
+          (n) => n > a % 10 && n !== a - n,
+        );
+        b = choices[int(0, choices.length - 1)];
+      } else {
+        // Alternate the two boundaries; neither may be mistaken for the visible result.
+        operation = '−';
+        unknown = 'b';
+        b = seed % 2 === 0 ? 20 : 0;
+        a = b === 20 ? 20 : int(1, 20);
+      }
+      const result = operation === '+' ? a + b : a - b;
+      const answer = unknown === 'a' ? a : b;
+      const candidates = Array.from({ length: 21 }, (_, n) => n).filter(
+        (n) => n !== answer && n !== result,
+      );
+      const options = [answer, result, candidates[int(0, candidates.length - 1)]];
+      for (let j = options.length - 1; j > 0; j--) {
+        const k = int(0, j);
+        [options[j], options[k]] = [options[k], options[j]];
+      }
+      return { a, b, operation, result, unknown, answer, options };
+    });
+  }
   function fresh() {
-    return { version: 3, completed: 0, round: null };
+    return { version: 4, completed: 0, round: null };
   }
   function restore(raw) {
     try {
       const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
       if (
         !data ||
-        ![1, 2, 3].includes(data.version) ||
+        ![1, 2, 3, 4].includes(data.version) ||
         !Number.isInteger(data.completed) ||
         data.completed < 0 ||
-        data.completed > (data.version === 1 ? 3 : data.version === 2 ? 2 : LEVELS.length)
+        data.completed > (data.version === 2 ? 2 : data.version === 4 ? 4 : 3)
       )
         return fresh();
       const legacy = data.version === 1;
       const result = {
-        version: 3,
+        version: 4,
         completed: legacy ? Math.max(0, data.completed - 1) : data.completed,
         round: null,
       };
@@ -105,7 +165,7 @@
         r &&
         Number.isInteger(r.stage) &&
         r.stage >= 0 &&
-        r.stage < (legacy ? 3 : data.version === 2 ? 2 : LEVELS.length) &&
+        r.stage < (data.version === 2 ? 2 : data.version === 4 ? 4 : 3) &&
         (!legacy || r.stage > 0) &&
         r.stage <= data.completed &&
         Number.isInteger(r.index) &&

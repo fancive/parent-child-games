@@ -69,13 +69,17 @@
     const r = game.progress.round;
     $('resume').hidden = !r;
     if (r) $('resume').textContent = `继续${LEVELS[r.stage].name} · 第 ${r.index + 1} 题`;
+    const collected = LEVELS.slice(0, game.progress.completed)
+      .map((level) => level.icon)
+      .join(' ');
     $('collection').textContent =
       game.progress.completed === LEVELS.length
-        ? '🥕 🍓 🌟 野餐准备好啦！也可以再去玩一遍。'
-        : `🧺 野餐徽章 ${game.progress.completed} / ${LEVELS.length}`;
+        ? `${collected} 四枚徽章集齐啦！也可以再去玩一遍。`
+        : `🧺 野餐徽章 ${game.progress.completed} / ${LEVELS.length}${collected ? ` · ${collected}` : ''}`;
     screen('map', focus ? 'map-title' : null);
   }
-  function makePile(amount, title, icon, given = false, tens = false) {
+  function makePile(amount, title, icon, given = false, tens = false, independent = false) {
+    let pileCount = 0;
     const pile = document.createElement('div');
     pile.className = given ? 'pile given' : 'pile';
     const label = document.createElement('p');
@@ -88,14 +92,19 @@
     if (amount === 0) {
       const zero = document.createElement('p');
       zero.className = 'zero';
-      zero.textContent = '全都送走啦！一个也没有，就是 0。';
+      zero.textContent = independent
+        ? '这里没有积木，就是 0。'
+        : '全都送走啦！一个也没有，就是 0。';
       tokens.appendChild(zero);
     }
     for (let i = 0; i < amount; i++) {
       if (tens && i % 10 === 0) {
         tokenGroup = document.createElement('div');
         tokenGroup.className = 'ten-group';
-        tokenGroup.setAttribute('aria-label', '每框最多 10 颗星星');
+        tokenGroup.setAttribute(
+          'aria-label',
+          independent ? '每框最多 10 块积木' : '每框最多 10 颗星星',
+        );
         tokens.appendChild(tokenGroup);
       }
       const token = document.createElement(given ? 'span' : 'button');
@@ -107,20 +116,85 @@
         token.setAttribute('aria-pressed', 'false');
         token.addEventListener('click', () => {
           if (token.classList.contains('counted')) return;
-          counted++;
+          if (independent) pileCount++;
+          else counted++;
           token.classList.add('counted');
           token.setAttribute('aria-pressed', 'true');
           const badge = document.createElement('span');
           badge.className = 'count-badge';
-          badge.textContent = counted;
+          badge.textContent = independent ? pileCount : counted;
           token.appendChild(badge);
-          $('count-help').textContent = `数到 ${counted} 啦！每个物品只数一次。`;
-          speak(String(counted));
+          $('count-help').textContent = independent
+            ? `${title}，数到 ${pileCount} 块啦！每一组分开数。`
+            : `数到 ${counted} 啦！每个物品只数一次。`;
+          speak(String(independent ? pileCount : counted));
         });
       }
       tokenGroup.appendChild(token);
     }
     return pile;
+  }
+  function missingEquation(q, solved = false, spoken = false) {
+    const blank = spoken ? '方框' : '□';
+    const a = q.unknown === 'a' && !solved ? blank : q.a;
+    const b = q.unknown === 'b' && !solved ? blank : q.b;
+    const operation = spoken ? (q.operation === '+' ? '加' : '减') : q.operation;
+    return `${a} ${operation} ${b} ${spoken ? '等于' : '='} ${q.result}`;
+  }
+  function questionSpeech() {
+    return game.question.unknown
+      ? `${missingEquation(game.question, false, true)}。请找出方框里的数字。`
+      : `${$('story').textContent}。${$('question-title').textContent}`;
+  }
+  function hiddenPile(title) {
+    const pile = document.createElement('div');
+    pile.className = 'pile mystery-pile';
+    const label = document.createElement('p');
+    label.className = 'pile-label';
+    label.textContent = title;
+    const number = document.createElement('div');
+    number.id = 'hidden-number';
+    number.className = 'hidden-number';
+    number.textContent = '?';
+    number.setAttribute('aria-label', '藏起来的数量，填入方框');
+    pile.append(label, number);
+    return pile;
+  }
+  function renderMissingObjects(q) {
+    const knownPile = (amount, title) =>
+      makePile(amount, `${title} · ${amount} 块`, '🟨', false, true, true);
+    const diagram = document.createElement('div');
+    diagram.className = 'part-whole';
+    const whole = document.createElement('div');
+    whole.className = 'whole';
+    const parts = document.createElement('div');
+    parts.className = 'parts';
+    const join = document.createElement('span');
+    join.className = 'part-join';
+    join.textContent = '+';
+    join.setAttribute('aria-hidden', 'true');
+    if (q.operation === '+') {
+      whole.appendChild(knownPile(q.result, '合起来一共'));
+      const first =
+        q.unknown === 'a' ? hiddenPile('藏起来的一部分') : knownPile(q.a, '已知的一部分');
+      const second =
+        q.unknown === 'b' ? hiddenPile('藏起来的一部分') : knownPile(q.b, '已知的一部分');
+      parts.append(first, join, second);
+    } else {
+      whole.appendChild(
+        q.unknown === 'a' ? hiddenPile('原来一共有几块？') : knownPile(q.a, '原来一共'),
+      );
+      parts.append(
+        q.unknown === 'b' ? hiddenPile('拿走了几块？') : knownPile(q.b, '拿走的'),
+        join,
+        knownPile(q.result, '剩下的'),
+      );
+    }
+    const relation = document.createElement('p');
+    relation.className = 'part-relation';
+    relation.textContent = '一共的数量 = 两部分合起来';
+    diagram.append(whole, relation, parts);
+    $('objects').appendChild(diagram);
   }
   function renderQuestion() {
     const r = game.progress.round;
@@ -139,20 +213,34 @@
         `<span class="step ${i < r.index ? 'done' : i === r.index ? 'current' : ''}" aria-hidden="true"></span>`,
     ).join('');
     $('steps').setAttribute('aria-label', `第 ${r.index + 1} 题，共 ${LENGTH} 题`);
+    const missing = Boolean(q.unknown);
     const advanced = r.stage === 2;
     const addition = advanced ? q.operation === '+' : r.stage === 0;
     const unit = advanced ? '颗' : addition ? '根' : '颗';
     const item = advanced ? '星星' : addition ? '胡萝卜' : '草莓';
-    $('story').textContent = addition
-      ? `${advanced ? '亮了' : '摘了'} ${q.a} ${unit}，又${advanced ? '亮了' : '摘了'} ${q.b} ${unit}。`
-      : `有 ${q.a} ${unit}${item}，送给朋友 ${q.b} ${unit}。`;
-    $('question-title').textContent = addition
-      ? `一共有几${unit}${item}？`
-      : `还剩下几${unit}${item}？`;
-    $('equation').textContent = `${q.a} ${addition ? '+' : '−'} ${q.b} = ?`;
+    $('story').textContent = missing
+      ? '一个数字藏起来了，算式两边要一样多。'
+      : addition
+        ? `${advanced ? '亮了' : '摘了'} ${q.a} ${unit}，又${advanced ? '亮了' : '摘了'} ${q.b} ${unit}。`
+        : `有 ${q.a} ${unit}${item}，送给朋友 ${q.b} ${unit}。`;
+    $('question-title').textContent = missing
+      ? '方框里应该填几？'
+      : addition
+        ? `一共有几${unit}${item}？`
+        : `还剩下几${unit}${item}？`;
+    $('equation').textContent = missing
+      ? missingEquation(q)
+      : `${q.a} ${addition ? '+' : '−'} ${q.b} = ?`;
+    $('equation').setAttribute(
+      'aria-label',
+      missing ? missingEquation(q, false, true) : $('equation').textContent,
+    );
     $('objects').replaceChildren();
     $('objects').classList.toggle('advanced', advanced);
-    if (addition) {
+    $('objects').classList.toggle('missing', missing);
+    if (missing) {
+      renderMissingObjects(q);
+    } else if (addition) {
       const plus = document.createElement('span');
       plus.className = 'operator';
       plus.textContent = '+';
@@ -168,17 +256,19 @@
         makePile(q.answer, '留下的', level.icon, false, advanced),
       );
     }
-    $('count-help').textContent = advanced
-      ? addition
-        ? '每框最多 10 颗。先找出一组十，再加上剩下的。'
-        : q.answer === 0
-          ? '全都送走了，就是 0。'
-          : '每框最多 10 颗，只看留下的星星。'
-      : !addition
-        ? q.answer === 0
-          ? '一个也没留下，就是 0。'
-          : '点一点留下的草莓，送走的不用数。'
-        : '点一点物品，一起数数。';
+    $('count-help').textContent = missing
+      ? '点一点已知的积木，每组分开数。问号只表示藏起来的一部分。'
+      : advanced
+        ? addition
+          ? '每框最多 10 颗。先找出一组十，再加上剩下的。'
+          : q.answer === 0
+            ? '全都送走了，就是 0。'
+            : '每框最多 10 颗，只看留下的星星。'
+        : !addition
+          ? q.answer === 0
+            ? '一个也没留下，就是 0。'
+            : '点一点留下的草莓，送走的不用数。'
+          : '点一点物品，一起数数。';
     $('feedback').textContent = '';
     $('next').hidden = true;
     $('next').textContent = r.index === LENGTH - 1 ? '领取野餐徽章' : '下一题';
@@ -193,7 +283,9 @@
         if (outcome === 'ignored') return;
         if (outcome === 'retry') {
           button.classList.add('retry');
-          $('feedback').textContent = '再数一数就好啦，点一点物品来帮忙。';
+          $('feedback').textContent = missing
+            ? '再试试，把选的数放进方框，两边一样多吗？'
+            : '再数一数就好啦，点一点物品来帮忙。';
           speak($('feedback').textContent);
         } else {
           persist();
@@ -204,7 +296,7 @@
     });
     screen('play', 'question-title');
     if (r.solved) showCorrect(false);
-    else speak(`${$('story').textContent}。${$('question-title').textContent}`);
+    else speak(questionSpeech());
   }
   function showCorrect(announce = true) {
     const q = game.question;
@@ -213,7 +305,20 @@
       button.classList.remove('retry');
       if (Number(button.textContent) === q.answer) button.classList.add('correct');
     }
-    $('feedback').textContent = `✓ 答对啦，是 ${q.answer}！小兔和你击个掌。`;
+    if (q.unknown) {
+      $('equation').textContent = missingEquation(q, true);
+      $('equation').setAttribute('aria-label', missingEquation(q, true, true));
+      $('hidden-number').textContent = q.answer;
+      $('hidden-number').classList.add('revealed');
+      $('hidden-number').setAttribute('aria-label', `藏起来的是 ${q.answer} 块积木`);
+      $('feedback').textContent =
+        q.operation === '+'
+          ? `✓ ${q.a} 和 ${q.b} 合起来是 ${q.result}，方框里填 ${q.answer}！`
+          : `✓ 原来有 ${q.a} 块，拿走 ${q.b} 块，还剩 ${q.result} 块，方框里填 ${q.answer}！`;
+      $('count-help').textContent = '把找到的数字放回算式，两边一样多啦！';
+    } else {
+      $('feedback').textContent = `✓ 答对啦，是 ${q.answer}！小兔和你击个掌。`;
+    }
     $('next').hidden = false;
     if (announce) {
       speak($('feedback').textContent);
@@ -227,7 +332,7 @@
       ? '开饭啦，数字小探险家！'
       : `收好你的${LEVELS[lastStage].reward}！`;
     $('reward-description').textContent = all
-      ? '20 以内的加减法也完成啦。谢谢你帮小兔准备了这场野餐！'
+      ? '从加一加、减一减到 20 以内填空，你找齐了四枚徽章。谢谢你陪小兔走过彩虹桥！'
       : '这一站完成啦！带着新本领，去看看下一站吧。';
     $('badges').innerHTML = LEVELS.slice(0, game.progress.completed)
       .map(
@@ -271,9 +376,7 @@
     if (!voice) window.speechSynthesis.cancel();
     else speak('一起开始数字冒险吧。');
   });
-  $('read').addEventListener('click', () =>
-    speak(`${$('story').textContent}。${$('question-title').textContent}`, true),
-  );
+  $('read').addEventListener('click', () => speak(questionSpeech(), true));
   window.addEventListener('pagehide', () => {
     if (canSpeak) window.speechSynthesis.cancel();
   });
