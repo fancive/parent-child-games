@@ -19,6 +19,7 @@ python3 -m http.server 8104 --bind 127.0.0.1
 ```sh
 PLAYWRIGHT_MODULE=/path/to/playwright BROWSER_CHANNEL=chrome node tests/mobile-layout.e2e.cjs
 PLAYWRIGHT_MODULE=/path/to/playwright BROWSER_CHANNEL=chrome COLORING_BASE_URL=http://127.0.0.1:8104 node tests/coloring-game.e2e.cjs
+PLAYWRIGHT_MODULE=/path/to/playwright BROWSER_CHANNEL=chrome NUMBER_BASE_URL=http://127.0.0.1:8104 node tests/number-game.e2e.cjs
 ```
 
 `MOBILE_BASE_URL` 可覆盖适配测试地址。`MOBILE_VIEWPORTS='[[390,844]]'` 可只重跑指定尺寸。
@@ -33,3 +34,5 @@ PLAYWRIGHT_MODULE=/path/to/playwright BROWSER_CHANNEL=chrome COLORING_BASE_URL=h
 - 小公主选择服装、完成展示和继续换装。
 
 涂画专项另覆盖画笔、橡皮、撤销重做、清空确认、PNG 下载、离线打开和触屏绘制。截图保存到运行输出中的临时目录。浏览器模拟不替代 Android / iOS 真机验收。
+
+数字冒险专项覆盖旧八关存档升级、原题和选项恢复、新增四关的实际答题、答错重试、积木点数、刷新恢复、键盘作答、十二枚徽章和重玩，并检查四种屏幕尺寸的横向溢出。

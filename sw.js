@@ -1,4 +1,4 @@
-const CACHE = 'pcg-v13-eight-stage-adventure';
+const CACHE = 'pcg-v14-hundred-adventure';
 const ASSETS = [
   './',
   './index.html',

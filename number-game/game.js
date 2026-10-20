@@ -49,7 +49,7 @@
   }
   function renderMap(focus = true) {
     $('map-description').textContent =
-      `每两关升一级，从 10 以内到 ${LEVELS.at(-1).max} 以内，走过 ${LEVELS.length} 站，集齐野餐徽章。`;
+      `从 10 以内到 ${LEVELS.at(-1).max} 以内，再挑战进位、退位和填空，走过 ${LEVELS.length} 站，集齐野餐徽章。`;
     $('stages').replaceChildren();
     LEVELS.forEach((level, index) => {
       if (index % 2 === 0) {

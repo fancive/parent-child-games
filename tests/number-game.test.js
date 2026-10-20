@@ -138,7 +138,7 @@ test('legacy counting progress is removed without unlocking subtraction', () => 
       completed,
       round: { stage: 0, index: 4, seed: 42, solved: true },
     });
-    assert.equal(progress.version, 5);
+    assert.equal(progress.version, 6);
     assert.equal(progress.completed, 0);
     assert.equal(progress.round, null);
     const game = new Adventure(progress);
@@ -182,6 +182,10 @@ test('map offers introductory arithmetic, twenty-range arithmetic and missing nu
       '50 以内填空加减法',
       '100 以内加减法',
       '100 以内填空加减法',
+      '100 以内进位加法',
+      '100 以内退位减法',
+      '100 以内两位数加减法',
+      '100 以内综合填空',
     ],
   );
   const html = readFileSync(new URL('number-game/index.html', root), 'utf8');
@@ -252,7 +256,7 @@ test('version two in-flight questions survive upgrade exactly', () => {
     const game = new Adventure(original);
     assert.deepEqual(JSON.parse(JSON.stringify(game.progress.round)), original.round);
     assert.equal(game.progress.completed, stage);
-    assert.equal(game.progress.version, 5);
+    assert.equal(game.progress.version, 6);
     assert.equal(new Adventure(game.serialize()).serialize(), game.serialize());
   }
 });
@@ -298,7 +302,7 @@ test('all four original stages retain the 99ab414 question and choice fixtures',
         round: { stage, index: 3, seed: 42, solved },
       };
       const game = new Adventure(original);
-      assert.equal(game.progress.version, 5);
+      assert.equal(game.progress.version, 6);
       assert.equal(game.progress.completed, stage);
       assert.deepEqual(JSON.parse(JSON.stringify(game.progress.round)), original.round);
       assert.deepEqual(JSON.parse(JSON.stringify(game.question)), oldQuestionFixtures[stage][3]);
@@ -358,7 +362,7 @@ test('version three completion unlocks rainbow but cannot claim fourth-stage pro
     });
     assert.equal(progress.round, null);
     assert.equal(progress.completed, completed === 3 ? 3 : 0);
-    assert.equal(progress.version, 5);
+    assert.equal(progress.version, 6);
   }
   assert.equal(restore({ version: 4, completed: 5, round: null }).completed, 0);
 });
@@ -373,7 +377,7 @@ test('rainbow retries, refresh, solved refresh and replay preserve progress and 
     assert.equal(game.answer(wrong), 'retry');
     assert.equal(game.serialize(), before);
     let restored = new Adventure(before);
-    assert.equal(restored.progress.version, 5);
+    assert.equal(restored.progress.version, 6);
     assert.equal(restored.progress.round.stage, 3);
     assert.equal(JSON.stringify(restored.question), JSON.stringify(game.question));
     assert.equal(restored.progress.round.solved, false);
@@ -399,18 +403,18 @@ test('rainbow retries, refresh, solved refresh and replay preserve progress and 
   }
 });
 
-test('eight levels increase the numeric range every two stages', () => {
-  assert.equal(LEVELS.length, 8);
+test('the first eight levels keep their numeric ranges and map identities', () => {
+  assert.equal(LEVELS.length, 12);
   assert.deepEqual(
-    Array.from(LEVELS, (level) => level.max),
+    Array.from(LEVELS.slice(0, 8), (level) => level.max),
     [10, 10, 20, 20, 50, 50, 100, 100],
   );
   assert.deepEqual(
-    Array.from(LEVELS, (level) => level.kind),
+    Array.from(LEVELS.slice(0, 8), (level) => level.kind),
     ['addition', 'subtraction', 'mixed', 'missing', 'mixed', 'missing', 'mixed', 'missing'],
   );
   assert.deepEqual(
-    Array.from(LEVELS.slice(4), (level) => [level.name, level.icon, level.reward]),
+    Array.from(LEVELS.slice(4, 8), (level) => [level.name, level.icon, level.reward]),
     [
       ['松果溪谷', '🪵', '溪谷徽章'],
       ['迷雾森林', '🌲', '森林徽章'],
@@ -505,7 +509,7 @@ test('new fifty and hundred rounds use larger numbers, carrying, borrowing and b
 
 test('version four completion unlocks the fifth stage without claiming the eight-stage finale', () => {
   const game = new Adventure({ version: 4, completed: 4, round: null });
-  assert.equal(game.progress.version, 5);
+  assert.equal(game.progress.version, 6);
   assert.equal(game.progress.completed, 4);
   assert.equal(game.start(4, 42), true);
   assert.equal(game.start(5, 42), false);
@@ -529,6 +533,7 @@ test('every historical save version retains its own completed and active-stage l
     [3, 3],
     [4, 4],
     [5, 8],
+    [6, 12],
   ]) {
     assert.equal(restore({ version, completed: limit + 1, round: null }).completed, 0);
     const restored = restore({
@@ -536,7 +541,7 @@ test('every historical save version retains its own completed and active-stage l
       completed: limit,
       round: { stage: limit, index: 1, seed: 42, solved: false },
     });
-    assert.equal(restored.version, 5);
+    assert.equal(restored.version, 6);
     assert.equal(restored.completed, version === 1 ? limit - 1 : limit);
     assert.equal(restored.round, null);
   }
@@ -559,7 +564,7 @@ test('all historical in-flight arithmetic questions retain seed, index, options 
             round: { stage: oldStage, index, seed: 42, solved },
           };
           const game = new Adventure(saved);
-          assert.equal(game.progress.version, 5);
+          assert.equal(game.progress.version, 6);
           assert.equal(game.progress.completed, stage);
           assert.deepEqual(JSON.parse(JSON.stringify(game.progress.round)), {
             stage,
@@ -610,5 +615,208 @@ test('new stages retain retries, refresh, solved refresh, repeated answers and r
       game.next();
     }
     assert.equal(game.progress.completed, 8);
+  }
+});
+
+test('all eight original stages retain every question and option across 500 seeds', () => {
+  // Captured from HEAD before adding the four hundred-range practice stages.
+  const hash = createHash('sha256');
+  for (let seed = 0; seed < 500; seed++) {
+    for (let stage = 0; stage < 8; stage++)
+      hash.update(JSON.stringify(questions(stage, seed)) + '\n');
+  }
+  assert.equal(
+    hash.digest('hex'),
+    'dbb338283a645dd29168e88092157a77c6a1a51cfdddc94cddff9812c093aa7f',
+  );
+});
+
+test('four new hundred-range destinations each describe a specific practice skill', () => {
+  assert.deepEqual(
+    Array.from(LEVELS.slice(8), ({ name, icon, reward, skill, kind, max, item, intro }) => ({
+      name,
+      icon,
+      reward,
+      skill,
+      kind,
+      max,
+      item,
+      hasIntro: typeof intro === 'string' && intro.length > 0,
+    })),
+    [
+      {
+        name: '蜜蜂花园',
+        icon: '🐝',
+        reward: '花园徽章',
+        skill: '100 以内进位加法',
+        kind: 'addition',
+        max: 100,
+        item: '积木',
+        hasIntro: true,
+      },
+      {
+        name: '月亮湖',
+        icon: '🌙',
+        reward: '月亮徽章',
+        skill: '100 以内退位减法',
+        kind: 'subtraction',
+        max: 100,
+        item: '积木',
+        hasIntro: true,
+      },
+      {
+        name: '宝石矿洞',
+        icon: '💎',
+        reward: '宝石徽章',
+        skill: '100 以内两位数加减法',
+        kind: 'mixed',
+        max: 100,
+        item: '积木',
+        hasIntro: true,
+      },
+      {
+        name: '太阳营地',
+        icon: '☀️',
+        reward: '太阳徽章',
+        skill: '100 以内综合填空',
+        kind: 'missing',
+        max: 100,
+        item: '积木',
+        hasIntro: true,
+      },
+    ],
+  );
+});
+
+test('new hundred rounds teach carrying, borrowing, mixed two-digit arithmetic and missing operands', () => {
+  for (let stage = 8; stage < 12; stage++) {
+    const boundaries = new Set();
+    for (const seed of [...Array.from({ length: 500 }, (_, n) => n), 2147483648, 4294967295]) {
+      const batch = questions(stage, seed);
+      assert.equal(batch.length, 5);
+      assert.equal(JSON.stringify(batch), JSON.stringify(questions(stage, seed)));
+      const skills = new Set();
+      for (const [index, q] of batch.entries()) {
+        assert.ok(['+', '−'].includes(q.operation));
+        const result = q.operation === '+' ? q.a + q.b : q.a - q.b;
+        assert.ok(
+          [q.a, q.b, result, q.answer, ...q.options].every(
+            (n) => Number.isInteger(n) && n >= 0 && n <= 100,
+          ),
+        );
+        assert.equal(q.options.length, 3);
+        assert.equal(new Set(q.options).size, 3);
+        assert.equal(q.options.filter((n) => n === q.answer).length, 1);
+        if (stage === 11) {
+          assert.ok(['a', 'b'].includes(q.unknown));
+          assert.equal(q.result, result);
+          assert.equal(q.answer, q[q.unknown]);
+          assert.notEqual(q.answer, q.result);
+          assert.ok(q.options.includes(q.result));
+          skills.add(`${q.operation}${q.unknown}`);
+        } else {
+          assert.equal(q.answer, result);
+          assert.equal(q.result, undefined);
+          assert.equal(q.unknown, undefined);
+        }
+        if (stage < 10 || index < 4) {
+          assert.ok(
+            q.a >= 10 && q.a <= 99 && q.b >= 10 && q.b <= 99,
+            'practice uses two-digit operands',
+          );
+        }
+        if (stage === 8) {
+          assert.equal(q.operation, '+');
+          assert.ok((q.a % 10) + (q.b % 10) >= 10, 'every addition requires carrying');
+        }
+        if (stage === 9) {
+          assert.equal(q.operation, '−');
+          assert.ok(q.b % 10 > q.a % 10, 'every subtraction requires borrowing');
+        }
+        boundaries.add(q.answer);
+      }
+      if (stage >= 10) {
+        assert.ok(batch.some((q) => q.operation === '+' && (q.a % 10) + (q.b % 10) >= 10));
+        assert.ok(batch.some((q) => q.operation === '−' && q.b % 10 > q.a % 10));
+        assert.ok([0, 100].includes(batch[4].answer));
+      }
+      if (stage === 11) {
+        for (const skill of ['+a', '+b', '−a', '−b']) assert.ok(skills.has(skill));
+      }
+    }
+    if (stage >= 10) assert.ok(boundaries.has(0) && boundaries.has(100));
+  }
+});
+
+test('version five in-flight saves retain every original question and cannot claim new progress', () => {
+  for (let stage = 0; stage < 8; stage++) {
+    for (let index = 0; index < 5; index++) {
+      for (const solved of [false, true]) {
+        const round = { stage, index, seed: 4294967295, solved };
+        const game = new Adventure({ version: 5, completed: stage, round });
+        assert.equal(game.progress.version, 6);
+        assert.equal(game.progress.completed, stage);
+        assert.deepEqual(JSON.parse(JSON.stringify(game.progress.round)), round);
+        assert.equal(
+          JSON.stringify(game.question),
+          JSON.stringify(questions(stage, round.seed)[index]),
+        );
+        assert.equal(new Adventure(game.serialize()).serialize(), game.serialize());
+      }
+    }
+  }
+  const upgraded = new Adventure({ version: 5, completed: 8, round: null });
+  assert.equal(upgraded.progress.completed, 8);
+  assert.equal(upgraded.start(8, 42), true);
+  assert.equal(upgraded.start(9, 42), false);
+  for (const completed of [9, 10, 11, 12]) {
+    assert.equal(restore({ version: 5, completed, round: null }).completed, 0);
+  }
+  for (const stage of [8, 9, 10, 11]) {
+    assert.equal(
+      restore({ version: 5, completed: 8, round: { stage, index: 1, seed: 42, solved: true } })
+        .round,
+      null,
+    );
+  }
+});
+
+test('new hundred stages keep retries, refresh, solved refresh and replay while unlocking all twelve', () => {
+  let game = new Adventure({ version: 5, completed: 8, round: null });
+  for (let stage = 8; stage < 12; stage++) {
+    assert.equal(game.start(stage + 1, 71), false);
+    assert.equal(game.start(stage, 71), true);
+    for (let index = 0; index < 5; index++) {
+      const before = game.serialize();
+      const question = JSON.stringify(game.question);
+      const wrong = game.question.options.find((value) => value !== game.question.answer);
+      assert.equal(game.next(), 'ignored');
+      assert.equal(game.answer(wrong), 'retry');
+      assert.equal(game.serialize(), before);
+      game = new Adventure(before);
+      assert.equal(game.progress.version, 6);
+      assert.equal(game.progress.round.index, index);
+      assert.equal(game.progress.round.solved, false);
+      assert.equal(JSON.stringify(game.question), question);
+      assert.equal(game.answer(game.question.answer), 'correct');
+      game = new Adventure(game.serialize());
+      assert.equal(JSON.stringify(game.question), question);
+      assert.equal(game.progress.round.solved, true);
+      assert.equal(game.answer(game.question.answer), 'ignored');
+      assert.equal(game.progress.completed, stage);
+      assert.equal(game.next(), index === 4 ? 'complete' : 'question');
+    }
+    assert.equal(game.progress.completed, stage + 1);
+    assert.equal(game.progress.round, null);
+  }
+  assert.equal(game.start(12, 42), false);
+  for (let stage = 0; stage < 12; stage++) {
+    assert.equal(game.start(stage, 42), true);
+    for (let index = 0; index < 5; index++) {
+      game.answer(game.question.answer);
+      game.next();
+    }
+    assert.equal(game.progress.completed, 12);
+    assert.equal(new Adventure(game.serialize()).progress.completed, 12);
   }
 });

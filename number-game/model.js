@@ -81,6 +81,46 @@
       max: 100,
       kind: 'missing',
     },
+    {
+      name: '蜜蜂花园',
+      skill: '100 以内进位加法',
+      icon: '🐝',
+      item: '积木',
+      intro: '帮小蜜蜂把积木花朵合在一起',
+      reward: '花园徽章',
+      max: 100,
+      kind: 'addition',
+    },
+    {
+      name: '月亮湖',
+      skill: '100 以内退位减法',
+      icon: '🌙',
+      item: '积木',
+      intro: '分一分积木点亮月亮湖',
+      reward: '月亮徽章',
+      max: 100,
+      kind: 'subtraction',
+    },
+    {
+      name: '宝石矿洞',
+      skill: '100 以内两位数加减法',
+      icon: '💎',
+      item: '积木',
+      intro: '加加减减找出矿洞里的宝石',
+      reward: '宝石徽章',
+      max: 100,
+      kind: 'mixed',
+    },
+    {
+      name: '太阳营地',
+      skill: '100 以内综合填空',
+      icon: '☀️',
+      item: '积木',
+      intro: '找回数字让营地充满阳光',
+      reward: '太阳徽章',
+      max: 100,
+      kind: 'missing',
+    },
   ];
   const LENGTH = 5;
   function randomFrom(seed) {
@@ -91,6 +131,7 @@
     };
   }
   function questions(stage, seed) {
+    if (stage >= 8) return hundredQuestions(stage, seed);
     if (stage >= 4) return expandedQuestions(stage, seed);
     if (stage === 3) return rainbowQuestions(seed);
     const random = randomFrom(seed);
@@ -244,24 +285,80 @@
         : { a, b, operation, answer, options };
     });
   }
+  // Enumerate valid two-digit pairs once; sampling never needs retries or invalid ranges.
+  const hundredPairs = { addition: [], subtraction: [], fullHundred: [] };
+  for (let a = 10; a < 100; a++) {
+    for (let b = 10; b < 100; b++) {
+      if (a + b <= 100 && (a % 10) + (b % 10) >= 10) {
+        hundredPairs.addition.push([a, b]);
+        if (a + b === 100) hundredPairs.fullHundred.push([a, b]);
+      }
+      // Equal subtrahend and result would make a missing-number distractor ambiguous.
+      if (a >= b && b % 10 > a % 10 && b !== a - b) {
+        hundredPairs.subtraction.push([a, b]);
+      }
+    }
+  }
+  function hundredQuestions(stage, seed) {
+    const { kind } = LEVELS[stage];
+    const missing = kind === 'missing';
+    const random = randomFrom(seed);
+    const int = (min, max) => min + Math.floor(random() * (max - min + 1));
+    const pick = (pairs) => pairs[int(0, pairs.length - 1)];
+    return Array.from({ length: LENGTH }, (_, i) => {
+      let operation = kind === 'addition' || (kind !== 'subtraction' && i % 2 === 0) ? '+' : '−';
+      const unknown = i === 1 || i === 2 ? 'a' : 'b';
+      let [a, b] = pick(operation === '+' ? hundredPairs.addition : hundredPairs.subtraction);
+      if (i === LENGTH - 1 && missing) {
+        operation = '−';
+        b = seed % 2 === 0 ? 100 : 0;
+        a = b === 100 ? 100 : int(10, 99);
+      } else if (i === LENGTH - 1 && kind === 'mixed') {
+        if (seed % 2 === 0) {
+          [a, b] = pick(hundredPairs.fullHundred);
+        } else {
+          operation = '−';
+          a = int(10, 99);
+          b = a;
+        }
+      }
+      const result = operation === '+' ? a + b : a - b;
+      const answer = missing ? (unknown === 'a' ? a : b) : result;
+      const options = missing ? [answer, result] : [answer];
+      const candidates = Array.from({ length: 101 }, (_, n) => n).filter(
+        (n) => !options.includes(n),
+      );
+      for (let count = options.length; count < 3; count++) {
+        options.push(candidates.splice(int(0, candidates.length - 1), 1)[0]);
+      }
+      for (let j = options.length - 1; j > 0; j--) {
+        const k = int(0, j);
+        [options[j], options[k]] = [options[k], options[j]];
+      }
+      return missing
+        ? { a, b, operation, result, unknown, answer, options }
+        : { a, b, operation, answer, options };
+    });
+  }
+  const saveStageLimits = [0, 3, 2, 3, 4, 8, 12];
   function fresh() {
-    return { version: 5, completed: 0, round: null };
+    return { version: 6, completed: 0, round: null };
   }
   function restore(raw) {
     try {
       const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
       if (
         !data ||
-        ![1, 2, 3, 4, 5].includes(data.version) ||
+        ![1, 2, 3, 4, 5, 6].includes(data.version) ||
         !Number.isInteger(data.completed) ||
         data.completed < 0 ||
-        data.completed > [0, 3, 2, 3, 4, LEVELS.length][data.version]
+        data.completed > saveStageLimits[data.version]
       )
         return fresh();
-      const stageLimit = [0, 3, 2, 3, 4, LEVELS.length][data.version];
+      const stageLimit = saveStageLimits[data.version];
       const legacy = data.version === 1;
       const result = {
-        version: 5,
+        version: 6,
         completed: legacy ? Math.max(0, data.completed - 1) : data.completed,
         round: null,
       };
