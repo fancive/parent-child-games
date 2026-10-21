@@ -1,4 +1,4 @@
-const CACHE = 'pcg-v14-hundred-adventure';
+const CACHE = 'pcg-v15-english-rainbow';
 const ASSETS = [
   './',
   './index.html',
@@ -6,6 +6,11 @@ const ASSETS = [
   './shared/utils.js',
   './shared/init.js',
   './shared/variables.css',
+  './english-game/index.html',
+  './english-game/styles.css',
+  './english-game/data.js',
+  './english-game/model.js',
+  './english-game/game.js',
   './kitchen-game/index.html',
   './kitchen-game/kitchen.html',
   './kitchen-game/ride.html',

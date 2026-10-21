@@ -118,5 +118,9 @@ export default [
       'prefer-const': ['warn', { destructuring: 'all' }],
     },
   },
+  {
+    files: ['english-game/*.js'],
+    languageOptions: { sourceType: 'module' },
+  },
   prettier,
 ];

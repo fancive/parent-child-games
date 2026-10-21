@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#27684a" />
+    <meta
+      name="description"
+      content="配合 New MidiEnglish 第三册的亲子英语复习游戏，听音找图、单词积木，慢慢玩，开心学。"
+    />
+    <title>英语彩虹岛 · 亲子游戏乐园</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="game.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到游戏</a>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="back-link" href="../">← 游戏乐园</a>
+        <a class="island-brand" href="./" aria-label="英语彩虹岛首页"
+          ><span aria-hidden="true">🌈</span> 英语彩虹岛</a
+        >
+        <button
+          class="album-link"
+          id="album-toggle"
+          type="button"
+          aria-expanded="false"
+          aria-controls="sticker-album"
+        >
+          贴纸 <span id="sticker-count">0</span>/10
+        </button>
+      </header>
+
+      <main id="main">
+        <section class="intro" id="intro" aria-labelledby="page-title">
+          <h1 id="page-title">今天去哪里玩英语？</h1>
+          <p class="intro-copy">听听英语，拼拼单词。每次 6 小题，收集属于你的彩虹贴纸。</p>
+        </section>
+
+        <section id="sticker-album" class="sticker-album" aria-labelledby="album-title" hidden>
+          <div>
+            <h2 id="album-title">我的探险贴纸</h2>
+            <p id="album-description">每完成一轮，就带回一份小惊喜。</p>
+          </div>
+          <div id="sticker-grid" class="sticker-grid"></div>
+        </section>
+
+        <div id="explore-panel">
+          <div class="book-tabs" role="tablist" aria-label="选择复习课本">
+            <button
+              id="tab-theme"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              aria-controls="island-panel"
+              tabindex="0"
+              data-book="theme"
+            >
+              <span aria-hidden="true">🌻</span> 主题乐园 <small>听音找图</small>
+            </button>
+            <button
+              id="tab-phonics"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              aria-controls="island-panel"
+              tabindex="-1"
+              data-book="phonics"
+            >
+              <span aria-hidden="true">🧩</span> 拼读工坊 <small>单词积木</small>
+            </button>
+          </div>
+
+          <div class="explore-grid" id="island-panel" role="tabpanel" aria-labelledby="tab-theme">
+            <section class="island-map" aria-label="选择复习单元">
+              <div class="map-caption">
+                <span class="map-dot"></span> 你的复习小岛
+                <span id="map-range">5 个单元，随心出发</span>
+              </div>
+              <svg
+                class="map-art"
+                viewBox="0 0 700 490"
+                preserveAspectRatio="xMidYMid slice"
+                aria-hidden="true"
+              >
+                <defs>
+                  <linearGradient id="islandGrass" x1="0" y1="0" x2="0" y2="1">
+                    <stop stop-color="#cde9ad" />
+                    <stop offset="1" stop-color="#a8d18d" />
+                  </linearGradient>
+                </defs>
+                <circle cx="596" cy="79" r="30" fill="#f8c84e" />
+                <g fill="none" stroke-width="15" opacity=".68">
+                  <path d="M 108 200 A 160 160 0 0 1 428 200" stroke="#df8c89" />
+                  <path d="M 124 200 A 144 144 0 0 1 412 200" stroke="#f8c84e" />
+                  <path d="M 140 200 A 128 128 0 0 1 396 200" stroke="#9dc995" />
+                  <path d="M 156 200 A 112 112 0 0 1 380 200" stroke="#84bbce" />
+                </g>
+                <g fill="#fff" opacity=".9">
+                  <ellipse cx="116" cy="184" rx="66" ry="21" />
+                  <circle cx="100" cy="168" r="28" />
+                  <circle cx="137" cy="170" r="22" />
+                  <ellipse cx="437" cy="199" rx="63" ry="20" />
+                  <circle cx="417" cy="180" r="27" />
+                  <circle cx="451" cy="186" r="21" />
+                </g>
+                <path
+                  d="M -20 355 Q 130 245 300 336 Q 450 247 720 340 L 720 520 L -20 520 Z"
+                  fill="url(#islandGrass)"
+                />
+                <path
+                  d="M -20 451 Q 120 385 270 430 T 720 416 L 720 520 L -20 520 Z"
+                  fill="#98c788"
+                  opacity=".7"
+                />
+                <path
+                  d="M 109 327 C 180 430 246 412 281 298 S 411 189 472 312 S 618 390 602 198"
+                  fill="none"
+                  stroke="#fff8dc"
+                  stroke-width="24"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M 109 327 C 180 430 246 412 281 298 S 411 189 472 312 S 618 390 602 198"
+                  fill="none"
+                  stroke="#d3bc83"
+                  stroke-width="3"
+                  stroke-dasharray="3 13"
+                  stroke-linecap="round"
+                />
+                <g font-size="22">
+                  <text x="54" y="433">🌼</text>
+                  <text x="334" y="458">🌼</text>
+                  <text x="552" y="457">🌱</text>
+                  <text x="655" y="380">🌼</text>
+                  <text x="371" y="327">🌱</text>
+                </g>
+              </svg>
+              <div id="map-nodes" class="map-nodes"></div>
+              <span class="map-note">点一个地标，选一段小冒险</span>
+            </section>
+
+            <section class="departure-card" aria-labelledby="departure-title">
+              <p class="eyebrow" id="selection-kicker">两本课本 · 快乐复习</p>
+              <h2 id="departure-title">今天，去哪里？</h2>
+              <p id="selection-description" class="selection-description"></p>
+              <button id="all-units" class="all-units selected" type="button" aria-pressed="true">
+                ✦ 全部单元混合复习
+              </button>
+              <div class="round-note">
+                <span aria-hidden="true">🎧</span>
+                <p id="activity-description"></p>
+              </div>
+              <button class="button primary start-button" id="start-round" type="button">
+                出发，玩 6 题
+              </button>
+              <button class="button text-button" id="review-missed" type="button">
+                再练练错题 <span id="missed-count">0</span>
+              </button>
+              <p class="gentle-note">没有倒计时，答错也没关系。</p>
+            </section>
+          </div>
+        </div>
+
+        <section
+          id="play-section"
+          class="play-section"
+          aria-labelledby="question-title"
+          hidden
+        ></section>
+        <p id="storage-warning" class="save-warning" role="status" hidden></p>
+
+        <details class="parent-settings" id="parent-settings">
+          <summary>
+            <span aria-hidden="true">⚙</span> 家长小角落
+            <span class="summary-note">复习范围与发音</span>
+          </summary>
+          <div class="parent-content">
+            <h2>按孩子的节奏，选复习范围</h2>
+            <p>
+              默认开放两本书的全部 5 单元。不清楚课堂进度也可以直接玩；想缩小范围时，再在这里调整。
+            </p>
+            <div class="range-settings">
+              <label for="theme-range"
+                >主题课本<select id="theme-range" data-range="theme">
+                  <option value="1">第 1 单元</option>
+                  <option value="2">第 1—2 单元</option>
+                  <option value="3">第 1—3 单元</option>
+                  <option value="4">第 1—4 单元</option>
+                  <option value="5">全部 5 单元</option>
+                </select></label
+              >
+              <label for="phonics-range"
+                >拼读课本<select id="phonics-range" data-range="phonics">
+                  <option value="1">第 1 单元</option>
+                  <option value="2">第 1—2 单元</option>
+                  <option value="3">第 1—3 单元</option>
+                  <option value="4">第 1—4 单元</option>
+                  <option value="5">全部 5 单元</option>
+                </select></label
+              >
+            </div>
+            <label class="reading-mode"
+              ><input type="checkbox" id="parent-reading" /> 家长读词模式
+              <span>题目中直接显示英文，方便家长读给孩子听</span></label
+            >
+            <p id="voice-status" class="voice-status"></p>
+            <p>
+              只朗读完整英文单词和例句；拼读积木不把字母名称当作字母发音。游戏不录音，也不评判孩子的口音。
+            </p>
+            <p class="source-note">
+              按官方 Level 3
+              大纲制作；实际页码和课堂顺序请以手中教材为准。这里是精选词汇的原创复习游戏，未覆盖整册所有课文与练习。<a
+                href="https://midienglishpub.oss-cn-beijing.aliyuncs.com/NewMidiEnglish/resources/lessonPlan/Level3-LessonPlan.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                >查看官方大纲 ↗</a
+              >
+            </p>
+            <p class="save-note" id="save-note">
+              复习范围、贴纸和错题保存在这台设备。刷新后从新的一轮开始。
+            </p>
+          </div>
+        </details>
+        <p id="app-announcement" class="sr-only" role="status" aria-live="polite"></p>
+      </main>
+      <footer>一小步，一点点。陪孩子把英语玩起来。<span aria-hidden="true"> ✿</span></footer>
+    </div>
+  </body>
+</html>
