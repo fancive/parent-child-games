@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#fff8e8" />
+    <meta
+      name="description"
+      content="适合5–6岁小朋友的小蜜蜂射击游戏，左右飞行、自动发射小星星，开启温柔的花园冒险。"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'"
+    />
+    <title>小蜜蜂出发！ · 亲子游戏</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="model.js" defer></script>
+    <script src="game.js" defer></script>
+  </head>
+  <body>
+    <main class="page">
+      <nav class="topbar" aria-label="游戏导航">
+        <a class="back" href="../index.html"><span aria-hidden="true">‹</span> 游戏小屋</a>
+        <span class="brand"
+          ><span class="brand-flower" aria-hidden="true">✿</span> 小小花园冒险</span
+        >
+        <button id="sound" class="quiet-button" type="button" aria-pressed="true">♪ 声音开</button>
+      </nav>
+      <header class="heading">
+        <div class="heading-copy">
+          <p class="eyebrow">给小小飞行员的第一场冒险</p>
+          <h1>小蜜蜂，出发！<span aria-hidden="true">✦</span></h1>
+          <p class="subtitle">挥挥翅膀，发射星星，把泡泡虫送回家。</p>
+        </div>
+        <div class="age-note">
+          <span aria-hidden="true">☀</span>
+          <div>慢慢飞，也很棒<small>适合 5–6 岁的小朋友</small></div>
+        </div>
+      </header>
+      <section class="game-frame" aria-label="小蜜蜂射击游戏">
+        <div class="game-toolbar">
+          <div class="score">
+            <span class="stat-icon" aria-hidden="true">★</span
+            ><span><small>小星星</small><strong id="score">0</strong></span>
+          </div>
+          <div class="level">
+            <span class="level-dot" aria-hidden="true"></span><span id="level">花园第 1 关</span
+            ><span class="level-total">/ 3</span>
+          </div>
+          <div class="hearts" role="img" aria-label="还有3颗爱心">
+            <span aria-hidden="true">♥ ♥ ♥</span>
+          </div>
+          <button id="pause" class="pause-button" type="button" aria-label="暂停游戏" disabled>
+            Ⅱ
+          </button>
+        </div>
+        <div class="garden" id="garden">
+          <canvas id="game" aria-label="左右移动小蜜蜂，自动向上发射星星，躲开泡泡" tabindex="0"
+            >请使用支持 Canvas 的浏览器玩游戏。</canvas
+          >
+          <div class="scene-tag" aria-hidden="true"><span>✿</span> 阳光花园</div>
+          <div id="announcement" class="announcement" hidden></div>
+          <section id="overlay" class="overlay" aria-labelledby="overlay-title">
+            <div class="welcome-card">
+              <span class="welcome-kicker" id="overlay-kicker">翅膀准备好了吗？</span>
+              <h2 id="overlay-title">今天，你是小小飞行员</h2>
+              <p id="overlay-description">左右飞一飞，小星星会自动发射哦！</p>
+              <button id="start" class="primary-button" type="button">
+                出发啦 <span aria-hidden="true">➜</span>
+              </button>
+              <span class="welcome-note" id="overlay-note">不用着急，没有倒计时</span>
+            </div>
+          </section>
+        </div>
+        <div class="controls">
+          <div class="control-tip">
+            <span class="tip-hand" aria-hidden="true">↔</span>
+            <div><strong>左右飞，躲泡泡</strong><small>拖动小蜜蜂，或按左右方向键</small></div>
+          </div>
+          <div class="direction-buttons" aria-label="飞行方向">
+            <button id="left" type="button" aria-label="向左飞">◀</button>
+            <span class="auto-fire"><span aria-hidden="true">✦</span> 自动发射</span>
+            <button id="right" type="button" aria-label="向右飞">▶</button>
+          </div>
+        </div>
+      </section>
+      <footer class="footer">
+        <span><span aria-hidden="true">♡</span> 和爸爸妈妈一起，勇敢试一试</span
+        ><button id="help" type="button">怎么玩？</button>
+      </footer>
+      <p id="status" class="sr-only" role="status" aria-live="polite"></p>
+    </main>
+    <dialog id="help-dialog" aria-labelledby="help-title">
+      <h2 id="help-title">一起学飞行</h2>
+      <p>↔ 拖动画面，或者按 ◀ ▶，让小蜜蜂左右飞。</p>
+      <p>✦ 小星星会自动发射，打中上方的泡泡虫就能得分。</p>
+      <p>♡ 躲开落下来的泡泡。碰到了也没关系，还有爱心保护你。</p>
+      <p>✿ 一共有 3 关，随时可以暂停休息。</p>
+      <form method="dialog"><button class="primary-button">知道啦</button></form>
+    </dialog>
+  </body>
+</html>

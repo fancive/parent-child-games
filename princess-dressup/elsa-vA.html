@@ -1,0 +1,429 @@
+<title>公主模特 · 优雅 chibi 重设计 vA</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+    color: #4a4258;
+    background:
+      radial-gradient(1200px 700px at 20% -10%, #eaf4ff 0%, rgba(234,244,255,0) 60%),
+      radial-gradient(1000px 700px at 90% 0%, #f3eaff 0%, rgba(243,234,255,0) 55%),
+      linear-gradient(180deg, #f7f3fb 0%, #eef2fb 100%);
+    min-height: 100vh;
+    padding: 40px 20px 64px;
+  }
+  header { text-align: center; max-width: 900px; margin: 0 auto 34px; }
+  h1 {
+    font-size: 27px; font-weight: 700; letter-spacing: .5px;
+    margin: 0 0 10px; color: #574b6b;
+  }
+  header p { margin: 0; font-size: 15px; line-height: 1.7; color: #7d7391; }
+  .row {
+    display: flex; flex-wrap: wrap; gap: 36px;
+    justify-content: center; align-items: flex-start;
+    max-width: 1000px; margin: 0 auto;
+  }
+  .card {
+    background: rgba(255,255,255,0.72);
+    border: 1px solid rgba(255,255,255,0.9);
+    border-radius: 26px;
+    padding: 22px 24px 26px;
+    box-shadow: 0 18px 46px -20px rgba(120,110,160,0.5), 0 2px 8px rgba(120,110,160,0.08);
+    backdrop-filter: blur(4px);
+    width: 428px; max-width: 92vw;
+    text-align: center;
+  }
+  .stage {
+    border-radius: 20px;
+    background: linear-gradient(180deg, #fbfcff 0%, #f2f0fb 100%);
+    box-shadow: inset 0 2px 14px rgba(120,110,160,0.10);
+    padding: 8px 0 2px;
+  }
+  .doll { width: 380px; max-width: 100%; height: auto; display: block; margin: 0 auto; }
+  .tag {
+    display: inline-block; margin: 16px 0 8px;
+    font-size: 12.5px; font-weight: 700; letter-spacing: 1px;
+    padding: 5px 14px; border-radius: 999px;
+  }
+  .tag-a { background: #e3f1fc; color: #3f7fb0; }
+  .tag-b { background: #fce3ef; color: #c05a8b; }
+  .card h2 { font-size: 18px; margin: 4px 0 8px; color: #574b6b; }
+  .card ul { list-style: none; margin: 0; padding: 0; font-size: 13.5px; line-height: 1.85; color: #7d7391; }
+  .card ul li::before { content: "· "; color: #b8aecd; }
+  footer { text-align: center; max-width: 760px; margin: 38px auto 0; font-size: 12.5px; color: #9990ad; line-height: 1.7; }
+  code { background: rgba(140,130,170,0.12); padding: 1px 6px; border-radius: 6px; font-size: 12px; }
+</style>
+
+<header>
+  <h1>公主模特 · 优雅 chibi 重设计（方案 A）</h1>
+  <p>同一位模特的两套穿搭。头身比从大头娃娃改为约 3.2 头身，纤颈、肘部弧度、修长腿。<br>
+     气质取向：修长、仙气、精致——脸是重点：多层虹膜、明显睫毛、细弯眉、温柔浅笑。</p>
+</header>
+
+<div class="row">
+
+  <!-- ============================== OUTFIT A ============================== -->
+  <div class="card">
+    <div class="stage">
+      <svg class="doll" viewBox="0 0 320 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="穿冰蓝礼服的公主模特">
+        <defs>
+          <linearGradient id="mA-bodice" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#E4F3FD"/><stop offset="1" stop-color="#A9D6F2"/>
+          </linearGradient>
+          <linearGradient id="mA-skirt" x1="0.2" y1="0" x2="0.5" y2="1">
+            <stop offset="0" stop-color="#D3ECFB"/><stop offset="0.55" stop-color="#A6D3F1"/><stop offset="1" stop-color="#79B4E2"/>
+          </linearGradient>
+          <linearGradient id="mA-skirt2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#F1F9FF"/><stop offset="1" stop-color="#C4E3F8"/>
+          </linearGradient>
+          <linearGradient id="mA-hairback" x1="0.15" y1="0" x2="0.85" y2="1">
+            <stop offset="0" stop-color="#F5F6FB"/><stop offset="0.5" stop-color="#DEE2ED"/><stop offset="1" stop-color="#C2C8DA"/>
+          </linearGradient>
+          <linearGradient id="mA-hairfront" x1="0.2" y1="0" x2="0.8" y2="1">
+            <stop offset="0" stop-color="#FCFDFF"/><stop offset="1" stop-color="#D0D6E5"/>
+          </linearGradient>
+          <linearGradient id="mA-braid" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#FBFCFF"/><stop offset="1" stop-color="#CAD1E2"/>
+          </linearGradient>
+          <radialGradient id="mA-snow" cx="50%" cy="50%" r="55%">
+            <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#CDE9FB"/>
+          </radialGradient>
+        </defs>
+
+        <!-- ===== hairBack: platinum swept crown + soft back sweep ===== -->
+        <g id="hairBack">
+          <path d="M100,122 C94,60 128,36 160,36 C192,36 226,60 220,122 C224,152 216,176 205,188 C209,152 206,120 199,101 C160,95 120,95 121,101 C114,120 111,152 115,188 C104,176 96,152 100,122 Z" fill="url(#mA-hairback)"/>
+          <path d="M199,101 C214,120 220,150 214,196 C222,176 226,150 220,120 C214,104 206,100 199,101 Z" fill="url(#mA-hairback)"/>
+          <path d="M118,58 C140,44 182,44 204,60" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+          <path d="M110,92 C120,74 145,64 160,64 C178,64 198,74 210,92" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+        </g>
+
+        <!-- ===== BODY (identical across both outfits) ===== -->
+        <g id="body">
+          <defs>
+            <radialGradient id="pm-skin" cx="45%" cy="36%" r="72%">
+              <stop offset="0" stop-color="#FFF4EC"/><stop offset="0.6" stop-color="#FCE4D4"/><stop offset="1" stop-color="#F6D2BD"/>
+            </radialGradient>
+            <radialGradient id="pm-iris" cx="50%" cy="40%" r="62%">
+              <stop offset="0" stop-color="#D3ECFC"/><stop offset="0.42" stop-color="#5EA6DA"/><stop offset="0.8" stop-color="#3277AE"/><stop offset="1" stop-color="#244E77"/>
+            </radialGradient>
+            <linearGradient id="pm-lip" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ED96A8"/><stop offset="1" stop-color="#DD7089"/>
+            </linearGradient>
+          </defs>
+          <path d="M146,176 C145,190 144,201 139,212 L181,212 C176,201 175,190 174,176 C165,184 155,184 146,176 Z" fill="url(#pm-skin)"/>
+          <path d="M145,178 C154,187 166,187 175,178 C172,190 148,190 145,178 Z" fill="#E7B49B" opacity="0.35"/>
+          <path d="M132,214 C127,242 131,272 138,292 C133,300 130,308 130,316 L190,316 C190,308 187,300 182,292 C189,272 193,242 188,214 C170,224 150,224 132,214 Z" fill="url(#pm-skin)"/>
+          <path d="M136,314 C132,356 130,404 136,448 C137,462 140,474 146,479 C151,481 156,478 157,470 C159,430 160,368 159,316 C152,322 143,322 136,314 Z" fill="url(#pm-skin)"/>
+          <path d="M184,314 C188,356 190,404 184,448 C183,462 180,474 174,479 C169,481 164,478 163,470 C161,430 160,368 161,316 C168,322 177,322 184,314 Z" fill="url(#pm-skin)"/>
+          <path d="M140,474 C138,484 143,490 150,489 C156,488 158,482 157,475 C151,479 145,479 140,474 Z" fill="url(#pm-skin)"/>
+          <path d="M180,474 C182,484 177,490 170,489 C164,488 162,482 163,475 C169,479 175,479 180,474 Z" fill="url(#pm-skin)"/>
+          <path d="M160,50 C195,50 215,76 217,113 C218,141 205,169 178,182 C166,188 154,188 142,182 C115,169 102,141 103,113 C105,76 125,50 160,50 Z" fill="url(#pm-skin)"/>
+          <path d="M108,120 C110,150 124,174 150,184 C140,182 120,168 112,146 C108,138 106,128 108,120 Z" fill="#EDBFA6" opacity="0.28"/>
+          <path d="M212,120 C210,150 196,174 170,184 C180,182 200,168 208,146 C212,138 214,128 212,120 Z" fill="#EDBFA6" opacity="0.28"/>
+          <ellipse cx="129" cy="150" rx="12" ry="7" fill="#F6A6C4" opacity="0.32"/>
+          <ellipse cx="191" cy="150" rx="12" ry="7" fill="#F6A6C4" opacity="0.32"/>
+          <path d="M124,109 C132,105 142,104 150,107" fill="none" stroke="#C89B79" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M196,109 C188,105 178,104 170,107" fill="none" stroke="#C89B79" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M124,132 C129,121 138,118 143,118 C150,118 155,124 156,130 C151,140 137,143 129,140 C126,138 124,135 124,132 Z" fill="#FCFDFF"/>
+          <circle cx="140" cy="131" r="11" fill="url(#pm-iris)"/>
+          <circle cx="140" cy="132" r="4.6" fill="#241A24"/>
+          <circle cx="135.5" cy="126.5" r="3.1" fill="#FFFFFF"/>
+          <circle cx="144" cy="135" r="1.5" fill="#FFFFFF" opacity="0.9"/>
+          <path d="M123,131 C128,120 138,117 144,117 C151,117 156,123 158,129" fill="none" stroke="#33262C" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M123,131 C120,130 118,131 116,129" fill="none" stroke="#33262C" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M129,120 C137,116 147,117 154,122" fill="none" stroke="#E7B49B" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+          <path d="M130,139 C136,142 142,142 149,140" fill="none" stroke="#7A565C" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+          <path d="M196,132 C191,121 182,118 177,118 C170,118 165,124 164,130 C169,140 183,143 191,140 C194,138 196,135 196,132 Z" fill="#FCFDFF"/>
+          <circle cx="180" cy="131" r="11" fill="url(#pm-iris)"/>
+          <circle cx="180" cy="132" r="4.6" fill="#241A24"/>
+          <circle cx="175.5" cy="126.5" r="3.1" fill="#FFFFFF"/>
+          <circle cx="184" cy="135" r="1.5" fill="#FFFFFF" opacity="0.9"/>
+          <path d="M197,131 C192,120 182,117 176,117 C169,117 164,123 162,129" fill="none" stroke="#33262C" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M197,131 C200,130 202,131 204,129" fill="none" stroke="#33262C" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M191,120 C183,116 173,117 166,122" fill="none" stroke="#E7B49B" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+          <path d="M190,139 C184,142 178,142 171,140" fill="none" stroke="#7A565C" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+          <path d="M156,157 C158,160 162,160 164,157" fill="none" stroke="#E3AE93" stroke-width="1.4" stroke-linecap="round" opacity="0.7"/>
+          <path d="M147,165 C152,163 157,164 160,165 C163,164 168,163 173,165 C170,172 164,176 160,176 C156,176 150,172 147,165 Z" fill="url(#pm-lip)"/>
+          <path d="M147,165 C154,167 166,167 173,165" fill="none" stroke="#CE6B80" stroke-width="0.8" stroke-linecap="round" opacity="0.7"/>
+          <ellipse cx="160" cy="172" rx="4" ry="1.5" fill="#FBD2DA" opacity="0.7"/>
+          <path d="M131,215 C117,235 108,260 107,285 C107,307 111,327 116,341 C111,347 110,355 115,358 C119,361 126,361 128,357 C131,353 130,346 129,341 C127,327 124,307 125,287 C127,263 135,240 143,228 C139,223 135,219 131,215 Z" fill="url(#pm-skin)"/>
+          <path d="M189,215 C203,235 212,260 213,285 C213,307 209,327 204,341 C209,347 210,355 205,358 C201,361 194,361 192,357 C189,353 190,346 191,341 C193,327 196,307 195,287 C193,263 185,240 177,228 C181,223 185,219 189,215 Z" fill="url(#pm-skin)"/>
+          <path d="M128,344 C132,344 133,349 129,350 C127,349 126,345 128,344 Z" fill="url(#pm-skin)"/>
+          <path d="M192,344 C188,344 187,349 191,350 C193,349 194,345 192,344 Z" fill="url(#pm-skin)"/>
+          <path d="M124,290 C126,310 128,326 132,340" fill="none" stroke="#E7B49B" stroke-width="1.4" opacity="0.4" stroke-linecap="round"/>
+          <path d="M196,290 C194,310 192,326 188,340" fill="none" stroke="#E7B49B" stroke-width="1.4" opacity="0.4" stroke-linecap="round"/>
+        </g>
+
+        <!-- ===== shoes (silver tips, mostly under hem) ===== -->
+        <g id="shoes">
+          <path d="M146,482 C143,490 148,494 155,492 C160,491 161,485 159,480 C153,484 149,484 146,482 Z" fill="#DCEBF7"/>
+          <path d="M174,482 C177,490 172,494 165,492 C160,491 159,485 161,480 C167,484 171,484 174,482 Z" fill="#DCEBF7"/>
+        </g>
+
+        <!-- ===== dress: ice-blue floor gown ===== -->
+        <g id="dress">
+          <path d="M132,300 C131,320 131,340 130,360 C112,420 96,470 82,502 Q160,516 238,502 C224,470 208,420 190,360 C189,340 189,320 188,300 C170,310 150,310 132,300 Z" fill="url(#mA-skirt)"/>
+          <path d="M138,312 C136,338 134,360 132,378 C120,424 108,466 98,494 Q160,506 222,494 C212,466 200,424 188,378 C186,360 184,338 182,312 C168,320 152,320 138,312 Z" fill="url(#mA-skirt2)" opacity="0.7"/>
+          <path d="M151,306 C148,360 148,440 151,498 Q160,500 169,498 C172,440 172,360 169,306 C164,310 156,310 151,306 Z" fill="#F4FAFF" opacity="0.42"/>
+          <path d="M132,360 C122,404 108,452 94,496" fill="none" stroke="#7FB6E2" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+          <path d="M150,362 C146,410 144,456 143,498" fill="none" stroke="#7FB6E2" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+          <path d="M170,362 C174,410 176,456 177,498" fill="none" stroke="#7FB6E2" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+          <path d="M188,360 C198,404 212,452 226,496" fill="none" stroke="#7FB6E2" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+          <path d="M82,502 Q100,494 116,502 Q132,494 148,502 Q160,496 172,502 Q188,494 204,502 Q220,494 238,502 L236,512 Q160,522 84,512 Z" fill="#EAF7FF" opacity="0.55"/>
+          <path d="M124,220 C132,214 150,216 160,224 C170,216 188,214 196,220 C200,248 197,278 189,300 C170,310 150,310 131,300 C123,278 120,248 124,220 Z" fill="url(#mA-bodice)"/>
+          <path d="M128,223 C138,233 152,237 160,232 C168,237 182,233 192,223" fill="none" stroke="#F2FAFF" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+          <path d="M159,229 C157,256 157,281 160,300 C163,281 163,256 161,229 Z" fill="#F2FAFF" opacity="0.4"/>
+          <path d="M131,297 C145,305 175,305 189,297" fill="none" stroke="#EAF7FF" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="140" cy="299" r="2" fill="#FFFFFF"/><circle cx="160" cy="302" r="2.4" fill="#FFFFFF"/><circle cx="180" cy="299" r="2" fill="#FFFFFF"/>
+          <path d="M120,406 Q121,411 126,412 Q121,413 120,418 Q119,413 114,412 Q119,411 120,406 Z" fill="#FFFFFF"/>
+          <path d="M150,452 Q151,456 155,457 Q151,458 150,462 Q149,458 145,457 Q149,456 150,452 Z" fill="#FFFFFF"/>
+          <path d="M192,410 Q193,415 198,416 Q193,417 192,422 Q191,417 186,416 Q191,415 192,410 Z" fill="#FFFFFF"/>
+          <path d="M176,466 Q177,470 181,471 Q177,472 176,476 Q175,472 171,471 Q175,470 176,466 Z" fill="#FFFFFF"/>
+          <path d="M110,470 Q111,474 115,475 Q111,476 110,480 Q109,476 105,475 Q109,474 110,470 Z" fill="#FFFFFF" opacity="0.9"/>
+          <path d="M210,456 Q211,460 215,461 Q211,462 210,466 Q209,462 205,461 Q209,460 210,456 Z" fill="#FFFFFF" opacity="0.9"/>
+          <circle cx="136" cy="436" r="1.8" fill="#FFFFFF" opacity="0.85"/><circle cx="164" cy="420" r="1.8" fill="#FFFFFF" opacity="0.85"/>
+          <circle cx="200" cy="440" r="1.8" fill="#FFFFFF" opacity="0.85"/><circle cx="120" cy="450" r="1.6" fill="#FFFFFF" opacity="0.8"/>
+          <circle cx="186" cy="484" r="1.6" fill="#FFFFFF" opacity="0.8"/><circle cx="150" cy="484" r="1.6" fill="#FFFFFF" opacity="0.8"/>
+        </g>
+
+        <!-- ===== accFront: delicate snowflake pendant ===== -->
+        <g id="accFront">
+          <path d="M140,214 Q160,230 180,214" fill="none" stroke="#DCEBF7" stroke-width="1.6"/>
+          <g transform="translate(160,232)" stroke="#EAF7FF" stroke-width="1.4" stroke-linecap="round">
+            <path d="M0,-7 L0,7 M-6,-3.5 L6,3.5 M-6,3.5 L6,-3.5"/>
+          </g>
+          <circle cx="160" cy="232" r="2" fill="#FFFFFF"/>
+        </g>
+
+        <!-- ===== hairFront: side-swept fringe + face-frame + HERO side braid ===== -->
+        <g id="hairFront">
+          <!-- soft side-swept fringe (reveals forehead, not a helmet) -->
+          <path d="M112,106 C110,80 130,58 160,56 C186,55 208,68 214,96 C206,86 196,84 187,90 C182,82 172,82 165,90 C160,80 150,80 145,90 C138,84 128,86 122,96 C118,100 114,102 112,106 Z" fill="url(#mA-hairfront)"/>
+          <path d="M150,60 C160,70 176,74 200,90" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" opacity="0.6"/>
+          <path d="M140,64 C132,74 126,84 124,94" fill="none" stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round" opacity="0.5"/>
+          <!-- right temple face-frame wisp -->
+          <path d="M212,110 C219,138 217,164 206,184 C206,162 206,140 200,120 C204,113 209,110 212,110 Z" fill="url(#mA-hairfront)"/>
+          <path d="M209,116 C214,140 213,162 205,180" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+          <!-- HERO: platinum side braid over LEFT shoulder, in front of bodice -->
+          <!-- dark envelope: shows between locks as woven shadow -->
+          <path d="M118,100 C104,118 99,150 105,184 C97,212 101,246 113,276 C121,300 126,320 124,336 C119,322 109,302 101,284 C89,252 87,214 97,184 C91,150 98,118 112,98 Z" fill="#BCC4D7"/>
+          <path d="M112,102 C104,120 101,150 108,182" fill="none" stroke="#F4F6FC" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+          <!-- interwoven locks: alternating diagonal lenses -->
+          <g stroke="#AEB6CD" stroke-width="0.7">
+            <g transform="translate(104,198) rotate(26)"><path d="M-13,0 C-9,-9 9,-9 13,0 C9,9 -9,9 -13,0 Z" fill="url(#mA-braid)"/></g>
+            <g transform="translate(108,217) rotate(-26)"><path d="M-13,0 C-9,-9 9,-9 13,0 C9,9 -9,9 -13,0 Z" fill="url(#mA-braid)"/></g>
+            <g transform="translate(111,236) rotate(26) scale(0.96)"><path d="M-13,0 C-9,-9 9,-9 13,0 C9,9 -9,9 -13,0 Z" fill="url(#mA-braid)"/></g>
+            <g transform="translate(114,255) rotate(-26) scale(0.93)"><path d="M-13,0 C-9,-9 9,-9 13,0 C9,9 -9,9 -13,0 Z" fill="url(#mA-braid)"/></g>
+            <g transform="translate(117,274) rotate(26) scale(0.88)"><path d="M-13,0 C-9,-9 9,-9 13,0 C9,9 -9,9 -13,0 Z" fill="url(#mA-braid)"/></g>
+            <g transform="translate(119,293) rotate(-26) scale(0.82)"><path d="M-13,0 C-9,-9 9,-9 13,0 C9,9 -9,9 -13,0 Z" fill="url(#mA-braid)"/></g>
+            <g transform="translate(121,311) rotate(26) scale(0.74)"><path d="M-13,0 C-9,-9 9,-9 13,0 C9,9 -9,9 -13,0 Z" fill="url(#mA-braid)"/></g>
+          </g>
+          <path d="M106,205 C110,240 116,280 122,312" fill="none" stroke="#FFFFFF" stroke-width="1" stroke-linecap="round" opacity="0.45"/>
+          <!-- wispy braid tail -->
+          <path d="M118,322 C126,336 126,350 118,360 C122,348 118,336 113,328 C114,325 116,322 118,322 Z" fill="url(#mA-braid)"/>
+          <path d="M124,324 C130,336 130,350 123,360" fill="none" stroke="#CAD1E2" stroke-width="1.3" stroke-linecap="round"/>
+        </g>
+
+        <!-- ===== hairAcc: snowflake tiara + clips ===== -->
+        <g id="hairAcc">
+          <g stroke="#BFE1F5" stroke-width="1.5" stroke-linecap="round">
+            <g transform="translate(160,58)">
+              <path d="M0,-11 L0,11 M-9.5,-5.5 L9.5,5.5 M-9.5,5.5 L9.5,-5.5"/>
+              <path d="M0,-11 l-2.5,3 M0,-11 l2.5,3 M9.5,5.5 l-3.6,-.4 M9.5,5.5 l-.4,-3.6 M-9.5,5.5 l3.6,-.4 M-9.5,5.5 l.4,-3.6 M9.5,-5.5 l-3.6,.4 M9.5,-5.5 l-.4,3.6 M-9.5,-5.5 l3.6,.4 M-9.5,-5.5 l.4,3.6"/>
+            </g>
+          </g>
+          <circle cx="160" cy="58" r="3" fill="url(#mA-snow)"/>
+          <g stroke="#CFE9FA" stroke-width="1.1" stroke-linecap="round">
+            <g transform="translate(118,86) scale(0.62)"><path d="M0,-9 L0,9 M-8,-4.6 L8,4.6 M-8,4.6 L8,-4.6"/></g>
+            <g transform="translate(206,92) scale(0.55)"><path d="M0,-9 L0,9 M-8,-4.6 L8,4.6 M-8,4.6 L8,-4.6"/></g>
+          </g>
+          <circle cx="118" cy="86" r="2" fill="#FFFFFF"/><circle cx="206" cy="92" r="1.8" fill="#FFFFFF"/>
+        </g>
+      </svg>
+    </div>
+    <div class="tag tag-a">穿搭 A · 仙气验证</div>
+    <h2>冰蓝及地礼服</h2>
+    <ul>
+      <li>冰蓝缎面礼服，多层裙摆 + 缎光 + 碎钻星点</li>
+      <li>铂金大侧编发，麻花辫搭在左肩前压住裙身</li>
+      <li>雪花发饰：头顶主雪花冠 + 两侧小雪花卡</li>
+    </ul>
+  </div>
+
+  <!-- ============================== OUTFIT B ============================== -->
+  <div class="card">
+    <div class="stage">
+      <svg class="doll" viewBox="0 0 320 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="穿粉色蓬蓬裙的公主模特">
+        <defs>
+          <linearGradient id="mB-bodice" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#FAC1D6"/><stop offset="1" stop-color="#EA84AD"/>
+          </linearGradient>
+          <linearGradient id="mB-skirt" x1="0.2" y1="0" x2="0.5" y2="1">
+            <stop offset="0" stop-color="#FBCADD"/><stop offset="0.55" stop-color="#F49FC1"/><stop offset="1" stop-color="#EC7FAC"/>
+          </linearGradient>
+          <linearGradient id="mB-skirt2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#FFE7F1"/><stop offset="1" stop-color="#F9BAD5"/>
+          </linearGradient>
+          <linearGradient id="mB-hairback" x1="0.2" y1="0" x2="0.8" y2="1">
+            <stop offset="0" stop-color="#7A5236"/><stop offset="0.55" stop-color="#5E3F28"/><stop offset="1" stop-color="#42291A"/>
+          </linearGradient>
+          <linearGradient id="mB-hairfront" x1="0.2" y1="0" x2="0.8" y2="1">
+            <stop offset="0" stop-color="#875C3D"/><stop offset="1" stop-color="#4C3120"/>
+          </linearGradient>
+          <linearGradient id="mB-crown" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#FBE59A"/><stop offset="1" stop-color="#E0A828"/>
+          </linearGradient>
+        </defs>
+
+        <!-- ===== hairBack: dark-brown long waves ===== -->
+        <g id="hairBack">
+          <path d="M98,124 C92,58 128,34 160,34 C192,34 228,58 222,124 C228,190 224,262 214,330 C210,362 202,388 190,398 C196,360 198,300 197,236 C160,120 160,120 123,236 C122,300 124,360 130,398 C118,388 110,362 106,330 C96,262 92,190 98,124 Z" fill="url(#mB-hairback)"/>
+          <path d="M112,220 C108,270 110,330 122,384" fill="none" stroke="#8A6142" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+          <path d="M208,220 C212,270 210,330 198,384" fill="none" stroke="#8A6142" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+          <path d="M100,150 C96,210 98,280 108,344" fill="none" stroke="#8A6142" stroke-width="2.4" stroke-linecap="round" opacity="0.4"/>
+          <path d="M220,150 C224,210 222,280 212,344" fill="none" stroke="#8A6142" stroke-width="2.4" stroke-linecap="round" opacity="0.4"/>
+        </g>
+
+        <!-- ===== BODY (identical across both outfits) ===== -->
+        <g id="body">
+          <defs>
+            <radialGradient id="pm-skin" cx="45%" cy="36%" r="72%">
+              <stop offset="0" stop-color="#FFF4EC"/><stop offset="0.6" stop-color="#FCE4D4"/><stop offset="1" stop-color="#F6D2BD"/>
+            </radialGradient>
+            <radialGradient id="pm-iris" cx="50%" cy="40%" r="62%">
+              <stop offset="0" stop-color="#D3ECFC"/><stop offset="0.42" stop-color="#5EA6DA"/><stop offset="0.8" stop-color="#3277AE"/><stop offset="1" stop-color="#244E77"/>
+            </radialGradient>
+            <linearGradient id="pm-lip" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ED96A8"/><stop offset="1" stop-color="#DD7089"/>
+            </linearGradient>
+          </defs>
+          <path d="M146,176 C145,190 144,201 139,212 L181,212 C176,201 175,190 174,176 C165,184 155,184 146,176 Z" fill="url(#pm-skin)"/>
+          <path d="M145,178 C154,187 166,187 175,178 C172,190 148,190 145,178 Z" fill="#E7B49B" opacity="0.35"/>
+          <path d="M132,214 C127,242 131,272 138,292 C133,300 130,308 130,316 L190,316 C190,308 187,300 182,292 C189,272 193,242 188,214 C170,224 150,224 132,214 Z" fill="url(#pm-skin)"/>
+          <path d="M136,314 C132,356 130,404 136,448 C137,462 140,474 146,479 C151,481 156,478 157,470 C159,430 160,368 159,316 C152,322 143,322 136,314 Z" fill="url(#pm-skin)"/>
+          <path d="M184,314 C188,356 190,404 184,448 C183,462 180,474 174,479 C169,481 164,478 163,470 C161,430 160,368 161,316 C168,322 177,322 184,314 Z" fill="url(#pm-skin)"/>
+          <path d="M140,474 C138,484 143,490 150,489 C156,488 158,482 157,475 C151,479 145,479 140,474 Z" fill="url(#pm-skin)"/>
+          <path d="M180,474 C182,484 177,490 170,489 C164,488 162,482 163,475 C169,479 175,479 180,474 Z" fill="url(#pm-skin)"/>
+          <path d="M160,50 C195,50 215,76 217,113 C218,141 205,169 178,182 C166,188 154,188 142,182 C115,169 102,141 103,113 C105,76 125,50 160,50 Z" fill="url(#pm-skin)"/>
+          <path d="M108,120 C110,150 124,174 150,184 C140,182 120,168 112,146 C108,138 106,128 108,120 Z" fill="#EDBFA6" opacity="0.28"/>
+          <path d="M212,120 C210,150 196,174 170,184 C180,182 200,168 208,146 C212,138 214,128 212,120 Z" fill="#EDBFA6" opacity="0.28"/>
+          <ellipse cx="129" cy="150" rx="12" ry="7" fill="#F6A6C4" opacity="0.32"/>
+          <ellipse cx="191" cy="150" rx="12" ry="7" fill="#F6A6C4" opacity="0.32"/>
+          <path d="M124,109 C132,105 142,104 150,107" fill="none" stroke="#C89B79" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M196,109 C188,105 178,104 170,107" fill="none" stroke="#C89B79" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M124,132 C129,121 138,118 143,118 C150,118 155,124 156,130 C151,140 137,143 129,140 C126,138 124,135 124,132 Z" fill="#FCFDFF"/>
+          <circle cx="140" cy="131" r="11" fill="url(#pm-iris)"/>
+          <circle cx="140" cy="132" r="4.6" fill="#241A24"/>
+          <circle cx="135.5" cy="126.5" r="3.1" fill="#FFFFFF"/>
+          <circle cx="144" cy="135" r="1.5" fill="#FFFFFF" opacity="0.9"/>
+          <path d="M123,131 C128,120 138,117 144,117 C151,117 156,123 158,129" fill="none" stroke="#33262C" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M123,131 C120,130 118,131 116,129" fill="none" stroke="#33262C" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M129,120 C137,116 147,117 154,122" fill="none" stroke="#E7B49B" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+          <path d="M130,139 C136,142 142,142 149,140" fill="none" stroke="#7A565C" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+          <path d="M196,132 C191,121 182,118 177,118 C170,118 165,124 164,130 C169,140 183,143 191,140 C194,138 196,135 196,132 Z" fill="#FCFDFF"/>
+          <circle cx="180" cy="131" r="11" fill="url(#pm-iris)"/>
+          <circle cx="180" cy="132" r="4.6" fill="#241A24"/>
+          <circle cx="175.5" cy="126.5" r="3.1" fill="#FFFFFF"/>
+          <circle cx="184" cy="135" r="1.5" fill="#FFFFFF" opacity="0.9"/>
+          <path d="M197,131 C192,120 182,117 176,117 C169,117 164,123 162,129" fill="none" stroke="#33262C" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M197,131 C200,130 202,131 204,129" fill="none" stroke="#33262C" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M191,120 C183,116 173,117 166,122" fill="none" stroke="#E7B49B" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>
+          <path d="M190,139 C184,142 178,142 171,140" fill="none" stroke="#7A565C" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
+          <path d="M156,157 C158,160 162,160 164,157" fill="none" stroke="#E3AE93" stroke-width="1.4" stroke-linecap="round" opacity="0.7"/>
+          <path d="M147,165 C152,163 157,164 160,165 C163,164 168,163 173,165 C170,172 164,176 160,176 C156,176 150,172 147,165 Z" fill="url(#pm-lip)"/>
+          <path d="M147,165 C154,167 166,167 173,165" fill="none" stroke="#CE6B80" stroke-width="0.8" stroke-linecap="round" opacity="0.7"/>
+          <ellipse cx="160" cy="172" rx="4" ry="1.5" fill="#FBD2DA" opacity="0.7"/>
+          <path d="M131,215 C117,235 108,260 107,285 C107,307 111,327 116,341 C111,347 110,355 115,358 C119,361 126,361 128,357 C131,353 130,346 129,341 C127,327 124,307 125,287 C127,263 135,240 143,228 C139,223 135,219 131,215 Z" fill="url(#pm-skin)"/>
+          <path d="M189,215 C203,235 212,260 213,285 C213,307 209,327 204,341 C209,347 210,355 205,358 C201,361 194,361 192,357 C189,353 190,346 191,341 C193,327 196,307 195,287 C193,263 185,240 177,228 C181,223 185,219 189,215 Z" fill="url(#pm-skin)"/>
+          <path d="M128,344 C132,344 133,349 129,350 C127,349 126,345 128,344 Z" fill="url(#pm-skin)"/>
+          <path d="M192,344 C188,344 187,349 191,350 C193,349 194,345 192,344 Z" fill="url(#pm-skin)"/>
+          <path d="M124,290 C126,310 128,326 132,340" fill="none" stroke="#E7B49B" stroke-width="1.4" opacity="0.4" stroke-linecap="round"/>
+          <path d="M196,290 C194,310 192,326 188,340" fill="none" stroke="#E7B49B" stroke-width="1.4" opacity="0.4" stroke-linecap="round"/>
+        </g>
+
+        <!-- ===== shoes: little rose flats (visible below short hem) ===== -->
+        <g id="shoes">
+          <path d="M138,478 C135,489 142,494 151,492 C158,491 160,484 158,477 C151,481 144,481 138,478 Z" fill="#F4A8C6"/>
+          <path d="M139,479 C145,483 152,483 157,479" fill="none" stroke="#E37AA4" stroke-width="1.6"/>
+          <circle cx="148" cy="479" r="2.2" fill="#FFE07A"/>
+          <path d="M182,478 C185,489 178,494 169,492 C162,491 160,484 162,477 C169,481 176,481 182,478 Z" fill="#F4A8C6"/>
+          <path d="M181,479 C175,483 168,483 163,479" fill="none" stroke="#E37AA4" stroke-width="1.6"/>
+          <circle cx="172" cy="479" r="2.2" fill="#FFE07A"/>
+        </g>
+
+        <!-- ===== dress: pink puffy ball gown (short, shows legs) ===== -->
+        <g id="dress">
+          <!-- bodice, fitted to low waist -->
+          <path d="M124,220 C132,214 150,216 160,224 C170,216 188,214 196,220 C200,256 197,300 189,338 C170,348 150,348 131,338 C123,300 120,256 124,220 Z" fill="url(#mB-bodice)"/>
+          <path d="M128,223 C138,233 152,237 160,232 C168,237 182,233 192,223" fill="none" stroke="#FFE0EE" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+          <path d="M159,229 C157,270 157,310 160,338 C163,310 163,270 161,229 Z" fill="#FFE0EE" opacity="0.35"/>
+          <!-- puffy skirt: back tier -->
+          <path d="M130,332 C110,342 84,372 74,406 C68,424 66,436 72,444 C96,458 128,464 160,464 C192,464 224,458 248,444 C254,436 252,424 246,406 C236,372 210,342 190,332 C170,344 150,344 130,332 Z" fill="url(#mB-skirt)"/>
+          <!-- upper tulle tier with scallops -->
+          <path d="M136,336 C118,346 98,372 90,398 Q104,408 118,398 Q134,410 150,400 Q160,406 170,400 Q186,410 202,398 Q216,408 230,398 C222,372 202,346 184,336 C168,346 152,346 136,336 Z" fill="url(#mB-skirt2)" opacity="0.85"/>
+          <!-- lower scalloped hem -->
+          <path d="M74,430 Q90,446 106,432 Q122,448 138,434 Q152,448 160,438 Q168,448 182,434 Q198,448 214,432 Q230,446 246,430 Q248,440 246,446 C224,460 192,466 160,466 C128,466 96,460 74,446 Q72,440 74,430 Z" fill="#FFE7F1" opacity="0.9"/>
+          <!-- waist sash + bow -->
+          <path d="M131,336 C145,346 175,346 189,336 L188,346 C174,356 146,356 132,346 Z" fill="#E86F9E"/>
+          <path d="M160,341 C148,333 132,335 130,345 C132,355 148,353 160,346 Z" fill="#E86F9E"/>
+          <path d="M160,341 C172,333 188,335 190,345 C188,355 172,353 160,346 Z" fill="#E86F9E"/>
+          <path d="M156,344 C152,358 151,372 157,380 C160,376 160,360 160,350 Z" fill="#D9528A"/>
+          <path d="M164,344 C168,358 169,372 163,380 C160,376 160,360 160,350 Z" fill="#D9528A"/>
+          <ellipse cx="160" cy="345" rx="6" ry="8" fill="#C9427D"/>
+          <!-- sparkle star specks + dots -->
+          <path d="M112,392 Q113,397 118,398 Q113,399 112,404 Q111,399 106,398 Q111,397 112,392 Z" fill="#FFFFFF"/>
+          <path d="M204,392 Q205,397 210,398 Q205,399 204,404 Q203,399 198,398 Q203,397 204,392 Z" fill="#FFFFFF"/>
+          <path d="M160,414 Q161,419 166,420 Q161,421 160,426 Q159,421 154,420 Q159,419 160,414 Z" fill="#FFFFFF"/>
+          <path d="M132,420 Q133,424 137,425 Q133,426 132,430 Q131,426 127,425 Q131,424 132,420 Z" fill="#FFFFFF" opacity="0.9"/>
+          <path d="M188,420 Q189,424 193,425 Q189,426 188,430 Q187,426 183,425 Q187,424 188,420 Z" fill="#FFFFFF" opacity="0.9"/>
+          <circle cx="100" cy="410" r="1.8" fill="#FFFFFF" opacity="0.85"/><circle cx="222" cy="410" r="1.8" fill="#FFFFFF" opacity="0.85"/>
+          <circle cx="146" cy="446" r="1.6" fill="#FFFFFF" opacity="0.8"/><circle cx="174" cy="446" r="1.6" fill="#FFFFFF" opacity="0.8"/>
+          <circle cx="120" cy="440" r="1.6" fill="#FFFFFF" opacity="0.8"/><circle cx="200" cy="440" r="1.6" fill="#FFFFFF" opacity="0.8"/>
+        </g>
+
+        <!-- ===== accFront: none needed (sash on dress) ===== -->
+        <g id="accFront"></g>
+
+        <!-- ===== hairFront: curtain bangs + long brown curls forward ===== -->
+        <g id="hairFront">
+          <path d="M110,110 C108,80 130,56 160,55 C190,54 212,78 210,110 C202,96 190,92 180,98 C176,86 166,84 160,92 C154,84 144,86 140,98 C130,92 118,96 110,110 Z" fill="url(#mB-hairfront)"/>
+          <path d="M160,60 C150,72 140,88 136,104 M160,60 C170,72 180,88 184,104" fill="none" stroke="#9A6E4C" stroke-width="1.6" stroke-linecap="round" opacity="0.55"/>
+          <!-- left face-frame curl coming forward over shoulder -->
+          <path d="M112,104 C102,140 100,190 108,236 C112,262 116,286 110,308 C104,322 92,326 84,318 C92,320 100,314 100,302 C102,282 96,258 94,232 C90,190 92,142 104,106 C107,104 110,103 112,104 Z" fill="url(#mB-hairfront)"/>
+          <path d="M84,318 C78,308 80,296 90,292 C86,298 88,306 96,306 C90,314 86,318 84,318 Z" fill="url(#mB-hairfront)"/>
+          <path d="M106,120 C98,160 98,210 108,258 C114,282 116,300 108,314" fill="none" stroke="#9A6E4C" stroke-width="1.6" stroke-linecap="round" opacity="0.5"/>
+          <!-- right face-frame curl -->
+          <path d="M208,104 C218,140 220,190 212,236 C208,262 204,286 210,308 C216,322 228,326 236,318 C228,320 220,314 220,302 C218,282 224,258 226,232 C230,190 228,142 216,106 C213,104 210,103 208,104 Z" fill="url(#mB-hairfront)"/>
+          <path d="M236,318 C242,308 240,296 230,292 C234,298 232,306 224,306 C230,314 234,318 236,318 Z" fill="url(#mB-hairfront)"/>
+          <path d="M214,120 C222,160 222,210 212,258 C206,282 204,300 212,314" fill="none" stroke="#9A6E4C" stroke-width="1.6" stroke-linecap="round" opacity="0.5"/>
+        </g>
+
+        <!-- ===== hairAcc: small gold crown ===== -->
+        <g id="hairAcc">
+          <path d="M136,66 Q160,74 184,66 Q182,71 160,72 Q138,71 136,66 Z" fill="#E0A828"/>
+          <path d="M136,66 Q137,46 145,42 Q151,52 156,57 Q158,36 160,34 Q168,36 170,57 Q175,52 181,42 Q189,46 190,66 Q184,71 160,71 Q142,71 136,66 Z" fill="url(#mB-crown)"/>
+          <circle cx="160" cy="48" r="3.4" fill="#F48FB1"/>
+          <circle cx="145" cy="56" r="2.6" fill="#7FC0E8"/>
+          <circle cx="175" cy="56" r="2.6" fill="#7FC0E8"/>
+          <circle cx="160" cy="64" r="2.4" fill="#F48FB1"/>
+          <path d="M160,30 Q161,34 165,35 Q161,36 160,40 Q159,36 155,35 Q159,34 160,30 Z" fill="#FFF6D8"/>
+        </g>
+      </svg>
+    </div>
+    <div class="tag tag-b">穿搭 B · 百搭验证</div>
+    <h2>粉色蓬蓬舞会裙</h2>
+    <ul>
+      <li>粉色多层蓬蓬裙，缎面束腰 + 蝴蝶结 + 亮片星点</li>
+      <li>深棕长卷发，面颊两侧卷绺垂在裙前</li>
+      <li>金色小皇冠，短裙露出修长小腿与玫粉平底鞋</li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>
+  两套的 <code>&lt;g id="body"&gt;</code> 图层（头/脸/脖/手臂/手/腿+五官）逐字节相同；仅 hairBack / dress / accFront / hairFront / hairAcc / shoes 各层随穿搭更换。<br>
+  图层顺序（后→前）：hairBack → body → shoes → dress → accFront → hairFront → hairAcc。
+</footer>

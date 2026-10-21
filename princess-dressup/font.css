@@ -1,0 +1,17 @@
+/*
+ * ZCOOL KuaiLe (站酷快乐体) — subsetted for princess-dressup
+ *
+ * License: SIL Open Font License 1.1, see ./assets/OFL.txt
+ * Source: https://github.com/google/fonts/tree/main/ofl/zcoolkuaile
+ *
+ * This subset only includes the CJK characters, common Chinese
+ * punctuation, digits and basic Latin actually used by this game
+ * (see font-tools/resubset.sh to regenerate after adding new text).
+ */
+@font-face {
+  font-family: 'ZCOOL KuaiLe';
+  src: url('./assets/zcool-kuaile-subset.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

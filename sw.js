@@ -1,4 +1,4 @@
-const CACHE = 'pcg-v3';
+const CACHE = 'pcg-v5-bee';
 const ASSETS = [
   './',
   './index.html',
@@ -22,6 +22,15 @@ const ASSETS = [
   './bear-supermarket/data.js',
   './bear-supermarket/renderer.js',
   './bear-supermarket/game.js',
+  './princess-dressup/index.html',
+  './princess-dressup/styles.css',
+  './princess-dressup/data.js',
+  './princess-dressup/renderer.js',
+  './princess-dressup/game.js',
+  './bee-game/index.html',
+  './bee-game/styles.css',
+  './bee-game/model.js',
+  './bee-game/game.js',
   './offline.html',
 ];
 
