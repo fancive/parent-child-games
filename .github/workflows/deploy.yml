@@ -53,7 +53,6 @@ jobs:
           cp -r kitchen-game _site/
           cp -r bear-supermarket _site/
           cp -r english-game _site/
-          cp -r bee-game _site/
           cp -r coloring-game _site/
           cp -r number-game _site/
           cp -r princess-dressup _site/

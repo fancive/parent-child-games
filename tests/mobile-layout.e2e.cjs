@@ -58,7 +58,8 @@ async function noOverflow(page) {
       await page.goto(base);
       await noOverflow(page);
       for (const game of [
-        'bee-game',
+        'english-game',
+        'number-game',
         'coloring-game',
         'bear-supermarket',
         'kitchen-game',
@@ -66,32 +67,7 @@ async function noOverflow(page) {
       ]) {
         assert.equal(await page.locator(`a[href="${game}/index.html"]`).count(), 1);
       }
-      await page.locator('a[href="bee-game/index.html"]').tap();
-      if (width < 1000)
-        for (const selector of ['#start', '#left', '#right', '#pause']) await fits(page, selector);
-      await page.locator('#start').tap();
-      await page.waitForFunction(() => document.querySelector('#overlay').hidden);
-      await page.locator('#right').tap();
-      const canvas = await page.locator('#game').boundingBox();
-      const cdp = await context.newCDPSession(page);
-      await cdp.send('Input.dispatchTouchEvent', {
-        type: 'touchStart',
-        touchPoints: [{ x: canvas.x + canvas.width / 2, y: canvas.y + canvas.height / 2 }],
-      });
-      await cdp.send('Input.dispatchTouchEvent', {
-        type: 'touchMove',
-        touchPoints: [{ x: canvas.x + canvas.width * 0.75, y: canvas.y + canvas.height / 2 }],
-      });
-      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-      await page.locator('#pause').tap();
-      await page.waitForFunction(() => !document.querySelector('#overlay').hidden);
-      await noOverflow(page);
-      await page.screenshot({ path: join(artifacts, `bee-${width}.png`) });
-      if (width === 390) {
-        await page.setViewportSize({ width: 844, height: 390 });
-        for (const selector of ['#start', '#left', '#right']) await fits(page, selector);
-        await page.setViewportSize({ width, height });
-      }
+      assert.equal(await page.locator('a[href*="bee-game"]').count(), 0);
 
       await page.goto(`${base}/coloring-game/`);
       for (const button of await page.locator('#colors button').all()) {
@@ -178,7 +154,7 @@ async function noOverflow(page) {
       assert.deepEqual(errors, []);
       await context.close();
       console.log(
-        `PASS ${width}x${height}: home, bee touch/pause, coloring fill/persistence, bear sale, kitchen meal, princess dress/finish`,
+        `PASS ${width}x${height}: home six games, coloring fill/persistence, bear sale, kitchen meal, princess dress/finish`,
       );
     }
     console.log('Artifacts:', artifacts);

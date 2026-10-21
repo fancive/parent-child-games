@@ -1,4 +1,4 @@
-const CACHE = 'pcg-v15-english-rainbow';
+const CACHE = 'pcg-v16-without-bee';
 const ASSETS = [
   './',
   './index.html',
@@ -27,10 +27,6 @@ const ASSETS = [
   './bear-supermarket/data.js',
   './bear-supermarket/renderer.js',
   './bear-supermarket/game.js',
-  './bee-game/index.html',
-  './bee-game/styles.css',
-  './bee-game/model.js',
-  './bee-game/game.js',
   './coloring-game/index.html',
   './coloring-game/styles.css',
   './coloring-game/model.js',
