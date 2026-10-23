@@ -38,13 +38,53 @@ describe('复习范围与教材词族', () => {
     const state = setRange(original, 'theme', 2);
     assert.deepEqual(state.ranges, { theme: 2, phonics: 5 });
     assert.deepEqual(original.ranges, { theme: 5, phonics: 5 });
-    assert.ok(availableWords(state, 'theme').every((word) => word.unit <= 2));
+    assert.deepEqual(
+      availableWords(state, 'theme'),
+      WORDS.theme.filter((word) => word.unit === 1),
+    );
     assert.deepEqual(availableWords(state, 'theme', 3), []);
     assert.deepEqual(availableWords(state, 'theme', -1), []);
     assert.deepEqual(availableWords(state, 'unknown'), []);
     for (const invalid of [0, 6, 1.5, '2', NaN])
       assert.equal(setRange(state, 'theme', invalid), state);
     assert.equal(setRange(state, 'unknown', 2), state);
+  });
+
+  test('默认只练第一单元，全部开放与缩小范围都不会混合单元', () => {
+    for (const book of ['theme', 'phonics']) {
+      for (let limit = 1; limit <= 5; limit++) {
+        const state = setRange(freshState(), book, limit);
+        assert.deepEqual(
+          availableWords(state, book),
+          WORDS[book].filter((word) => word.unit === 1),
+        );
+        const round = createRound(state, { book }, seededRandom(limit));
+        assert.equal(round.book, book);
+        assert.equal(round.unit, 1);
+        assert.equal(round.questions.length, ROUND_SIZE);
+        assert.ok(
+          round.questions.every(
+            (question) => question.target.book === book && question.target.unit === 1,
+          ),
+        );
+      }
+    }
+    const round = createRound(freshState());
+    assert.equal(round.book, 'theme');
+    assert.equal(round.unit, 1);
+    assert.ok(round.questions.every((question) => question.target.unit === 1));
+  });
+
+  test('非法单元不会回退为混合复习，普通轮和错题轮都拒绝', () => {
+    const state = { ...freshState(), missed: ['theme-1-hen', 'phonics-1-cat'] };
+    for (const book of ['theme', 'phonics']) {
+      for (const unit of [0, -1, 1.5, 6, '1', null, false, NaN, Infinity]) {
+        for (const review of [false, true]) {
+          assert.deepEqual(availableWords(state, book, unit, review), []);
+          assert.equal(createRound(state, { book, unit, review }), null);
+        }
+      }
+    }
   });
 
   test('拼读每单元覆盖官方列明词族，首音与词尾能拼成真实目标词', () => {
@@ -93,17 +133,28 @@ describe('复习范围与教材词族', () => {
     for (const book of ['theme', 'phonics']) {
       for (let limit = 1; limit <= 5; limit++) {
         const state = setRange(freshState(), book, limit);
-        const mixed = createRound(state, { book }, seededRandom(limit));
-        assert.equal(mixed.questions.length, ROUND_SIZE);
-        assert.ok(mixed.questions.every((question) => question.target.unit <= limit));
         for (let unit = 1; unit <= limit; unit++) {
           const round = createRound(state, { book, unit }, seededRandom(unit));
+          assert.equal(round.book, book);
+          assert.equal(round.unit, unit);
           assert.equal(round.questions.length, ROUND_SIZE);
-          assert.ok(round.questions.every((question) => question.target.unit === unit));
+          assert.ok(
+            round.questions.every(
+              (question) => question.target.book === book && question.target.unit === unit,
+            ),
+          );
+          assert.ok(
+            round.questions.every((question) =>
+              availableWords(state, book, unit).includes(question.target),
+            ),
+          );
         }
         assert.equal(createRound(state, { book, unit: limit + 1 }), null);
       }
     }
+    const small = createRound(freshState(), { book: 'theme', unit: 5 }, seededRandom(5));
+    assert.equal(small.questions.length, ROUND_SIZE);
+    assert.equal(new Set(small.questions.map((question) => question.target.id)).size, 4);
   });
 });
 
@@ -167,24 +218,55 @@ describe('答题、错题与奖励', () => {
     assert.deepEqual(state.stickers, ['theme-2']);
   });
 
-  test('错题按书、范围和指定单元筛选，缩小范围不删除远处错题', () => {
+  test('错题只按当前书和单元重练，范围变化与重练保留其他单元错题', () => {
     let state = freshState();
-    state.missed = ['theme-1-hen', 'theme-5-sunny', 'phonics-1-cat', 'phonics-4-pig'];
+    const missed = [
+      'theme-1-hen',
+      'theme-2-kitchen',
+      'theme-5-sunny',
+      'phonics-1-cat',
+      'phonics-4-pig',
+    ];
+    state.missed = missed;
     state = setRange(state, 'theme', 2);
     assert.deepEqual(
-      availableWords(state, 'theme', 0, true).map((word) => word.id),
+      availableWords(state, 'theme', undefined, true).map((word) => word.id),
       ['theme-1-hen'],
+    );
+    assert.deepEqual(
+      availableWords(state, 'theme', 2, true).map((word) => word.id),
+      ['theme-2-kitchen'],
     );
     assert.deepEqual(
       availableWords(state, 'phonics', 4, true).map((word) => word.id),
       ['phonics-4-pig'],
     );
-    assert.equal(createRound(state, { book: 'theme', unit: 2, review: true }), null);
+    assert.equal(createRound(state, { book: 'theme', unit: 5, review: true }), null);
     const round = createRound(state, { book: 'theme', review: true });
     assert.ok(round.questions.every((question) => question.target.id === 'theme-1-hen'));
+    assert.deepEqual(state.missed, missed);
+    const solved = solveRound(state, round);
+    assert.deepEqual(
+      solved.state.missed,
+      missed.filter((id) => id !== 'theme-1-hen'),
+    );
+    assert.deepEqual(state.missed, missed);
+    state = solved.state;
+    state = setRange(state, 'theme', 1);
+    assert.equal(createRound(state, { book: 'theme', review: true }), null);
+    assert.deepEqual(availableWords(state, 'theme', 2, true), []);
+    assert.ok(state.missed.includes('theme-2-kitchen'));
     assert.ok(state.missed.includes('theme-5-sunny'));
     state = setRange(state, 'theme', 5);
-    assert.equal(availableWords(state, 'theme', 0, true).length, 2);
+    assert.deepEqual(
+      availableWords(state, 'theme', 5, true).map((word) => word.id),
+      ['theme-5-sunny'],
+    );
+    assert.equal(availableWords(state, 'theme', undefined, true).length, 0);
+    const second = createRound(state, { book: 'theme', unit: 2, review: true });
+    assert.ok(second.questions.every((question) => question.target.id === 'theme-2-kitchen'));
+    const reviewed = solveRound(state, second);
+    assert.deepEqual(reviewed.state.missed, ['theme-5-sunny', 'phonics-1-cat', 'phonics-4-pig']);
   });
 
   test('错题重练一次答对才移除；答错后的本题重试仍留待下轮', () => {

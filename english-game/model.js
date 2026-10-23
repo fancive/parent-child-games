@@ -53,13 +53,10 @@ export function setRange(state, book, maxUnit) {
   return { ...state, ranges: { ...state.ranges, [book]: maxUnit } };
 }
 
-export function availableWords(state, book, unit = 0, review = false) {
-  if (!isBook(book) || !Number.isInteger(unit) || unit < 0 || unit > state.ranges[book]) return [];
+export function availableWords(state, book, unit = 1, review = false) {
+  if (!isBook(book) || !Number.isInteger(unit) || unit < 1 || unit > state.ranges[book]) return [];
   return WORDS[book].filter(
-    (word) =>
-      word.unit <= state.ranges[book] &&
-      (!unit || word.unit === unit) &&
-      (!review || state.missed.includes(word.id)),
+    (word) => word.unit === unit && (!review || state.missed.includes(word.id)),
   );
 }
 
@@ -105,7 +102,7 @@ export function createRound(
   state,
   {
     book = 'theme',
-    unit = 0,
+    unit = 1,
     review = false,
     id = `round-${Date.now()}-${Math.random().toString(36).slice(2)}`,
   } = {},

@@ -20,7 +20,7 @@ try {
 }
 let state = parseState(initialSave);
 let book = 'theme';
-let unit = 0;
+let unit = 1;
 let round = null;
 let hintVisible = false;
 let lastSticker = null;
@@ -177,18 +177,12 @@ function renderHome() {
     })
     .join('');
   $('#selection-kicker').textContent = `${BOOKS[book].english}`;
-  $('#departure-title').textContent = unit ? UNITS[book][unit - 1].title : '整座小岛，一起逛逛';
-  $('#selection-description').textContent = unit
-    ? `第 ${unit} 单元 · ${UNITS[book][unit - 1].english}`
-    : `从第 1—${state.ranges[book]} 单元挑选 6 道题，也可以点击地图，只复习喜欢的一个单元。`;
+  $('#departure-title').textContent = UNITS[book][unit - 1].title;
+  $('#selection-description').textContent = `第 ${unit} 单元 · ${UNITS[book][unit - 1].english}`;
   $('#activity-description').textContent =
     book === 'theme'
       ? '先听一个英文，再从三张图里找到它。图片有中文小标签帮帮忙。'
       : '听完整单词，看图选一块首字母，和后面的词尾拼在一起。';
-  $('#all-units').setAttribute('aria-pressed', String(!unit));
-  $('#all-units').classList.toggle('selected', !unit);
-  $('#all-units').textContent =
-    state.ranges[book] === 5 ? '✦ 全部单元混合复习' : `✦ 第 1—${state.ranges[book]} 单元混合复习`;
   $('#missed-count').textContent = missedCount();
   $('#review-missed').disabled = !missedCount();
   $('#theme-range').value = state.ranges.theme;
@@ -202,7 +196,7 @@ function startRound(review = false) {
   cancelSpeech();
   round = createRound(state, { book, unit, review });
   if (!round) {
-    announce('当前范围没有需要重练的错题。');
+    announce('当前单元没有需要重练的错题。');
     return;
   }
   lastSticker = null;
@@ -329,7 +323,7 @@ document.addEventListener('click', (event) => {
   if (button.dataset.book) {
     cancelSpeech();
     book = button.dataset.book;
-    unit = 0;
+    unit = 1;
     renderHome();
   } else if (button.dataset.unit) {
     unit = Number(button.dataset.unit);
@@ -341,10 +335,6 @@ document.addEventListener('click', (event) => {
     chooseAnswer(button.dataset.answer);
   } else {
     switch (button.id) {
-      case 'all-units':
-        unit = 0;
-        renderHome();
-        break;
       case 'start-round':
       case 'play-again':
         startRound();
@@ -385,7 +375,7 @@ document.addEventListener('click', (event) => {
 document.addEventListener('change', (event) => {
   if (event.target.dataset.range) {
     state = setRange(state, event.target.dataset.range, Number(event.target.value));
-    if (unit > state.ranges[book]) unit = 0;
+    if (unit > state.ranges[book]) unit = 1;
     save();
     renderHome();
     announce('复习范围已保存。已有贴纸和错题会保留。');
@@ -411,7 +401,7 @@ $('.book-tabs').addEventListener('keydown', (event) => {
         : book === 'theme'
           ? 'phonics'
           : 'theme';
-  unit = 0;
+  unit = 1;
   renderHome();
   $(`#tab-${book}`).focus();
 });
