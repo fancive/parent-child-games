@@ -1,4 +1,4 @@
-const CACHE = 'pcg-v16-without-bee';
+const CACHE = 'pcg-v17-english-voice';
 const ASSETS = [
   './',
   './index.html',
@@ -10,6 +10,7 @@ const ASSETS = [
   './english-game/styles.css',
   './english-game/data.js',
   './english-game/model.js',
+  './english-game/speech.js',
   './english-game/game.js',
   './kitchen-game/index.html',
   './kitchen-game/kitchen.html',

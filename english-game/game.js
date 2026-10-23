@@ -8,6 +8,7 @@ import {
   parseState,
   setRange,
 } from './model.js';
+import { selectEnglishVoice } from './speech.js';
 
 const $ = (selector) => document.querySelector(selector);
 let storageAvailable = true;
@@ -26,7 +27,6 @@ let lastSticker = null;
 let utterance = null;
 let speechTimer = null;
 let speechToken = 0;
-let voiceList = [];
 
 const escapeHtml = (value) =>
   String(value).replace(
@@ -65,12 +65,7 @@ function cancelSpeech() {
 
 function findVoice() {
   if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) return null;
-  voiceList = window.speechSynthesis.getVoices();
-  return (
-    voiceList.find((voice) => /^en[-_]US$/i.test(voice.lang)) ??
-    voiceList.find((voice) => /^en(?:[-_]|$)/i.test(voice.lang)) ??
-    null
-  );
+  return selectEnglishVoice(window.speechSynthesis.getVoices());
 }
 
 function voiceDescription() {
