@@ -100,12 +100,52 @@ describe('复习范围与教材词族', () => {
       for (const word of unit.words) {
         assert.equal(word.onset + word.rime, word.word);
         assert.match(word.onset, /^[a-z]$/);
+        assert.equal(word.letters.length, 3);
+        assert.equal(new Set(word.letters).size, 3);
         assert.equal(word.letters.filter((letter) => letter === word.onset).length, 1);
       }
     });
-    assert.equal(WORDS.theme.length, 36);
-    assert.equal(WORDS.phonics.length, 36);
-    assert.equal(WORD_BY_ID.size, 72);
+    for (const unit of UNITS.theme)
+      assert.equal(new Set(unit.words.map((word) => word.picture)).size, unit.words.length);
+    assert.ok(WORDS.theme.length >= 65);
+    assert.ok(WORDS.phonics.length >= 75);
+    assert.equal(WORD_BY_ID.size, WORDS.theme.length + WORDS.phonics.length);
+  });
+
+  test('补齐第三册较早单元和后续单元的词汇，新增词能进入各自单元题库', () => {
+    const additions = {
+      theme: [
+        ['morning', 'night', 'moon'],
+        ['mopping', 'sweeping', 'scrubbing', 'sofa'],
+        ['sweets', 'apple', 'milk'],
+        ['hose', 'baton', 'hairdryer'],
+        ['swim', 'walk', 'jog', 'nap'],
+      ],
+      phonics: [
+        ['pad', 'rag', 'cap', 'lab', 'mat'],
+        ['ram', 'can', 'pack', 'red', 'peg'],
+        ['pen', 'jet', 'well', 'fix', 'kick'],
+        ['dig', 'fig', 'bin', 'tin', 'mill', 'fog'],
+        ['cod', 'pod', 'dock', 'lock', 'rock', 'top', 'hot'],
+      ],
+    };
+    for (const [book, units] of Object.entries(additions)) {
+      units.forEach((words, index) => {
+        const pool = availableWords(freshState(), book, index + 1);
+        for (const word of words)
+          assert.ok(
+            pool.some((entry) => entry.word === word),
+            `${book} ${index + 1}: ${word}`,
+          );
+      });
+    }
+    for (const word of WORDS.theme) {
+      assert.ok(word.sentence.length > 0, word.id);
+      assert.match(word.sentence, /[.!?]$/);
+    }
+    assert.equal(WORD_BY_ID.get('theme-2-mopping').sentence, 'I am mopping the floor.');
+    assert.equal(WORD_BY_ID.get('theme-4-hose').sentence, 'The fireman uses a hose.');
+    assert.equal(WORD_BY_ID.get('theme-5-swim').sentence, 'I like to swim.');
   });
 
   test('所有书、单元、随机种子的题目恰好三个选项且正确项唯一', () => {
@@ -127,6 +167,13 @@ describe('复习范围与教材词族', () => {
         }
       }
     }
+  });
+
+  test('图片字段不包含可打印的Unicode转义残留', () => {
+    for (const word of WORD_BY_ID.values())
+      assert.doesNotMatch(word.picture, /\\[uU][0-9a-fA-F]{4}|U[0-9a-fA-F]{8}/, word.id);
+    assert.equal(WORD_BY_ID.get('phonics-5-pod').picture, '🫛');
+    assert.equal(WORD_BY_ID.get('phonics-5-job').picture, '🧑‍💼');
   });
 
   test('每轮六题；小词库允许复现，但不会越过指定单元与范围', () => {
@@ -152,14 +199,18 @@ describe('复习范围与教材词族', () => {
         assert.equal(createRound(state, { book, unit: limit + 1 }), null);
       }
     }
-    const small = createRound(freshState(), { book: 'theme', unit: 5 }, seededRandom(5));
+    const small = createRound(
+      { ...freshState(), missed: ['theme-5-sunny'] },
+      { book: 'theme', unit: 5, review: true },
+      seededRandom(5),
+    );
     assert.equal(small.questions.length, ROUND_SIZE);
-    assert.equal(new Set(small.questions.map((question) => question.target.id)).size, 4);
+    assert.equal(new Set(small.questions.map((question) => question.target.id)).size, 1);
   });
 });
 
 describe('答题、错题与奖励', () => {
-  test('错误可重试，重复点同一错误不增加次数；必须答对并显式前进', () => {
+  test('错误可重试，重复点同一错误不增加次数；模型仅允许答对后推进', () => {
     const state = freshState();
     const round = createRound(state, { id: 'retry-round' }, seededRandom(7));
     const question = round.questions[0];
@@ -283,6 +334,44 @@ describe('答题、错题与奖励', () => {
 });
 
 describe('保存兼容', () => {
+  test('扩词后原有72个词的ID和所有单元存档仍然有效', () => {
+    const legacy = {
+      theme: [
+        ['hen', 'squirrel', 'rabbit', 'bat', 'owl', 'firefly'],
+        ['living-room', 'dining-room', 'kitchen', 'bedroom', 'bathroom', 'garage', 'storeroom'],
+        [
+          'carrot',
+          'cabbage',
+          'bread',
+          'rice',
+          'noodles',
+          'ice-cream',
+          'peas',
+          'fish',
+          'chicken',
+          'beef',
+          'jello',
+        ],
+        ['chef', 'pilot', 'astronaut', 'fireman', 'hairdresser', 'policeman', 'postman', 'waiter'],
+        ['sunny', 'cloudy', 'windy', 'rainy'],
+      ],
+      phonics: [
+        ['dad', 'bag', 'map', 'cab', 'cat', 'hat'],
+        ['jam', 'ham', 'van', 'fan', 'sack', 'bed', 'leg'],
+        ['hen', 'ten', 'net', 'wet', 'bell', 'sit', 'six', 'lick'],
+        ['pig', 'wig', 'pin', 'fin', 'hill', 'dog', 'log'],
+        ['cob', 'rod', 'mop', 'hop', 'pot', 'fox', 'box', 'sock'],
+      ],
+    };
+    const missed = Object.entries(legacy).flatMap(([book, units]) =>
+      units.flatMap((words, index) => words.map((word) => `${book}-${index + 1}-${word}`)),
+    );
+    assert.equal(missed.length, 72);
+    const stickers = ['theme-1', 'theme-5', 'phonics-1', 'phonics-5'];
+    const saved = { ...freshState(), missed, stickers, totalRounds: 12 };
+    assert.deepEqual(parseState(JSON.stringify(saved)), saved);
+  });
+
   test('损坏、缺失、旧版本记录回到两本全部开放的安全默认值', () => {
     for (const raw of [null, undefined, '', '{broken', 'null', '42', '[]', '{"version":9}']) {
       assert.deepEqual(parseState(raw), freshState());

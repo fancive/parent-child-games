@@ -761,15 +761,6 @@ footer span {
 .answer-feedback.retry {
   color: #a0673c;
 }
-.next-button {
-  min-width: 190px;
-  margin-top: 12px;
-}
-.next-button:disabled {
-  background: #e9ede4;
-  color: #82917c;
-  box-shadow: none;
-}
 .phonics-picture {
   font-size: 58px;
   margin: 16px 0 0;

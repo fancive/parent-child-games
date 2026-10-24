@@ -1,4 +1,4 @@
-const CACHE = 'pcg-v18-english-single-unit';
+const CACHE = 'pcg-v19-english-full-vocabulary';
 const ASSETS = [
   './',
   './index.html',

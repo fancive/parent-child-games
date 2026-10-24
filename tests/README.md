@@ -20,6 +20,7 @@ python3 -m http.server 8104 --bind 127.0.0.1
 PLAYWRIGHT_MODULE=/path/to/playwright BROWSER_CHANNEL=chrome node tests/mobile-layout.e2e.cjs
 PLAYWRIGHT_MODULE=/path/to/playwright BROWSER_CHANNEL=chrome COLORING_BASE_URL=http://127.0.0.1:8104 node tests/coloring-game.e2e.cjs
 PLAYWRIGHT_MODULE=/path/to/playwright BROWSER_CHANNEL=chrome NUMBER_BASE_URL=http://127.0.0.1:8104 node tests/number-game.e2e.cjs
+PLAYWRIGHT_MODULE=/path/to/playwright BROWSER_CHANNEL=chrome ENGLISH_BASE_URL=http://127.0.0.1:8104 node tests/english-game.e2e.cjs
 ```
 
 `MOBILE_BASE_URL` 可覆盖适配测试地址。`MOBILE_VIEWPORTS='[[390,844]]'` 可只重跑指定尺寸。
@@ -35,3 +36,5 @@ PLAYWRIGHT_MODULE=/path/to/playwright BROWSER_CHANNEL=chrome NUMBER_BASE_URL=htt
 涂画专项另覆盖画笔、橡皮、撤销重做、清空确认、PNG 下载、离线打开和触屏绘制。截图保存到运行输出中的临时目录。浏览器模拟不替代 Android / iOS 真机验收。
 
 数字冒险专项覆盖旧八关存档升级、原题和选项恢复、新增四关的实际答题、答错重试、积木点数、刷新恢复、键盘作答、十二枚徽章和重玩，并检查四种屏幕尺寸的横向溢出。
+
+英语专项覆盖 320×568、390×844、1365×1000 的图片和拼读作答、答对自动换题、错误重试、连点防重复、末题自动收贴纸、退出后重开、旧存档保留、各单元选择、键盘和触屏、离线刷新。`ENGLISH_VIEWPORTS` 可指定尺寸。朗读回调与页面生命周期信号使用受控边界验证暂停与恢复推进，不验证设备实际音质或系统切换标签行为。截图与结果写入运行输出中的临时目录。

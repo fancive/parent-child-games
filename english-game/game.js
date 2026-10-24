@@ -27,6 +27,7 @@ let lastSticker = null;
 let utterance = null;
 let speechTimer = null;
 let speechToken = 0;
+let advanceTimer = null;
 
 const escapeHtml = (value) =>
   String(value).replace(
@@ -61,6 +62,21 @@ function cancelSpeech() {
   speechTimer = null;
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   utterance = null;
+}
+
+function cancelAdvance() {
+  clearTimeout(advanceTimer);
+  advanceTimer = null;
+}
+
+function scheduleAdvance() {
+  cancelAdvance();
+  if (document.hidden || !round || round.finished || !round.questions[round.index].solved) return;
+  const answeredRound = round;
+  advanceTimer = setTimeout(() => {
+    advanceTimer = null;
+    if (round === answeredRound && !document.hidden) nextQuestion();
+  }, 1000);
 }
 
 function findVoice() {
@@ -103,6 +119,7 @@ function speak(text) {
     announce(voiceDescription());
     return;
   }
+  cancelAdvance();
   const token = speechToken;
   utterance = new window.SpeechSynthesisUtterance(text);
   utterance.voice = voice;
@@ -115,10 +132,12 @@ function speak(text) {
     message.textContent = '这次朗读没有成功。可以再点一次，或点“显示单词”请家长读。';
     message.classList.add('warning');
     announce(message.textContent);
+    scheduleAdvance();
   };
   utterance.onstart = () => {
     if (token !== speechToken || !message?.isConnected) return;
     clearTimeout(speechTimer);
+    speechTimer = setTimeout(failure, 15000);
     message.textContent = '正在朗读… 如果听不到，请检查设备音量，或点“显示单词”。';
     message.classList.remove('warning');
   };
@@ -126,6 +145,7 @@ function speak(text) {
     if (token !== speechToken || !message?.isConnected) return;
     clearTimeout(speechTimer);
     message.textContent = '还想听一遍？再点喇叭就好。';
+    scheduleAdvance();
   };
   utterance.onerror = failure;
   if (message) {
@@ -193,6 +213,7 @@ function renderHome() {
 }
 
 function startRound(review = false) {
+  cancelAdvance();
   cancelSpeech();
   round = createRound(state, { book, unit, review });
   if (!round) {
@@ -212,6 +233,7 @@ function startRound(review = false) {
 }
 
 function sentenceFor(target) {
+  if (target.sentence) return target.sentence;
   if (target.unit === 1)
     return `I see ${['owl'].includes(target.word) ? 'an' : 'a'} ${target.word}.`;
   if (target.unit === 2) return `This is the ${target.word}.`;
@@ -232,13 +254,15 @@ function renderQuestion() {
     .join('');
   const instruction = book === 'theme' ? '听一听，哪张图是它？' : '少了一块，帮它拼完整！';
   const subtitle =
-    book === 'theme' ? '点喇叭听英文，再选一张图片。' : '先听整个单词，再选择开头的字母。';
+    book === 'theme'
+      ? '点喇叭听英文，再选一张图片。答对自动开始下一题。'
+      : '先听整个单词，再选择开头的字母。答对自动开始下一题。';
   const phonicsPicture =
     book === 'phonics'
       ? `<div class="phonics-picture" role="img" aria-label="${target.label}">${target.picture}</div><p class="phonics-label">${target.label}</p><div class="word-blocks" aria-label="空格，加上词尾 ${target.rime}"><span class="word-block blank" id="onset-block">_</span><span class="word-block plus" aria-hidden="true">+</span><span class="word-block">${target.rime}</span></div>`
       : '';
   $('#play-section').innerHTML =
-    `<div class="play-top"><button type="button" class="exit-round" id="exit-round">← 回小岛</button><div class="round-position"><div class="progress-dots">${progress}</div><span>第 ${round.index + 1} / ${round.questions.length} 题</span></div></div><div class="question-card"><p class="eyebrow">${BOOKS[book].activity} · 第 ${target.unit} 单元${round.review ? ' · 错题重练' : ''}</p><h2 id="question-title" tabindex="-1">${instruction}</h2><p class="question-subtitle">${subtitle}</p><button type="button" class="speak-button" id="speak-word"><span aria-hidden="true">🔊</span> 听一听</button><p id="speech-message" class="speech-message" role="status"></p><button type="button" class="hint-button" id="show-hint" aria-expanded="${hintVisible}" aria-controls="word-hint">${hintVisible ? '收起单词' : '显示单词 / 小提示'}</button><div id="word-hint" class="word-hint" ${hintVisible ? '' : 'hidden'}><span lang="en">${escapeHtml(target.word)}</span><small>${target.label}</small></div>${phonicsPicture}<div class="${book === 'theme' ? 'picture-options' : 'letter-options'}" role="group" aria-label="${book === 'theme' ? '选择图片' : '选择开头字母'}">${question.options.map((option) => `<button type="button" class="answer-option" data-answer="${option.value}" aria-label="${option.label}">${book === 'theme' ? `<span class="picture" aria-hidden="true">${option.picture}</span><span class="option-label">${option.label}</span>` : `<span lang="en">${option.label}</span>`}</button>`).join('')}</div><p id="answer-feedback" class="answer-feedback" role="status" aria-live="polite">慢慢来，准备好了就选一个。</p><div id="sentence-reward" class="sentence-reward" hidden></div><button type="button" class="button primary next-button" id="next-question" disabled>${round.index === round.questions.length - 1 ? '收集小贴纸 ✦' : '下一题 →'}</button></div>`;
+    `<div class="play-top"><button type="button" class="exit-round" id="exit-round">← 回小岛</button><div class="round-position"><div class="progress-dots">${progress}</div><span>第 ${round.index + 1} / ${round.questions.length} 题</span></div></div><div class="question-card"><p class="eyebrow">${BOOKS[book].activity} · 第 ${target.unit} 单元${round.review ? ' · 错题重练' : ''}</p><h2 id="question-title" tabindex="-1">${instruction}</h2><p class="question-subtitle">${subtitle}</p><button type="button" class="speak-button" id="speak-word"><span aria-hidden="true">🔊</span> 听一听</button><p id="speech-message" class="speech-message" role="status"></p><button type="button" class="hint-button" id="show-hint" aria-expanded="${hintVisible}" aria-controls="word-hint">${hintVisible ? '收起单词' : '显示单词 / 小提示'}</button><div id="word-hint" class="word-hint" ${hintVisible ? '' : 'hidden'}><span lang="en">${escapeHtml(target.word)}</span><small>${target.label}</small></div>${phonicsPicture}<div class="${book === 'theme' ? 'picture-options' : 'letter-options'}" role="group" aria-label="${book === 'theme' ? '选择图片' : '选择开头字母'}">${question.options.map((option) => `<button type="button" class="answer-option" data-answer="${option.value}" aria-label="${option.label}">${book === 'theme' ? `<span class="picture" aria-hidden="true">${option.picture}</span><span class="option-label">${option.label}</span>` : `<span lang="en">${option.label}</span>`}</button>`).join('')}</div><p id="answer-feedback" class="answer-feedback" role="status" aria-live="polite">慢慢来，准备好了就选一个。</p><div id="sentence-reward" class="sentence-reward" hidden></div></div>`;
   $('#question-title').focus({ preventScroll: true });
   updateVoiceStatus();
 }
@@ -280,11 +304,13 @@ function chooseAnswer(value) {
       `<span lang="en">${escapeHtml(sentence)}</span><button type="button" id="speak-sentence" ${findVoice() ? '' : 'disabled'}>🔊 读一句</button>`;
     $('#sentence-reward').hidden = false;
   }
-  $('#next-question').disabled = false;
-  $('#next-question').focus({ preventScroll: true });
+  feedback.textContent +=
+    round.index === round.questions.length - 1 ? ' 马上收集贴纸！' : ' 马上开始下一题。';
+  scheduleAdvance();
 }
 
 function nextQuestion() {
+  cancelAdvance();
   const next = advanceRound(round);
   if (next === round) return;
   cancelSpeech();
@@ -310,6 +336,7 @@ function renderFinish() {
 }
 
 function goHome() {
+  cancelAdvance();
   cancelSpeech();
   round = null;
   renderHome();
@@ -346,9 +373,6 @@ document.addEventListener('click', (event) => {
       case 'exit-round':
       case 'finish-home':
         goHome();
-        break;
-      case 'next-question':
-        nextQuestion();
         break;
       case 'speak-word':
         speak(round.questions[round.index].target.word);
@@ -406,9 +430,16 @@ $('.book-tabs').addEventListener('keydown', (event) => {
   $(`#tab-${book}`).focus();
 });
 
-window.addEventListener('pagehide', cancelSpeech);
+window.addEventListener('pagehide', () => {
+  cancelAdvance();
+  cancelSpeech();
+});
+window.addEventListener('pageshow', scheduleAdvance);
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) cancelSpeech();
+  if (document.hidden) {
+    cancelAdvance();
+    cancelSpeech();
+  } else scheduleAdvance();
 });
 if ('speechSynthesis' in window)
   window.speechSynthesis.addEventListener('voiceschanged', updateVoiceStatus);
