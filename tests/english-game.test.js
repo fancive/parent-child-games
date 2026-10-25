@@ -10,7 +10,6 @@ import {
   freshState,
   makeQuestion,
   parseState,
-  ROUND_SIZE,
   setRange,
 } from '../english-game/model.js';
 
@@ -61,7 +60,7 @@ describe('复习范围与教材词族', () => {
         const round = createRound(state, { book }, seededRandom(limit));
         assert.equal(round.book, book);
         assert.equal(round.unit, 1);
-        assert.equal(round.questions.length, ROUND_SIZE);
+        assert.equal(round.questions.length, WORDS[book].filter((word) => word.unit === 1).length);
         assert.ok(
           round.questions.every(
             (question) => question.target.book === book && question.target.unit === 1,
@@ -176,40 +175,97 @@ describe('复习范围与教材词族', () => {
     assert.equal(WORD_BY_ID.get('phonics-5-job').picture, '🧑‍💼');
   });
 
-  test('每轮六题；小词库允许复现，但不会越过指定单元与范围', () => {
+  test('每轮完整覆盖所选单元，每词一次，且不越过指定单元与范围', () => {
     for (const book of ['theme', 'phonics']) {
       for (let limit = 1; limit <= 5; limit++) {
         const state = setRange(freshState(), book, limit);
         for (let unit = 1; unit <= limit; unit++) {
-          const round = createRound(state, { book, unit }, seededRandom(unit));
-          assert.equal(round.book, book);
-          assert.equal(round.unit, unit);
-          assert.equal(round.questions.length, ROUND_SIZE);
-          assert.ok(
-            round.questions.every(
-              (question) => question.target.book === book && question.target.unit === unit,
-            ),
-          );
-          assert.ok(
-            round.questions.every((question) =>
-              availableWords(state, book, unit).includes(question.target),
-            ),
-          );
+          const expected = WORDS[book].filter((word) => word.unit === unit).map((word) => word.id);
+          for (let seed = 1; seed <= 25; seed++) {
+            const round = createRound(state, { book, unit }, seededRandom(seed));
+            const actual = round.questions.map((question) => question.target.id);
+            assert.equal(round.book, book);
+            assert.equal(round.unit, unit);
+            assert.equal(actual.length, expected.length, `${book} unit ${unit}, seed ${seed}`);
+            assert.equal(new Set(actual).size, expected.length);
+            assert.deepEqual([...actual].sort(), [...expected].sort());
+          }
         }
         assert.equal(createRound(state, { book, unit: limit + 1 }), null);
       }
     }
-    const small = createRound(
-      { ...freshState(), missed: ['theme-5-sunny'] },
-      { book: 'theme', unit: 5, review: true },
-      seededRandom(5),
-    );
-    assert.equal(small.questions.length, ROUND_SIZE);
-    assert.equal(new Set(small.questions.map((question) => question.target.id)).size, 1);
+  });
+
+  test('错题轮完整覆盖本单元全部错词，单词数少于或多于六个都不重复补题', () => {
+    for (const book of ['theme', 'phonics']) {
+      for (const unit of [1, 3, 5]) {
+        const pool = WORDS[book].filter((word) => word.unit === unit);
+        const otherUnit = WORDS[book].find((word) => word.unit !== unit).id;
+        for (const count of [1, 2, 8]) {
+          const expected = pool.slice(0, count).map((word) => word.id);
+          const missed = [...expected, otherUnit];
+          const state = { ...freshState(), missed };
+          for (const seed of [1, 7, 25]) {
+            const round = createRound(state, { book, unit, review: true }, seededRandom(seed));
+            const actual = round.questions.map((question) => question.target.id);
+            assert.equal(actual.length, count);
+            assert.equal(new Set(actual).size, count);
+            assert.deepEqual([...actual].sort(), [...expected].sort());
+            assert.deepEqual(state.missed, missed);
+          }
+        }
+      }
+    }
+  });
+
+  test('全量轮可以打乱顺序，且不会改动原始词库的顺序', () => {
+    for (const book of ['theme', 'phonics']) {
+      const original = WORDS[book].map((word) => word.id);
+      const first = createRound(freshState(), { book, unit: 1 }, seededRandom(1));
+      const second = createRound(freshState(), { book, unit: 1 }, seededRandom(2));
+      assert.notDeepEqual(
+        first.questions.map((question) => question.target.id),
+        second.questions.map((question) => question.target.id),
+      );
+      assert.deepEqual(
+        WORDS[book].map((word) => word.id),
+        original,
+      );
+    }
   });
 });
 
 describe('答题、错题与奖励', () => {
+  test('完整单元或单词错题轮仅在最后一题答对并前进后奖励', () => {
+    const initial = freshState();
+    for (const [state, options] of [
+      [initial, { book: 'theme', unit: 1, id: 'full-unit-reward' }],
+      [
+        { ...initial, missed: ['theme-1-hen'] },
+        { book: 'theme', unit: 1, review: true, id: 'single-word-reward' },
+      ],
+    ]) {
+      let current = state;
+      let round = createRound(current, options, seededRandom(3));
+      for (let index = 0; index < round.questions.length; index++) {
+        assert.equal(round.finished, false);
+        assert.equal(completeRound(current, round).awarded, false);
+        ({ state: current, round } = answerQuestion(
+          current,
+          round,
+          round.questions[index].correct,
+        ));
+        assert.equal(completeRound(current, round).awarded, false);
+        round = advanceRound(round);
+        assert.equal(round.finished, index === round.questions.length - 1);
+      }
+      const reward = completeRound(current, round);
+      assert.equal(reward.awarded, true);
+      assert.equal(reward.state.totalRounds, 1);
+      assert.equal(completeRound(reward.state, round).awarded, false);
+    }
+  });
+
   test('错误可重试，重复点同一错误不增加次数；模型仅允许答对后推进', () => {
     const state = freshState();
     const round = createRound(state, { id: 'retry-round' }, seededRandom(7));
@@ -234,7 +290,7 @@ describe('答题、错题与奖励', () => {
     assert.equal(completeRound(correct.state, correct.round).awarded, false);
   });
 
-  test('完整六题后只奖励一次，重载保存仍防止同一轮重复发奖', () => {
+  test('完整单元后只奖励一次，重载保存仍防止同一轮重复发奖', () => {
     const state = freshState();
     const round = createRound(state, { book: 'phonics', unit: 4, id: 'one-sticker' });
     const solved = solveRound(state, round);

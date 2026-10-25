@@ -588,16 +588,25 @@ footer span {
 }
 .round-position {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
   font-size: 13px;
   font-weight: 700;
 }
+.round-position > span {
+  white-space: nowrap;
+}
 .progress-dots {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: min(210px, 48vw);
   gap: 6px;
+  padding: 3px;
 }
 .progress-dot {
+  flex-shrink: 0;
   width: 9px;
   height: 9px;
   background: #dce6d5;

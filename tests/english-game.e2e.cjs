@@ -7,6 +7,49 @@ const { join } = require('node:path');
 const base = process.env.ENGLISH_BASE_URL || 'http://127.0.0.1:8104';
 const artifacts = mkdtempSync(join(tmpdir(), 'english-qa-'));
 const storageKey = 'english-rainbow-island-v1';
+const firstUnitWords = {
+  theme: [
+    'hen',
+    'squirrel',
+    'rabbit',
+    'bat',
+    'owl',
+    'firefly',
+    'morning',
+    'night',
+    'sun',
+    'moon',
+    'star',
+    'bird',
+    'sleep',
+    'wake up',
+  ],
+  phonics: [
+    'dad',
+    'bag',
+    'map',
+    'cab',
+    'cat',
+    'hat',
+    'bad',
+    'mad',
+    'sad',
+    'pad',
+    'rag',
+    'tag',
+    'wag',
+    'nap',
+    'cap',
+    'gap',
+    'lap',
+    'tap',
+    'lab',
+    'bat',
+    'mat',
+    'rat',
+  ],
+};
+const unitSizes = { theme: [14, 16, 17, 16, 12], phonics: [22, 20, 28, 20, 21] };
 const legacy = {
   version: 1,
   ranges: { theme: 5, phonics: 5 },
@@ -17,12 +60,20 @@ const legacy = {
   totalRounds: 2,
 };
 
-async function position(page, index) {
+async function position(page, index, total = firstUnitWords.theme.length) {
   await page.waitForFunction(
-    (number) =>
-      document.querySelector('.round-position')?.textContent.includes(`第 ${number} / 6 题`),
-    index,
+    ({ number, size }) =>
+      document.querySelector('.round-position')?.textContent.includes(`第 ${number} / ${size} 题`),
+    { number: index, size: total },
   );
+}
+
+async function unitDescription(page, total) {
+  assert.match(
+    await page.locator('#selection-description').textContent(),
+    new RegExp(`全部 ${total} 个词`),
+  );
+  assert.match(await page.locator('#start-round').textContent(), new RegExp(`练完 ${total} 个词`));
 }
 
 async function correctOption(page, book) {
@@ -51,6 +102,30 @@ async function noOverflow(page) {
     true,
     `horizontal overflow at ${page.viewportSize().width}px`,
   );
+}
+
+async function completeUnit(page, book, input, roundsBefore) {
+  const expected = firstUnitWords[book];
+  const seen = [];
+  for (let index = 1; index <= expected.length; index++) {
+    await position(page, index, expected.length);
+    const word = await page.locator('#word-hint span').textContent();
+    assert.equal(seen.includes(word), false, `repeated ${book} word before completing the unit`);
+    seen.push(word);
+    await answer(page, book, index === 1 ? 'keyboard' : input);
+    if (index === 6) {
+      await position(page, 7, expected.length);
+      assert.equal(await page.locator('.finish-card').count(), 0);
+      assert.equal((await saved(page)).totalRounds, roundsBefore);
+    }
+  }
+  await page.locator('.finish-card').waitFor();
+  assert.deepEqual([...seen].sort(), [...expected].sort());
+  assert.match(
+    await page.locator('.finish-card p').nth(1).textContent(),
+    new RegExp(`^${expected.length} 道题都完成啦`),
+  );
+  return seen;
 }
 
 (async () => {
@@ -83,6 +158,7 @@ async function noOverflow(page) {
       await page.locator('#map-nodes button').first().waitFor();
       assert.equal(await page.locator('#map-nodes button').count(), 5);
       assert.equal(await page.locator('#sticker-count').textContent(), '2');
+      await unitDescription(page, 14);
       await noOverflow(page);
       await page.locator('#start-round').click();
       await position(page, 1);
@@ -109,12 +185,7 @@ async function noOverflow(page) {
       await page.waitForTimeout(1200);
       await position(page, 1);
       assert.equal((await saved(page)).totalRounds, 2);
-      for (let index = 1; index <= 6; index++) {
-        await position(page, index);
-        await answer(page, 'theme', index === 1 ? 'keyboard' : width < 1000 ? 'tap' : 'click');
-      }
-      await page.locator('.finish-card').waitFor();
-      assert.match(await page.locator('#question-title').textContent(), /六小步/);
+      const themeWords = await completeUnit(page, 'theme', width < 1000 ? 'tap' : 'click', 2);
       let progress = await saved(page);
       assert.equal(progress.totalRounds, 3);
       assert.ok(progress.stickers.includes('theme-1'));
@@ -131,27 +202,38 @@ async function noOverflow(page) {
       await page.locator('#tab-theme').focus();
       await page.locator('#tab-theme').press('ArrowRight');
       assert.equal(await page.locator('#tab-phonics').getAttribute('aria-selected'), 'true');
+      await unitDescription(page, 22);
       await page.locator('#start-round').click();
-      for (let index = 1; index <= 6; index++) {
-        await position(page, index);
-        await answer(page, 'phonics', width < 1000 ? 'tap' : 'click');
-      }
-      await page.locator('.finish-card').waitFor();
+      const phonicsWords = await completeUnit(page, 'phonics', width < 1000 ? 'tap' : 'click', 3);
       progress = await saved(page);
       assert.equal(progress.totalRounds, 4);
       assert.ok(progress.stickers.includes('phonics-1'));
       assert.equal(progress.completed.length, 4);
       await page.locator('#finish-home').click();
       await page.locator('#review-missed').click();
-      await position(page, 1);
+      await position(page, 1, 1);
       assert.match(await page.locator('.question-card .eyebrow').textContent(), /错题重练/);
+      assert.equal(await page.locator('#word-hint span').textContent(), 'cat');
       await answer(page, 'phonics');
-      await position(page, 2);
-      await page.locator('#exit-round').click();
+      await page.locator('.finish-card').waitFor();
+      assert.match(await page.locator('.finish-card p').nth(1).textContent(), /^1 道题都完成啦/);
       progress = await saved(page);
+      assert.equal(progress.totalRounds, 5);
+      assert.equal(progress.stickers.length, 4);
       assert.equal(progress.missed.includes('phonics-1-cat'), false);
       assert.ok(progress.missed.includes('phonics-4-pig'));
       assert.ok(progress.missed.includes('theme-2-kitchen'));
+      await page.locator('#finish-home').click();
+
+      await page.locator('[data-unit="3"]').click();
+      await unitDescription(page, 28);
+      await page.locator('#start-round').click();
+      await position(page, 1, 28);
+      await noOverflow(page);
+      const progressBox = await page.locator('.round-position').boundingBox();
+      assert.ok(progressBox && progressBox.x >= 0 && progressBox.x + progressBox.width <= width);
+      await page.screenshot({ path: join(artifacts, `long-unit-${width}.png`), fullPage: true });
+      await page.locator('#exit-round').click();
 
       for (const book of ['theme', 'phonics']) {
         await page.locator(`#tab-${book}`).click();
@@ -161,6 +243,7 @@ async function noOverflow(page) {
             await page.locator('#selection-description').textContent(),
             new RegExp(`第 ${unit} 单元`),
           );
+          await unitDescription(page, unitSizes[book][unit - 1]);
         }
       }
       await noOverflow(page);
@@ -180,6 +263,9 @@ async function noOverflow(page) {
       results.push({
         viewport: [width, height],
         automaticAnswers: 'PASS',
+        fullUnitCoverage: { theme: themeWords, phonics: phonicsWords },
+        singleWordReview: 'PASS',
+        longUnitLayout: 'PASS',
         retry: 'PASS',
         legacySave: 'PASS',
         offline: 'PASS',

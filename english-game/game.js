@@ -198,7 +198,10 @@ function renderHome() {
     .join('');
   $('#selection-kicker').textContent = `${BOOKS[book].english}`;
   $('#departure-title').textContent = UNITS[book][unit - 1].title;
-  $('#selection-description').textContent = `第 ${unit} 单元 · ${UNITS[book][unit - 1].english}`;
+  const totalWords = availableWords(state, book, unit).length;
+  $('#selection-description').textContent =
+    `第 ${unit} 单元 · ${UNITS[book][unit - 1].english} · 全部 ${totalWords} 个词`;
+  $('#start-round').textContent = `出发，练完 ${totalWords} 个词`;
   $('#activity-description').textContent =
     book === 'theme'
       ? '先听一个英文，再从三张图里找到它。图片有中文小标签帮帮忙。'
@@ -328,10 +331,11 @@ function nextQuestion() {
 }
 
 function renderFinish() {
+  const total = round.questions.length;
   const firstTry = round.questions.filter((question) => question.attempts === 1).length;
   const remaining = availableWords(state, book, unit, true).length;
   $('#play-section').innerHTML =
-    `<div class="finish-card"><p class="eyebrow">A LITTLE ADVENTURE, A BIG SMILE</p><div class="reward-sticker" role="img" aria-label="本轮收集的贴纸">${lastSticker?.icon ?? '🌈'}</div><h2 id="question-title" tabindex="-1">六小步，真了不起！</h2><p>6 道题都完成啦，${firstTry} 道一次就找对。<br>${lastSticker?.isNew ? `收到了第 ${lastSticker.unit} 单元的新贴纸！` : '又为小岛添了一份快乐！'}${remaining ? `<br>还有 ${remaining} 个词可以慢慢再练。` : '<br>这一片的错题都复习好啦。'}</p><div class="finish-actions"><button type="button" class="button primary" id="play-again">再玩一轮 →</button><button type="button" class="button secondary" id="finish-home">带贴纸回小岛</button>${remaining ? '<button type="button" class="button secondary" id="finish-review">再练练错题</button>' : ''}</div><p>错题重练时，一次答对的词会从错题本移走。</p></div>`;
+    `<div class="finish-card"><p class="eyebrow">A LITTLE ADVENTURE, A BIG SMILE</p><div class="reward-sticker" role="img" aria-label="本轮收集的贴纸">${lastSticker?.icon ?? '🌈'}</div><h2 id="question-title" tabindex="-1">本轮全部完成，真了不起！</h2><p>${total} 道题都完成啦，${firstTry} 道一次就找对。<br>${lastSticker?.isNew ? `收到了第 ${lastSticker.unit} 单元的新贴纸！` : '又为小岛添了一份快乐！'}${remaining ? `<br>还有 ${remaining} 个词可以慢慢再练。` : '<br>这一片的错题都复习好啦。'}</p><div class="finish-actions"><button type="button" class="button primary" id="play-again">再玩一轮 →</button><button type="button" class="button secondary" id="finish-home">带贴纸回小岛</button>${remaining ? '<button type="button" class="button secondary" id="finish-review">再练练错题</button>' : ''}</div><p>错题重练时，一次答对的词会从错题本移走。</p></div>`;
   $('#question-title').focus({ preventScroll: true });
 }
 

@@ -1,7 +1,5 @@
 import { BOOKS, LANDMARKS, WORDS, WORD_BY_ID } from './data.js';
 
-export const ROUND_SIZE = 6;
-
 export function freshState() {
   return {
     version: 1,
@@ -110,9 +108,7 @@ export function createRound(
 ) {
   const pool = availableWords(state, book, unit, review);
   if (!pool.length) return null;
-  const selected = [];
-  while (selected.length < ROUND_SIZE)
-    selected.push(...shuffled(pool, random).slice(0, ROUND_SIZE - selected.length));
+  const selected = shuffled(pool, random);
   return {
     id,
     book,
